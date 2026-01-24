@@ -1,0 +1,434 @@
+.auto-attendance {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.attendance-header {
+  margin-bottom: 32px;
+}
+
+.attendance-header h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 8px 0;
+}
+
+.attendance-header p {
+  font-size: 16px;
+  color: #718096;
+  margin: 0;
+}
+
+/* Time Display */
+.time-display {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 40px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+}
+
+.clock-icon {
+  font-size: 64px;
+  color: white;
+}
+
+.time-info h2 {
+  font-size: 56px;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+  font-family: 'Courier New', monospace;
+}
+
+.time-info p {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 8px 0 0 0;
+}
+
+/* Status Card */
+.status-card {
+  background: white;
+  padding: 32px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 32px;
+}
+
+.status-card.checked-in {
+  border-left: 6px solid #48bb78;
+}
+
+.status-card.checked-out {
+  border-left: 6px solid #667eea;
+}
+
+.status-card.not-checked-in {
+  border-left: 6px solid #f59e0b;
+}
+
+.status-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.status-icon {
+  font-size: 48px;
+}
+
+.status-icon.success {
+  color: #48bb78;
+}
+
+.status-icon.warning {
+  color: #f59e0b;
+}
+
+.status-header h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0;
+}
+
+.status-header p {
+  font-size: 16px;
+  color: #718096;
+  margin: 4px 0 0 0;
+}
+
+.attendance-times {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.time-box {
+  background: #f7fafc;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.time-box label {
+  font-size: 14px;
+  color: #718096;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.time-box .time {
+  font-size: 28px;
+  font-weight: 700;
+  color: #667eea;
+  font-family: 'Courier New', monospace;
+  margin: 0;
+}
+
+/* Check-In Methods */
+.check-in-methods {
+  background: white;
+  padding: 32px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 32px;
+}
+
+.check-in-methods h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 20px 0;
+}
+
+.methods-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.method-card {
+  background: #f7fafc;
+  border: 2px solid transparent;
+  padding: 24px 16px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.method-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.method-card.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-color: #667eea;
+}
+
+.method-card svg {
+  font-size: 32px;
+}
+
+.method-card span {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Location Info */
+.location-info {
+  background: #edf2f7;
+  padding: 20px;
+  border-radius: 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.location-info svg {
+  font-size: 24px;
+  color: #667eea;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.location-info p {
+  margin: 4px 0;
+  font-size: 14px;
+  color: #2d3748;
+}
+
+.location-coords {
+  font-family: 'Courier New', monospace;
+  color: #4a5568;
+}
+
+.accuracy {
+  color: #718096;
+  font-size: 12px;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.btn-check-in,
+.btn-check-out {
+  padding: 16px 48px;
+  font-size: 18px;
+  font-weight: 700;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.3s ease;
+  min-width: 200px;
+  justify-content: center;
+}
+
+.btn-check-in {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
+}
+
+.btn-check-in:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(72, 187, 120, 0.4);
+}
+
+.btn-check-out {
+  background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(245, 101, 101, 0.3);
+}
+
+.btn-check-out:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(245, 101, 101, 0.4);
+}
+
+.btn-check-in:disabled,
+.btn-check-out:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.completed-message {
+  text-align: center;
+  padding: 24px;
+  background: #d4edda;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #155724;
+}
+
+.completed-message svg {
+  font-size: 32px;
+}
+
+/* Today's Summary */
+.today-summary {
+  background: white;
+  padding: 32px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 32px;
+}
+
+.today-summary h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 20px 0;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.summary-item {
+  background: #f7fafc;
+  padding: 16px;
+  border-radius: 12px;
+}
+
+.summary-item label {
+  font-size: 14px;
+  color: #718096;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.summary-item span {
+  font-size: 16px;
+  color: #1a202c;
+  font-weight: 600;
+}
+
+.badge {
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-block;
+  text-transform: capitalize;
+}
+
+.badge.present {
+  background: #d4edda;
+  color: #155724;
+}
+
+.badge.absent {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* Quick Links */
+.quick-links {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.quick-links button {
+  padding: 12px 24px;
+  background: white;
+  border: 2px solid #667eea;
+  color: #667eea;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.quick-links button:hover {
+  background: #667eea;
+  color: white;
+}
+
+/* Spinner */
+.spinner-small {
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top: 3px solid white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .auto-attendance {
+    padding: 16px;
+  }
+
+  .time-display {
+    flex-direction: column;
+    padding: 32px 24px;
+  }
+
+  .time-info h2 {
+    font-size: 40px;
+  }
+
+  .methods-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .attendance-times {
+    grid-template-columns: 1fr;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .btn-check-in,
+  .btn-check-out {
+    width: 100%;
+  }
+
+  .quick-links {
+    flex-direction: column;
+  }
+
+  .quick-links button {
+    width: 100%;
+  }
+}

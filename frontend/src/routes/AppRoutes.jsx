@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import PrivateRoute from './PrivateRoute';
 import { useAuth } from '../hooks/useAuth';
 
@@ -40,6 +40,104 @@ import FeedbackForm from '../Components/Client/Feedback/FeedbackForm';
 
 // Loader
 import Loader from '../Components/Shared/Loader/Loader';
+
+// Error Pages Components
+const UnauthorizedPage = () => {
+  const navigate = useNavigate();
+  
+  return (
+    <div style={{ 
+      display: 'flex', 
+      flexDirection: 'column',
+      justifyContent: 'center', 
+      alignItems: 'center', 
+      height: '100vh',
+      textAlign: 'center',
+      padding: '20px'
+    }}>
+      <h1 style={{ fontSize: '3rem', marginBottom: '1rem', color: '#ef4444' }}>
+        401
+      </h1>
+      <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>
+        Unauthorized Access
+      </h2>
+      <p style={{ color: '#6b7280', marginBottom: '2rem' }}>
+        You don't have permission to access this page.
+      </p>
+      <button 
+        onClick={() => navigate('/login')}
+        style={{
+          padding: '12px 24px',
+          background: '#2563eb',
+          color: 'white',
+          border: 'none',
+          borderRadius: '6px',
+          cursor: 'pointer',
+          fontSize: '1rem',
+          fontWeight: '500',
+          transition: 'background 0.2s'
+        }}
+        onMouseOver={(e) => e.target.style.background = '#1d4ed8'}
+        onMouseOut={(e) => e.target.style.background = '#2563eb'}
+      >
+        Back to Login
+      </button>
+    </div>
+  );
+};
+
+const NotFoundPage = () => {
+  const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
+  
+  const handleGoHome = () => {
+    if (isAuthenticated && user?.role) {
+      navigate(`/${user.role}/dashboard`);
+    } else {
+      navigate('/login');
+    }
+  };
+  
+  return (
+    <div style={{ 
+      display: 'flex', 
+      flexDirection: 'column',
+      justifyContent: 'center', 
+      alignItems: 'center', 
+      height: '100vh',
+      textAlign: 'center',
+      padding: '20px'
+    }}>
+      <h1 style={{ fontSize: '3rem', marginBottom: '1rem', color: '#ef4444' }}>
+        404
+      </h1>
+      <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>
+        Page Not Found
+      </h2>
+      <p style={{ color: '#6b7280', marginBottom: '2rem' }}>
+        The page you're looking for doesn't exist.
+      </p>
+      <button 
+        onClick={handleGoHome}
+        style={{
+          padding: '12px 24px',
+          background: '#2563eb',
+          color: 'white',
+          border: 'none',
+          borderRadius: '6px',
+          cursor: 'pointer',
+          fontSize: '1rem',
+          fontWeight: '500',
+          transition: 'background 0.2s'
+        }}
+        onMouseOver={(e) => e.target.style.background = '#1d4ed8'}
+        onMouseOut={(e) => e.target.style.background = '#2563eb'}
+      >
+        Go Home
+      </button>
+    </div>
+  );
+};
 
 function AppRoutes() {
   const { isAuthenticated, loading, user } = useAuth();
@@ -144,8 +242,8 @@ function AppRoutes() {
       <Route 
         path="/" 
         element={
-          isAuthenticated ? (
-            <Navigate to={`/${user?.role}/dashboard`} replace />
+          isAuthenticated && user?.role ? (
+            <Navigate to={`/${user.role}/dashboard`} replace />
           ) : (
             <Navigate to="/login" replace />
           )
@@ -153,68 +251,10 @@ function AppRoutes() {
       />
 
       {/* Unauthorized Route */}
-      <Route 
-        path="/unauthorized" 
-        element={
-          <div style={{ 
-            display: 'flex', 
-            flexDirection: 'column',
-            justifyContent: 'center', 
-            alignItems: 'center', 
-            height: '100vh',
-            textAlign: 'center'
-          }}>
-            <h1>Unauthorized Access</h1>
-            <p>You don't have permission to access this page.</p>
-            <button 
-              onClick={() => window.location.href = '/login'}
-              style={{
-                marginTop: '20px',
-                padding: '10px 20px',
-                background: '#2563eb',
-                color: 'white',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer'
-              }}
-            >
-              Back to Login
-            </button>
-          </div>
-        } 
-      />
+      <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
       {/* 404 Not Found */}
-      <Route 
-        path="*" 
-        element={
-          <div style={{ 
-            display: 'flex', 
-            flexDirection: 'column',
-            justifyContent: 'center', 
-            alignItems: 'center', 
-            height: '100vh',
-            textAlign: 'center'
-          }}>
-            <h1>404 - Page Not Found</h1>
-            <p>The page you're looking for doesn't exist.</p>
-            <button 
-              onClick={() => window.location.href = '/'}
-              style={{
-                marginTop: '20px',
-                padding: '10px 20px',
-                background: '#2563eb',
-                color: 'white',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer'
-              }}
-            >
-              Go Home
-            </button>
-          </div>
-        } 
-      />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }

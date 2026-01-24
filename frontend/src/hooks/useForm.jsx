@@ -4,7 +4,7 @@ import { useState } from 'react';
  * Custom hook for form handling
  * Manages form state, validation, and submission
  */
-const useForm = (initialValues = {}, validate = null) => {
+export  const useForm = (initialValues = {}, validate = null) => {
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});

@@ -4,7 +4,7 @@ import { useAuthContext } from '../context/AuthContext';
  * Custom hook for authentication
  * Provides easy access to auth context and helper methods
  */
-const useAuth = () => {
+export const useAuth = () => {
   const context = useAuthContext();
 
   if (!context) {

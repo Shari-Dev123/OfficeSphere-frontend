@@ -45,6 +45,7 @@ function Login() {
     setLoading(true);
 
     try {
+      // Call login function with email, password, role
       const result = await login(formData.email, formData.password, formData.role);
 
       if (result.success) {
@@ -53,7 +54,7 @@ function Login() {
       }
     } catch (error) {
       console.error('Login error:', error);
-      toast.error('Login failed. Please try again.');
+      toast.error('Login failed. Please check your credentials.');
     } finally {
       setLoading(false);
     }

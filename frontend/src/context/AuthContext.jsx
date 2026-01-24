@@ -1,8 +1,9 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { toast } from 'react-toastify';
+import { authAPI } from '../utils/api'; // Import your mock API
 
 // Create Auth Context
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
 // Custom hook to use Auth Context
 export const useAuthContext = () => {
@@ -12,6 +13,8 @@ export const useAuthContext = () => {
   }
   return context;
 };
+
+export const useAuth = useAuthContext;
 
 // Auth Provider Component
 export const AuthProvider = ({ children }) => {
@@ -43,9 +46,13 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   };
 
-  // Login function
-  const login = async (userData, token) => {
+  // Login function - Updated to match Login.js usage
+  const login = async (email, password, role) => {
     try {
+      // Call the mock API
+      const response = await authAPI.login({ email, password, role });
+      const { user: userData, token } = response.data;
+
       // Store token and user data
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(userData));
@@ -55,10 +62,33 @@ export const AuthProvider = ({ children }) => {
       setIsAuthenticated(true);
       
       toast.success(`Welcome back, ${userData.name}!`);
-      return { success: true };
+      return { success: true, user: userData };
     } catch (error) {
       console.error('Login error:', error);
-      toast.error('Login failed. Please try again.');
+      toast.error(error.message || 'Invalid credentials. Please try again.');
+      return { success: false, error: error.message };
+    }
+  };
+
+  // Register function (optional)
+  const register = async (userData) => {
+    try {
+      const response = await authAPI.register(userData);
+      const { user: newUser, token } = response.data;
+
+      // Store token and user data
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(newUser));
+      
+      // Update state
+      setUser(newUser);
+      setIsAuthenticated(true);
+      
+      toast.success(`Welcome, ${newUser.name}!`);
+      return { success: true, user: newUser };
+    } catch (error) {
+      console.error('Registration error:', error);
+      toast.error('Registration failed. Please try again.');
       return { success: false, error: error.message };
     }
   };
@@ -98,6 +128,7 @@ export const AuthProvider = ({ children }) => {
     loading,
     isAuthenticated,
     login,
+    register,
     logout,
     updateUser,
     getUserRole,

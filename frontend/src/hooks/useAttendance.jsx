@@ -4,7 +4,7 @@ import { useAttendanceContext } from '../context/AttendanceContext';
  * Custom hook for attendance management
  * Provides easy access to attendance context and helper methods
  */
-const useAttendance = () => {
+export const useAttendance = () => {
   const context = useAttendanceContext();
 
   if (!context) {
