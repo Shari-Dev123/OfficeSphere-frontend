@@ -1,22 +1,33 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
-import { FaUser, FaEnvelope, FaLock, FaPhone, FaBuilding, FaUserTie } from 'react-icons/fa';
-import { toast } from 'react-toastify';
-import './Register.css';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
+import {
+  FaUser,
+  FaEnvelope,
+  FaLock,
+  FaPhone,
+  FaBuilding,
+  FaUserTie,
+  FaBriefcase,
+  FaSitemap,
+} from "react-icons/fa";
+import { toast } from "react-toastify";
+import "./Register.css";
 
 function Register() {
   const navigate = useNavigate();
   const { register } = useAuth();
 
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    phone: '',
-    role: 'employee',
-    company: '' // For clients
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    phone: "",
+    role: "employee",
+    company: "",
+    department: "",
+    designation: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -28,13 +39,13 @@ function Register() {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value
+      [name]: value,
     });
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors({
         ...errors,
-        [name]: ''
+        [name]: "",
       });
     }
   };
@@ -44,29 +55,38 @@ function Register() {
     const newErrors = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
+      newErrors.name = "Name is required";
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
+      newErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email is invalid';
+      newErrors.email = "Email is invalid";
     }
 
     if (!formData.password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = "Password is required";
     } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+      newErrors.password = "Password must be at least 6 characters";
     }
 
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your password';
+      newErrors.confirmPassword = "Please confirm your password";
     } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
+      newErrors.confirmPassword = "Passwords do not match";
     }
 
-    if (formData.role === 'client' && !formData.company.trim()) {
-      newErrors.company = 'Company name is required for clients';
+    if (formData.role === "client" && !formData.company.trim()) {
+      newErrors.company = "Company name is required for clients";
+    }
+
+    if (formData.role === "employee") {
+      if (!formData.department.trim()) {
+        newErrors.department = "Department is required for employees";
+      }
+      if (!formData.designation.trim()) {
+        newErrors.designation = "Designation is required for employees";
+      }
     }
 
     setErrors(newErrors);
@@ -78,29 +98,38 @@ function Register() {
     e.preventDefault();
 
     if (!validateForm()) {
-      toast.error('Please fix the errors in the form');
+      toast.error("Please fix the errors in the form");
       return;
     }
 
     setLoading(true);
 
     try {
-      const result = await register({
+      const userData = {
         name: formData.name,
         email: formData.email,
         password: formData.password,
         phone: formData.phone,
         role: formData.role,
-        company: formData.company
-      });
+      };
+
+      // Add role-specific fields
+      if (formData.role === "employee") {
+        userData.department = formData.department;
+        userData.designation = formData.designation;
+      } else if (formData.role === "client") {
+        userData.company = formData.company;
+      }
+
+      const result = await register(userData);
 
       if (result.success) {
-        toast.success('Registration successful! Please login.');
-        navigate('/login');
+        toast.success("Registration successful! Please login.");
+        navigate("/login");
       }
     } catch (error) {
-      console.error('Registration error:', error);
-      toast.error('Registration failed. Please try again.');
+      console.error("Registration error:", error);
+      toast.error(error.message || "Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -126,16 +155,29 @@ function Register() {
             <div className="role-buttons">
               <button
                 type="button"
-                className={`role-btn ${formData.role === 'employee' ? 'active' : ''}`}
-                onClick={() => setFormData({ ...formData, role: 'employee' })}
+                className={`role-btn ${
+                  formData.role === "employee" ? "active" : ""
+                }`}
+                onClick={() =>
+                  setFormData({ ...formData, role: "employee", company: "" })
+                }
               >
                 <FaUser />
                 <span>Employee</span>
               </button>
               <button
                 type="button"
-                className={`role-btn ${formData.role === 'client' ? 'active' : ''}`}
-                onClick={() => setFormData({ ...formData, role: 'client' })}
+                className={`role-btn ${
+                  formData.role === "client" ? "active" : ""
+                }`}
+                onClick={() =>
+                  setFormData({
+                    ...formData,
+                    role: "client",
+                    department: "",
+                    designation: "",
+                  })
+                }
               >
                 <FaBuilding />
                 <span>Client</span>
@@ -155,10 +197,12 @@ function Register() {
                 placeholder="Enter your full name"
                 value={formData.name}
                 onChange={handleChange}
-                className={errors.name ? 'error' : ''}
+                className={errors.name ? "error" : ""}
               />
             </div>
-            {errors.name && <span className="error-message">{errors.name}</span>}
+            {errors.name && (
+              <span className="error-message">{errors.name}</span>
+            )}
           </div>
 
           {/* Email Input */}
@@ -173,10 +217,12 @@ function Register() {
                 placeholder="Enter your email"
                 value={formData.email}
                 onChange={handleChange}
-                className={errors.email ? 'error' : ''}
+                className={errors.email ? "error" : ""}
               />
             </div>
-            {errors.email && <span className="error-message">{errors.email}</span>}
+            {errors.email && (
+              <span className="error-message">{errors.email}</span>
+            )}
           </div>
 
           {/* Phone Input */}
@@ -196,7 +242,7 @@ function Register() {
           </div>
 
           {/* Company Input (for clients) */}
-          {formData.role === 'client' && (
+          {formData.role === "client" && (
             <div className="form-group">
               <label htmlFor="company">Company Name *</label>
               <div className="input-with-icon">
@@ -208,10 +254,64 @@ function Register() {
                   placeholder="Enter your company name"
                   value={formData.company}
                   onChange={handleChange}
-                  className={errors.company ? 'error' : ''}
+                  className={errors.company ? "error" : ""}
                 />
               </div>
-              {errors.company && <span className="error-message">{errors.company}</span>}
+              {errors.company && (
+                <span className="error-message">{errors.company}</span>
+              )}
+            </div>
+          )}
+
+          {/* Department Input (for employees) */}
+          {formData.role === "employee" && (
+            <div className="form-group">
+              <label htmlFor="department">Department *</label>
+              <div className="input-with-icon">
+                <FaSitemap className="input-icon" />
+                <select
+                  id="department"
+                  name="department"
+                  value={formData.department}
+                  onChange={handleChange}
+                  className={errors.department ? "error" : ""}
+                >
+                  <option value="">Select Department</option>
+                  <option value="Development">Development</option>
+                  <option value="Design">Design</option>
+                  <option value="Marketing">Marketing</option>
+                  <option value="Sales">Sales</option>
+                  <option value="HR">HR</option>
+                  <option value="Finance">Finance</option>
+                  <option value="Operations">Operations</option>
+                  <option value="Management">Management</option>
+                </select>
+              </div>
+              {errors.department && (
+                <span className="error-message">{errors.department}</span>
+              )}
+            </div>
+          )}
+
+          {/* Designation Input (for employees) */}
+          {formData.role === "employee" && (
+            <div className="form-group">
+              <label htmlFor="designation">Designation *</label>
+              <div className="input-with-icon">
+                <FaBriefcase className="input-icon" />
+                <input
+                  type="text"
+                  id="designation"
+                  name="designation"
+                  placeholder="e.g., Software Developer, Project Manager"
+                  value={formData.designation}
+                  onChange={handleChange}
+                  className={errors.designation ? "error" : ""}
+                />
+              </div>
+              {errors.designation && (
+                <span className="error-message">{errors.designation}</span>
+              )}
             </div>
           )}
 
@@ -221,23 +321,25 @@ function Register() {
             <div className="input-with-icon">
               <FaLock className="input-icon" />
               <input
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 id="password"
                 name="password"
                 placeholder="Create a password (min 6 characters)"
                 value={formData.password}
                 onChange={handleChange}
-                className={errors.password ? 'error' : ''}
+                className={errors.password ? "error" : ""}
               />
               <button
                 type="button"
                 className="toggle-password"
                 onClick={() => setShowPassword(!showPassword)}
               >
-                {showPassword ? '👁️' : '👁️‍🗨️'}
+                {showPassword ? "👁️" : "👁️‍🗨️"}
               </button>
             </div>
-            {errors.password && <span className="error-message">{errors.password}</span>}
+            {errors.password && (
+              <span className="error-message">{errors.password}</span>
+            )}
           </div>
 
           {/* Confirm Password Input */}
@@ -246,16 +348,18 @@ function Register() {
             <div className="input-with-icon">
               <FaLock className="input-icon" />
               <input
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 id="confirmPassword"
                 name="confirmPassword"
                 placeholder="Confirm your password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className={errors.confirmPassword ? 'error' : ''}
+                className={errors.confirmPassword ? "error" : ""}
               />
             </div>
-            {errors.confirmPassword && <span className="error-message">{errors.confirmPassword}</span>}
+            {errors.confirmPassword && (
+              <span className="error-message">{errors.confirmPassword}</span>
+            )}
           </div>
 
           {/* Terms & Conditions */}
@@ -267,25 +371,27 @@ function Register() {
           </div>
 
           {/* Submit Button */}
-          <button 
-            type="submit" 
-            className="register-btn"
-            disabled={loading}
-          >
+          <button type="submit" className="register-btn" disabled={loading}>
             {loading ? (
               <>
                 <span className="spinner"></span>
                 Creating Account...
               </>
             ) : (
-              'Create Account'
+              "Create Account"
             )}
           </button>
 
           {/* Login Link */}
           <div className="login-link">
-            Already have an account? 
-            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/login'); }}>
+            Already have an account?
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("/login");
+              }}
+            >
               Login here
             </a>
           </div>
