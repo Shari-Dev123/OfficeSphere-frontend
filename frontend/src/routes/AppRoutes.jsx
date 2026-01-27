@@ -20,6 +20,7 @@ import AttendanceMonitor from '../Components/Admin/Attendance/AttendanceMonitor'
 import TaskList from '../Components/Admin/Tasks/TaskList';
 import MeetingList from '../Components/Admin/Meetings/MeetingList';
 import ReportGenerator from '../Components/Admin/Reports/ReportGenerator';
+import AdminSettings from '../Components/Admin/Settings/AdminSettings'; // ← ADDED
 
 // Employee Components
 import EmployeeLayout from '../Components/Shared/Layout/EmployeeLayout';
@@ -37,6 +38,7 @@ import ClientProjects from '../Components/Client/Projects/ClientProjects';
 import ClientMeetings from '../Components/Client/Meetings/ClientMeetings';
 import ClientReports from '../Components/Client/Reports/ClientReports';
 import FeedbackForm from '../Components/Client/Feedback/FeedbackForm';
+import ClientProfile from '../Components/Client/Profile/ClientProfile'; // ← ADDED
 
 // Loader
 import Loader from '../Components/Shared/Loader/Loader';
@@ -201,6 +203,7 @@ function AppRoutes() {
         <Route path="tasks" element={<TaskList />} />
         <Route path="meetings" element={<MeetingList />} />
         <Route path="reports" element={<ReportGenerator />} />
+        <Route path="settings" element={<AdminSettings />} /> {/* ← ADDED */}
       </Route>
 
       {/* Employee Routes */}
@@ -236,6 +239,7 @@ function AppRoutes() {
         <Route path="meetings" element={<ClientMeetings />} />
         <Route path="reports" element={<ClientReports />} />
         <Route path="feedback" element={<FeedbackForm />} />
+        <Route path="profile" element={<ClientProfile />} /> {/* ← ADDED */}
       </Route>
 
       {/* Default Redirect */}

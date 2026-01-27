@@ -145,9 +145,10 @@
   font-size: 18px;
 }
 
+
 .input-with-icon input {
   width: 100%;
-  padding: 14px 45px;
+  padding: 14px 45px !important;
   border: 2px solid #e5e7eb;
   border-radius: 10px;
   font-size: 14px;
