@@ -26,44 +26,60 @@ function DailyReportForm() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    // Validation
-    if (!formData.tasksAccomplished.trim()) {
-      toast.error('Please enter tasks accomplished');
-      return;
-    }
+  if (!formData.tasksAccomplished.trim()) {
+    toast.error('Please enter tasks accomplished');
+    return;
+  }
 
-    if (!formData.workingHours) {
-      toast.error('Please enter working hours');
-      return;
-    }
+  if (!formData.workingHours) {
+    toast.error('Please enter working hours');
+    return;
+  }
 
-    try {
-      setLoading(true);
-      await employeeAPI.submitDailyReport(formData);
-      toast.success('Daily report submitted successfully!');
-      setSubmitted(true);
-      
-      // Reset form after 2 seconds
-      setTimeout(() => {
-        setFormData({
-          date: new Date().toISOString().split('T')[0],
-          tasksAccomplished: '',
-          challengesFaced: '',
-          tomorrowPlan: '',
-          workingHours: '',
-          notes: ''
-        });
-        setSubmitted(false);
-      }, 2000);
-    } catch (error) {
-      console.error('Error submitting report:', error);
-      toast.error(error.response?.data?.message || 'Failed to submit report');
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    setLoading(true);
+
+    const reportData = {
+      reportId: 'RPT-' + Date.now(), // unique string
+      employee: 'EMPLOYEE_ID_HERE', // backend needs actual ObjectId
+      date: formData.date,
+      totalHoursWorked: parseFloat(formData.workingHours),
+      status: 'Submitted', // must match schema enum
+      achievements: formData.tasksAccomplished,
+      challenges: formData.challengesFaced || '',
+      blockers: formData.challengesFaced || '',
+      suggestions: formData.notes || '',
+      tasksCompleted: [], // optional
+      tasksInProgress: [], // optional
+      plannedForTomorrow: [] // optional
+    };
+
+    await employeeAPI.submitDailyReport(reportData);
+
+    toast.success('Daily report submitted successfully!');
+    setSubmitted(true);
+
+    setTimeout(() => {
+      setFormData({
+        date: new Date().toISOString().split('T')[0],
+        tasksAccomplished: '',
+        challengesFaced: '',
+        tomorrowPlan: '',
+        workingHours: '',
+        notes: ''
+      });
+      setSubmitted(false);
+    }, 2000);
+
+  } catch (error) {
+    console.error('Error submitting report:', error);
+    toast.error(error.response?.data?.message || 'Failed to submit report');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="daily-report-form">
@@ -74,11 +90,11 @@ function DailyReportForm() {
         </div>
         <div className="current-date">
           <FiCalendar />
-          <span>{new Date().toLocaleDateString('en-US', { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
+          <span>{new Date().toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
           })}</span>
         </div>
       </div>
@@ -203,8 +219,8 @@ function DailyReportForm() {
 
         {/* Submit Button */}
         <div className="form-actions">
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="submit-btn"
             disabled={loading || submitted}
           >
