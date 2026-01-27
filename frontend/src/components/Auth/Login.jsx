@@ -180,21 +180,6 @@ function Login() {
           </div>
         </form>
 
-        {/* Demo Credentials */}
-        <div className="demo-credentials">
-          <p className="demo-title">Demo Credentials:</p>
-          <div className="demo-list">
-            <div className="demo-item">
-              <strong>Admin:</strong> admin@office.com / admin123
-            </div>
-            <div className="demo-item">
-              <strong>Employee:</strong> employee@office.com / emp123
-            </div>
-            <div className="demo-item">
-              <strong>Client:</strong> client@office.com / client123
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Background Animation */}

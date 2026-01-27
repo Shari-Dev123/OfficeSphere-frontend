@@ -113,11 +113,11 @@ export const adminAPI = {
   deleteClient: (id) => api.delete(`/admin/clients/${id}`),
   
   // ============ Projects ============
-  getProjects: (params) => api.get('/projects', { params }),
-  getProject: (id) => api.get(`/projects/${id}`),
-  addProject: (data) => api.post('/projects', data),
-  updateProject: (id, data) => api.put(`/projects/${id}`, data),
-  deleteProject: (id) => api.delete(`/projects/${id}`),
+  getProjects: (params) => api.get('/admin/projects', { params }),
+  getProject: (id) => api.get(`/admin/projects/${id}`),
+  addProject: (data) => api.post('/admin/projects', data),
+  updateProject: (id, data) => api.put(`/admin/projects/${id}`, data),
+  deleteProject: (id) => api.delete(`/admin/projects/${id}`),
   
   // ============ Attendance ============
   getAllAttendance: (params) => api.get('/attendance/admin', { params }),

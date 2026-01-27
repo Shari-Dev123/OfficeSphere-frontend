@@ -1,4 +1,6 @@
 import { useAuthContext } from '../context/AuthContext';
+import { authAPI } from '../utils/api'; // Import your API functions
+import { toast } from 'react-toastify';
 
 /**
  * Custom hook for authentication
@@ -10,6 +12,36 @@ export const useAuth = () => {
   if (!context) {
     throw new Error('useAuth must be used within AuthProvider');
   }
+
+  // ADD THIS REGISTER FUNCTION
+  const register = async (userData) => {
+    try {
+      // Remove confirmPassword if it exists
+      const { confirmPassword, ...dataToSend } = userData;
+      
+      console.log('📤 Registering user:', dataToSend);
+      
+      const response = await authAPI.register(dataToSend);
+      
+      if (response.data.success) {
+        toast.success('Registration successful! Please login.');
+        return { success: true, data: response.data };
+      }
+      
+      throw new Error(response.data.message || 'Registration failed');
+      
+    } catch (error) {
+      console.error('Registration error:', error);
+      
+      // Show user-friendly error message
+      const errorMessage = error.response?.data?.message || 
+                          error.message || 
+                          'Registration failed. Please try again.';
+      
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
+    }
+  };
 
   // Check if user is admin
   const isAdmin = () => {
@@ -71,6 +103,9 @@ export const useAuth = () => {
     updateUser: context.updateUser,
     getUserRole: context.getUserRole,
     hasRole: context.hasRole,
+    
+    // ADD THIS TO RETURN
+    register: register, // <-- Add this line
     
     // Helper methods
     isAdmin,

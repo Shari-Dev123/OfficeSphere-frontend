@@ -60,7 +60,11 @@ function ReportGenerator() {
 
     try {
       setLoading(true);
-      const response = await adminAPI.generateReport(reportType, {
+      
+      // FIXED: Pass data object according to your API definition
+      // generateReport: (data) => api.post('/reports/admin/generate', data)
+      const response = await adminAPI.generateReport({
+        reportType: reportType,
         startDate: dateRange.startDate,
         endDate: dateRange.endDate
       });
@@ -69,7 +73,7 @@ function ReportGenerator() {
       toast.success('Report generated successfully!');
     } catch (error) {
       console.error('Error generating report:', error);
-      toast.error('Failed to generate report');
+      toast.error(error.response?.data?.message || 'Failed to generate report');
     } finally {
       setLoading(false);
     }
@@ -82,7 +86,13 @@ function ReportGenerator() {
     }
 
     try {
-      const response = await adminAPI.exportReport(generatedReport.id, format);
+      // FIXED: Use reportType and pass format in params
+      // exportReport: (reportType, params) => api.get(`/reports/admin/${reportType}/export`, { params, responseType: 'blob' })
+      const response = await adminAPI.exportReport(reportType, {
+        format: format,
+        startDate: dateRange.startDate,
+        endDate: dateRange.endDate
+      });
       
       // Create blob and download
       const blob = new Blob([response.data], { 
@@ -93,11 +103,12 @@ function ReportGenerator() {
       link.href = url;
       link.download = `${reportType}-report-${new Date().getTime()}.${format}`;
       link.click();
+      window.URL.revokeObjectURL(url); // Clean up
       
       toast.success('Report downloaded successfully!');
     } catch (error) {
       console.error('Error downloading report:', error);
-      toast.error('Failed to download report');
+      toast.error(error.response?.data?.message || 'Failed to download report');
     }
   };
 
