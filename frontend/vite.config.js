@@ -22,6 +22,9 @@ export default defineConfig({
     port: 3000,
     open: true,
     host: true,
+    proxy: {
+      '/api': 'http://localhost:5000',  // <-- ye add karo
+    }
   },
   
   build: {
