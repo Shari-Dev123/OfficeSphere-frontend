@@ -1,101 +1,127 @@
-import React, { useState } from 'react';
-import { employeeAPI } from '../../../utils/api';
-import { toast } from 'react-toastify';
-import { FiSave, FiCalendar, FiClock } from 'react-icons/fi';
-import { MdAssignment } from 'react-icons/md';
-import './DailyReportForm.css';
+import React, { useState } from "react";
+import { employeeAPI } from "../../../utils/api";
+import { useAuth } from "../../../hooks/useAuth";
+import { toast } from "react-toastify";
+import { FiSave, FiCalendar, FiClock } from "react-icons/fi";
+import { MdAssignment } from "react-icons/md";
+import "./DailyReportForm.css";
 
 function DailyReportForm() {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
-    date: new Date().toISOString().split('T')[0],
-    tasksAccomplished: '',
-    challengesFaced: '',
-    tomorrowPlan: '',
-    workingHours: '',
-    notes: ''
+    date: new Date().toISOString().split("T")[0],
+    tasksAccomplished: "",
+    challengesFaced: "",
+    tomorrowPlan: "",
+    workingHours: "",
+    notes: "",
   });
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!formData.tasksAccomplished.trim()) {
-    toast.error('Please enter tasks accomplished');
-    return;
-  }
+    // Validation
+    if (!formData.tasksAccomplished.trim()) {
+      toast.error("Please enter tasks accomplished");
+      return;
+    }
 
-  if (!formData.workingHours) {
-    toast.error('Please enter working hours');
-    return;
-  }
+    if (!formData.workingHours) {
+      toast.error("Please enter working hours");
+      return;
+    }
 
-  try {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    const reportData = {
-      reportId: 'RPT-' + Date.now(), // unique string
-      employee: 'EMPLOYEE_ID_HERE', // backend needs actual ObjectId
-      date: formData.date,
-      totalHoursWorked: parseFloat(formData.workingHours),
-      status: 'Submitted', // must match schema enum
-      achievements: formData.tasksAccomplished,
-      challenges: formData.challengesFaced || '',
-      blockers: formData.challengesFaced || '',
-      suggestions: formData.notes || '',
-      tasksCompleted: [], // optional
-      tasksInProgress: [], // optional
-      plannedForTomorrow: [] // optional
-    };
+      // Prepare data matching EXACT backend schema
+      const reportData = {
+        date: formData.date,
+        totalHoursWorked: parseFloat(formData.workingHours),
+        achievements: formData.tasksAccomplished,
+        challenges: formData.challengesFaced || "",
+        blockers: formData.challengesFaced || "", // Can be same as challenges
+        suggestions: formData.notes || "",
+        plannedForTomorrow: formData.tomorrowPlan
+          ? [{ description: formData.tomorrowPlan }]
+          : [],
+      };
 
-    await employeeAPI.submitDailyReport(reportData);
+      // Only add plannedForTomorrow if user provided text
+      // Schema expects array of objects with description
+      if (formData.tomorrowPlan && formData.tomorrowPlan.trim()) {
+        reportData.plannedForTomorrow = [
+          {
+            description: formData.tomorrowPlan,
+          },
+        ];
+      }
 
-    toast.success('Daily report submitted successfully!');
-    setSubmitted(true);
+      console.log("Submitting report:", reportData);
 
-    setTimeout(() => {
-      setFormData({
-        date: new Date().toISOString().split('T')[0],
-        tasksAccomplished: '',
-        challengesFaced: '',
-        tomorrowPlan: '',
-        workingHours: '',
-        notes: ''
-      });
-      setSubmitted(false);
-    }, 2000);
+      const response = await employeeAPI.submitDailyReport(reportData);
 
-  } catch (error) {
-    console.error('Error submitting report:', error);
-    toast.error(error.response?.data?.message || 'Failed to submit report');
-  } finally {
-    setLoading(false);
-  }
-};
+      console.log("Report submitted successfully:", response);
+
+      toast.success("Daily report submitted successfully!");
+      setSubmitted(true);
+
+      // Reset form after 2 seconds
+      setTimeout(() => {
+        setFormData({
+          date: new Date().toISOString().split("T")[0],
+          tasksAccomplished: "",
+          challengesFaced: "",
+          tomorrowPlan: "",
+          workingHours: "",
+          notes: "",
+        });
+        setSubmitted(false);
+      }, 2000);
+    } catch (error) {
+      console.error("Error submitting report:", error);
+      console.error("Error details:", error.response?.data);
+
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Failed to submit report";
+
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="daily-report-form">
       <div className="form-header">
         <div>
-          <h1><MdAssignment /> Daily Work Report</h1>
+          <h1>
+            <MdAssignment /> Daily Work Report
+          </h1>
           <p>Share your daily progress and plans</p>
         </div>
         <div className="current-date">
           <FiCalendar />
-          <span>{new Date().toLocaleDateString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-          })}</span>
+          <span>
+            {new Date().toLocaleDateString("en-US", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </span>
         </div>
       </div>
 
@@ -111,7 +137,7 @@ function DailyReportForm() {
             name="date"
             value={formData.date}
             onChange={handleChange}
-            max={new Date().toISOString().split('T')[0]}
+            max={new Date().toISOString().split("T")[0]}
             className="date-input"
             required
           />
@@ -201,19 +227,19 @@ function DailyReportForm() {
         {/* Additional Notes */}
         <div className="form-section">
           <label htmlFor="notes" className="section-label">
-            Additional Notes
+            Additional Notes/Suggestions
           </label>
           <textarea
             id="notes"
             name="notes"
             value={formData.notes}
             onChange={handleChange}
-            placeholder="Any other information or comments..."
+            placeholder="Any other information, suggestions, or comments..."
             rows="3"
             className="form-textarea"
           />
           <span className="help-text">
-            Optional: Add any extra information
+            Optional: Add any extra information or suggestions
           </span>
         </div>
 

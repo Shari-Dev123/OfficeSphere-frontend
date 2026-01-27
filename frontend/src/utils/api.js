@@ -239,6 +239,7 @@ export const clientAPI = {
   // ============ Profile ============
   getProfile: () => api.get('/client/profile'),
   updateProfile: (data) => api.put('/client/profile', data),
+  changePassword: (data) => api.put('/client/password', data),
 };
 
 // ========================================
