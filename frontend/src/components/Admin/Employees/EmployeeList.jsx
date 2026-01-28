@@ -1,15 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { adminAPI } from '../../../utils/api';
-import { FiPlus, FiEdit2, FiTrash2, FiSearch, FiMail, FiPhone } from 'react-icons/fi';
-import { toast } from 'react-toastify';
-import './EmployeeList.css';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { adminAPI } from "../../../utils/api";
+import {
+  FiPlus,
+  FiEdit2,
+  FiTrash2,
+  FiSearch,
+  FiMail,
+  FiPhone,
+} from "react-icons/fi";
+import { toast } from "react-toastify";
+import "./EmployeeList.css";
 
 function EmployeeList() {
   const navigate = useNavigate();
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [filteredEmployees, setFilteredEmployees] = useState([]);
 
   useEffect(() => {
@@ -26,8 +33,8 @@ function EmployeeList() {
       const response = await adminAPI.getEmployees();
       setEmployees(response.data.employees || []);
     } catch (error) {
-      console.error('Error fetching employees:', error);
-      toast.error('Failed to load employees');
+      console.error("Error fetching employees:", error);
+      toast.error("Failed to load employees");
     } finally {
       setLoading(false);
     }
@@ -39,10 +46,11 @@ function EmployeeList() {
       return;
     }
 
-    const filtered = employees.filter(employee =>
-      employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      employee.position?.toLowerCase().includes(searchTerm.toLowerCase())
+    const filtered = employees.filter(
+      (employee) =>
+        employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        employee.position?.toLowerCase().includes(searchTerm.toLowerCase()),
     );
     setFilteredEmployees(filtered);
   };
@@ -54,16 +62,16 @@ function EmployeeList() {
 
     try {
       await adminAPI.deleteEmployee(id);
-      toast.success('Employee deleted successfully');
+      toast.success("Employee deleted successfully");
       fetchEmployees();
     } catch (error) {
-      console.error('Error deleting employee:', error);
-      toast.error('Failed to delete employee');
+      console.error("Error deleting employee:", error);
+      toast.error("Failed to delete employee");
     }
   };
 
   const handleEdit = (id) => {
-    toast.info('Edit functionality coming soon');
+    toast.info("Edit functionality coming soon");
   };
 
   if (loading) {
@@ -85,7 +93,10 @@ function EmployeeList() {
           <h1>Employees</h1>
           <p>Manage your team members</p>
         </div>
-        <button className="btn btn-primary" onClick={() => navigate('/admin/employees/add')}>
+        <button
+          className="btn btn-primary"
+          onClick={() => navigate("/admin/employees/add")}
+        >
           <FiPlus /> Add Employee
         </button>
       </div>
@@ -110,13 +121,13 @@ function EmployeeList() {
         <div className="stat-item">
           <span className="stat-label">Active</span>
           <span className="stat-value stat-success">
-            {employees.filter(e => e.status === 'active').length}
+            {employees.filter((e) => e.status === "active").length}
           </span>
         </div>
         <div className="stat-item">
           <span className="stat-label">Inactive</span>
           <span className="stat-value stat-danger">
-            {employees.filter(e => e.status === 'inactive').length}
+            {employees.filter((e) => e.status === "inactive").length}
           </span>
         </div>
       </div>
@@ -128,11 +139,7 @@ function EmployeeList() {
             <div key={employee._id} className="employee-card">
               <div className="employee-card-header">
                 <div className="employee-avatar">
-                  {employee.avatar ? (
-                    <img src={employee.avatar} alt={employee.name} />
-                  ) : (
-                    <span>{employee.name?.charAt(0) || 'E'}</span>
-                  )}
+                  {employee?.name?.charAt(0).toUpperCase()}
                 </div>
                 <div className="employee-actions">
                   <button
@@ -141,6 +148,7 @@ function EmployeeList() {
                     title="Edit"
                   >
                     <FiEdit2 />
+                    <span>Edit</span>
                   </button>
                   <button
                     className="action-btn delete-btn"
@@ -148,14 +156,17 @@ function EmployeeList() {
                     title="Delete"
                   >
                     <FiTrash2 />
+                    <span>Delete</span>
                   </button>
                 </div>
               </div>
 
               <div className="employee-info">
                 <h3>{employee.name}</h3>
-                <p className="employee-position">{employee.position || 'Employee'}</p>
-                
+                <p className="employee-position">
+                  {employee.position || "Employee"}
+                </p>
+
                 <div className="employee-contact">
                   <div className="contact-item">
                     <FiMail />
@@ -171,8 +182,8 @@ function EmployeeList() {
               </div>
 
               <div className="employee-footer">
-                <span className={`status-badge ${employee.status || 'active'}`}>
-                  {employee.status || 'Active'}
+                <span className={`status-badge ${employee.status || "active"}`}>
+                  {employee.status || "Active"}
                 </span>
                 {employee.joinDate && (
                   <span className="join-date">
@@ -191,11 +202,14 @@ function EmployeeList() {
           <h3>No Employees Found</h3>
           <p>
             {searchTerm
-              ? 'No employees match your search criteria'
-              : 'Start by adding your first employee'}
+              ? "No employees match your search criteria"
+              : "Start by adding your first employee"}
           </p>
           {!searchTerm && (
-            <button className="btn btn-primary" onClick={() => navigate('/admin/employees/add')}>
+            <button
+              className="btn btn-primary"
+              onClick={() => navigate("/admin/employees/add")}
+            >
               <FiPlus /> Add First Employee
             </button>
           )}
