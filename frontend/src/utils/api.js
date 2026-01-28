@@ -214,6 +214,10 @@ export const clientAPI = {
   getMyProjects: (params) => api.get('/client/projects', { params }),
   getProject: (id) => api.get(`/client/projects/${id}`),
   getProjectProgress: (id) => api.get(`/client/projects/${id}/progress`),
+  createProject: (projectData) => api.post('/client/projects', projectData),
+  updateProject: (id, projectData) => api.put(`/client/projects/${id}`, projectData),
+  deleteProject: (id) => api.delete(`/client/projects/${id}`),
+  sendProjectToAdmin: (requestData) => api.post('/client/projects/send-to-admin', requestData),
 
   // ============ Meetings ============
   getMyMeetings: (params) => api.get('/meetings/client', { params }),

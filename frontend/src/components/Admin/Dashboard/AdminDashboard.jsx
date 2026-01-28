@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { adminAPI } from '../../../utils/api';
-import StatCard from './StatCard';
-import { FiUsers, FiUserCheck, FiBriefcase, FiClock } from 'react-icons/fi';
-import { toast } from 'react-toastify';
-import './AdminDashboard.css';
+import React, { useState, useEffect } from "react";
+import { adminAPI } from "../../../utils/api";
+import StatCard from "./StatCard";
+import { FiUsers, FiUserCheck, FiBriefcase, FiClock } from "react-icons/fi";
+import { toast } from "react-toastify";
+import "./AdminDashboard.css";
 
 function AdminDashboard() {
   const [loading, setLoading] = useState(true);
@@ -24,21 +24,34 @@ function AdminDashboard() {
     try {
       setLoading(true);
       const response = await adminAPI.getDashboardStats();
-      
-      if (response.data) {
-        setStats({
-          totalEmployees: response.data.totalEmployees || 0,
-          presentToday: response.data.presentToday || 0,
-          activeProjects: response.data.activeProjects || 0,
-          pendingTasks: response.data.pendingTasks || 0,
-        });
-        
-        setRecentActivity(response.data.recentActivity || []);
-        setAttendanceData(response.data.attendanceData || []);
+
+      console.log("🔍 Dashboard API Response:", response.data); // Debug log
+
+      // Check response structure
+      let dashboardData = {};
+
+      if (response.data && response.data.data) {
+        // Backend returns { success: true, data: { ... } }
+        dashboardData = response.data.data;
+      } else if (response.data) {
+        // If response.data is already the dashboard data
+        dashboardData = response.data;
       }
+
+      console.log("📊 Dashboard Data:", dashboardData);
+
+      setStats({
+        totalEmployees: dashboardData.totalEmployees || 0,
+        presentToday: dashboardData.presentToday || 0,
+        activeProjects: dashboardData.activeProjects || 0,
+        pendingTasks: dashboardData.pendingTasks || 0,
+      });
+
+      setRecentActivity(dashboardData.recentActivity || []);
+      setAttendanceData(dashboardData.attendanceData || []);
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-      toast.error('Failed to load dashboard data');
+      console.error("Error fetching dashboard data:", error);
+      toast.error("Failed to load dashboard data");
     } finally {
       setLoading(false);
     }
@@ -115,7 +128,7 @@ function AdminDashboard() {
                   <div key={index} className="attendance-item">
                     <div className="employee-info">
                       <div className="employee-avatar">
-                        {record.employeeName?.charAt(0) || 'E'}
+                        {record.employeeName?.charAt(0) || "E"}
                       </div>
                       <div>
                         <p className="employee-name">{record.employeeName}</p>
@@ -123,8 +136,11 @@ function AdminDashboard() {
                       </div>
                     </div>
                     <span className={`status-badge ${record.status}`}>
-                      {record.status === 'present' ? 'Present' : 
-                       record.status === 'late' ? 'Late' : 'Absent'}
+                      {record.status === "present"
+                        ? "Present"
+                        : record.status === "late"
+                          ? "Late"
+                          : "Absent"}
                     </span>
                   </div>
                 ))}
