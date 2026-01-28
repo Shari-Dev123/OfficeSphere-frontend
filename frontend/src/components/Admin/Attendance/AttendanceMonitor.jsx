@@ -22,7 +22,7 @@ function AttendanceMonitor() {
   const fetchAttendance = async () => {
     try {
       setLoading(true);
-      const response = await adminAPI.getDailyAttendance(selectedDate);
+      const response = await adminAPI.getDailyAttendance({ date: selectedDate });
       
       if (response.data) {
         setAttendanceData(response.data.attendance || []);
