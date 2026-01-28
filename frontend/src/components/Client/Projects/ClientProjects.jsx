@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { clientAPI } from '../../../utils/api';
-import { FiSearch, FiFilter, FiGrid, FiList, FiTrendingUp, FiClock, FiCheckCircle } from 'react-icons/fi';
+import { FiSearch, FiFilter, FiGrid, FiList, FiTrendingUp, FiClock, FiCheckCircle, FiPlus, FiSend, FiX } from 'react-icons/fi';
 import { BiTask } from 'react-icons/bi';
 import Card from '../../Shared/Card/Card';
 import Loader from '../../Shared/Loader/Loader';
@@ -15,7 +15,32 @@ function ClientProjects() {
   const [filteredProjects, setFilteredProjects] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
+  const [viewMode, setViewMode] = useState('grid');
+  
+  // Modal states
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showSendModal, setShowSendModal] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+  
+  // New project form data
+  const [newProject, setNewProject] = useState({
+    name: '',
+    description: '',
+    startDate: '',
+    deadline: '',
+    budget: '',
+    requirements: '',
+    priority: 'Medium',
+    category: ''
+  });
+
+  // Send to admin form data
+  const [sendData, setSendData] = useState({
+    message: '',
+    urgency: 'Normal',
+    requestType: 'Review' // Review, Approval, Discussion, etc.
+  });
 
   useEffect(() => {
     fetchProjects();
@@ -42,7 +67,6 @@ function ClientProjects() {
   const filterProjects = () => {
     let filtered = [...projects];
 
-    // Search filter
     if (searchTerm) {
       filtered = filtered.filter(project =>
         project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -50,12 +74,113 @@ function ClientProjects() {
       );
     }
 
-    // Status filter
     if (filterStatus !== 'all') {
       filtered = filtered.filter(project => project.status === filterStatus);
     }
 
     setFilteredProjects(filtered);
+  };
+
+  // Handle Create Project
+  const handleCreateProject = async (e) => {
+    e.preventDefault();
+    
+    try {
+      setSubmitting(true);
+
+      // Validation
+      if (!newProject.name || !newProject.description || !newProject.startDate || !newProject.deadline) {
+        toast.error('Please fill all required fields');
+        return;
+      }
+
+      const projectData = {
+        ...newProject,
+        status: 'Planning', // Default status
+        progress: 0,
+        tasksCompleted: 0,
+        totalTasks: 0,
+        milestonesCompleted: 0,
+        totalMilestones: 0
+      };
+
+      console.log('Creating project:', projectData);
+      const response = await clientAPI.createProject(projectData);
+      
+      toast.success('Project created successfully!');
+      
+      // Refresh projects list
+      await fetchProjects();
+      
+      // Close modal and reset form
+      setShowCreateModal(false);
+      setNewProject({
+        name: '',
+        description: '',
+        startDate: '',
+        deadline: '',
+        budget: '',
+        requirements: '',
+        priority: 'Medium',
+        category: ''
+      });
+
+    } catch (error) {
+      console.error('Error creating project:', error);
+      toast.error(error.response?.data?.message || 'Failed to create project');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Handle Send to Admin
+  const handleSendToAdmin = async (e) => {
+    e.preventDefault();
+    
+    try {
+      setSubmitting(true);
+
+      if (!sendData.message) {
+        toast.error('Please enter a message');
+        return;
+      }
+
+      const requestData = {
+        projectId: selectedProject._id,
+        projectName: selectedProject.name,
+        message: sendData.message,
+        urgency: sendData.urgency,
+        requestType: sendData.requestType,
+        clientInfo: {
+          // Add any client info you want to send
+        }
+      };
+
+      console.log('Sending to admin:', requestData);
+      const response = await clientAPI.sendProjectToAdmin(requestData);
+      
+      toast.success('Project sent to admin successfully!');
+      
+      // Close modal and reset
+      setShowSendModal(false);
+      setSelectedProject(null);
+      setSendData({
+        message: '',
+        urgency: 'Normal',
+        requestType: 'Review'
+      });
+
+    } catch (error) {
+      console.error('Error sending to admin:', error);
+      toast.error(error.response?.data?.message || 'Failed to send to admin');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const openSendModal = (project) => {
+    setSelectedProject(project);
+    setShowSendModal(true);
   };
 
   const getStatusColor = (status) => {
@@ -107,6 +232,13 @@ function ClientProjects() {
           <h1>My Projects</h1>
           <p>Track and manage all your active projects</p>
         </div>
+        <button 
+          className="create-project-btn"
+          onClick={() => setShowCreateModal(true)}
+        >
+          <FiPlus />
+          Create New Project
+        </button>
       </div>
 
       {/* Filters and Search */}
@@ -227,14 +359,25 @@ function ClientProjects() {
                     <span className="date-label">End:</span>
                     <span className="date-value">{formatDate(project.deadline)}</span>
                   </div>
-
-                  <button 
-                    className="view-details-btn"
-                    onClick={() => handleViewProject(project._id)}
-                  >
-                    <FiTrendingUp />
-                    View Details
-                  </button>
+                  
+                  <div className="project-actions">
+                    <button 
+                      className="send-to-admin-btn"
+                      onClick={() => openSendModal(project)}
+                      title="Send to Admin"
+                    >
+                      <FiSend />
+                      Send to Admin
+                    </button>
+                    
+                    <button 
+                      className="view-details-btn"
+                      onClick={() => handleViewProject(project._id)}
+                    >
+                      <FiTrendingUp />
+                      View Details
+                    </button>
+                  </div>
                 </div>
               </Card>
             );
@@ -249,6 +392,236 @@ function ClientProjects() {
               ? 'Try adjusting your filters'
               : 'You don\'t have any projects yet'}
           </p>
+          <button 
+            className="create-first-project-btn"
+            onClick={() => setShowCreateModal(true)}
+          >
+            <FiPlus />
+            Create Your First Project
+          </button>
+        </div>
+      )}
+
+      {/* Create Project Modal */}
+      {showCreateModal && (
+        <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Create New Project</h2>
+              <button 
+                className="close-btn"
+                onClick={() => setShowCreateModal(false)}
+              >
+                <FiX />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateProject} className="project-form">
+              <div className="form-grid">
+                <div className="form-group full-width">
+                  <label>Project Name *</label>
+                  <input
+                    type="text"
+                    value={newProject.name}
+                    onChange={(e) => setNewProject({...newProject, name: e.target.value})}
+                    placeholder="Enter project name"
+                    required
+                  />
+                </div>
+
+                <div className="form-group full-width">
+                  <label>Description *</label>
+                  <textarea
+                    value={newProject.description}
+                    onChange={(e) => setNewProject({...newProject, description: e.target.value})}
+                    placeholder="Describe your project"
+                    rows="4"
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Start Date *</label>
+                  <input
+                    type="date"
+                    value={newProject.startDate}
+                    onChange={(e) => setNewProject({...newProject, startDate: e.target.value})}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Deadline *</label>
+                  <input
+                    type="date"
+                    value={newProject.deadline}
+                    onChange={(e) => setNewProject({...newProject, deadline: e.target.value})}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Budget</label>
+                  <input
+                    type="number"
+                    value={newProject.budget}
+                    onChange={(e) => setNewProject({...newProject, budget: e.target.value})}
+                    placeholder="Enter budget (optional)"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Priority</label>
+                  <select
+                    value={newProject.priority}
+                    onChange={(e) => setNewProject({...newProject, priority: e.target.value})}
+                  >
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                    <option value="Critical">Critical</option>
+                  </select>
+                </div>
+
+                <div className="form-group full-width">
+                  <label>Category</label>
+                  <input
+                    type="text"
+                    value={newProject.category}
+                    onChange={(e) => setNewProject({...newProject, category: e.target.value})}
+                    placeholder="e.g., Web Development, Mobile App, etc."
+                  />
+                </div>
+
+                <div className="form-group full-width">
+                  <label>Requirements</label>
+                  <textarea
+                    value={newProject.requirements}
+                    onChange={(e) => setNewProject({...newProject, requirements: e.target.value})}
+                    placeholder="List project requirements (optional)"
+                    rows="3"
+                  />
+                </div>
+              </div>
+
+              <div className="modal-actions">
+                <button 
+                  type="button"
+                  className="cancel-btn"
+                  onClick={() => setShowCreateModal(false)}
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  className="submit-btn"
+                  disabled={submitting}
+                >
+                  {submitting ? (
+                    <>
+                      <div className="spinner-small"></div>
+                      Creating...
+                    </>
+                  ) : (
+                    <>
+                      <FiPlus />
+                      Create Project
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Send to Admin Modal */}
+      {showSendModal && selectedProject && (
+        <div className="modal-overlay" onClick={() => setShowSendModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Send to Admin</h2>
+              <button 
+                className="close-btn"
+                onClick={() => setShowSendModal(false)}
+              >
+                <FiX />
+              </button>
+            </div>
+
+            <div className="selected-project-info">
+              <h3>{selectedProject.name}</h3>
+              <p>{selectedProject.description}</p>
+            </div>
+
+            <form onSubmit={handleSendToAdmin} className="send-form">
+              <div className="form-group">
+                <label>Request Type</label>
+                <select
+                  value={sendData.requestType}
+                  onChange={(e) => setSendData({...sendData, requestType: e.target.value})}
+                >
+                  <option value="Review">Review Request</option>
+                  <option value="Approval">Approval Request</option>
+                  <option value="Discussion">Discussion</option>
+                  <option value="Update">Status Update</option>
+                  <option value="Issue">Report Issue</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Urgency Level</label>
+                <select
+                  value={sendData.urgency}
+                  onChange={(e) => setSendData({...sendData, urgency: e.target.value})}
+                >
+                  <option value="Low">Low</option>
+                  <option value="Normal">Normal</option>
+                  <option value="High">High</option>
+                  <option value="Urgent">Urgent</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Message to Admin *</label>
+                <textarea
+                  value={sendData.message}
+                  onChange={(e) => setSendData({...sendData, message: e.target.value})}
+                  placeholder="Explain what you need from the admin..."
+                  rows="6"
+                  required
+                />
+              </div>
+
+              <div className="modal-actions">
+                <button 
+                  type="button"
+                  className="cancel-btn"
+                  onClick={() => setShowSendModal(false)}
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  className="submit-btn"
+                  disabled={submitting}
+                >
+                  {submitting ? (
+                    <>
+                      <div className="spinner-small"></div>
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <FiSend />
+                      Send to Admin
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>
