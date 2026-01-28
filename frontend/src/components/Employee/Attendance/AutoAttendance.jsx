@@ -9,6 +9,9 @@ function AutoAttendance() {
   const [loading, setLoading] = useState(false);
   const [attendanceStatus, setAttendanceStatus] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [workingSeconds, setWorkingSeconds] = useState(0);
+  const [timerRunning, setTimerRunning] = useState(false);
+
   const [location, setLocation] = useState(null);
   const [checkInMethod, setCheckInMethod] = useState('auto'); // auto, manual, qr
   const [workingDuration, setWorkingDuration] = useState(null);
@@ -16,7 +19,7 @@ function AutoAttendance() {
   useEffect(() => {
     fetchAttendanceStatus();
     getLocation();
-    
+
     // Update time every second
     const timer = setInterval(() => {
       setCurrentTime(new Date());
@@ -36,6 +39,7 @@ function AutoAttendance() {
   const fetchAttendanceStatus = async () => {
     try {
       const response = await employeeAPI.getAttendanceStatus();
+      console.log("Attendance API Response:", response.data);
       setAttendanceStatus(response.data);
     } catch (error) {
       console.error('Error fetching attendance:', error);
@@ -62,31 +66,43 @@ function AutoAttendance() {
 
   const calculateDuration = () => {
     if (!attendanceStatus?.checkIn) return;
-    
+
     const checkInTime = new Date(attendanceStatus.checkIn);
     const now = new Date();
     const diff = now - checkInTime;
-    
+
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    
+
     setWorkingDuration(`${hours}h ${minutes}m`);
   };
 
   const handleCheckIn = async () => {
   try {
     setLoading(true);
-    const locationType = location ? 'Field' : 'Office';
+
+    if (!location) {
+      toast.warning('Location not detected. Please enable location or choose Manual method.');
+    }
+
+    // Send only the fields backend expects
     const checkInData = {
-      method: checkInMethod,
-      location: location ? JSON.stringify(location) : null, // <-- stringify here
-      timestamp: new Date(),
+      location: location ? { 
+        latitude: location.latitude, 
+        longitude: location.longitude, 
+        accuracy: location.accuracy 
+      } : null,
+      notes: `Check-in via ${checkInMethod}`,
     };
 
     const response = await employeeAPI.checkIn(checkInData);
-    setAttendanceStatus(response.data);
+
+    console.log("CheckIn Response:", response.data);
+
+    // Backend returns attendance data
+    setAttendanceStatus(response.data.data);
     toast.success('Checked in successfully!');
-    
+
   } catch (error) {
     console.error('Check-in error:', error);
     toast.error(error.response?.data?.message || 'Failed to check in');
@@ -95,36 +111,39 @@ function AutoAttendance() {
   }
 };
 
-const handleCheckOut = async () => {
-  try {
-    setLoading(true);
 
-    const checkOutData = {
-      location: location ? JSON.stringify(location) : null, // <-- stringify here
-      timestamp: new Date(),
-    };
+  const handleCheckOut = async () => {
+    try {
+      setLoading(true);
 
-    const response = await employeeAPI.checkOut(checkOutData);
-    setAttendanceStatus(response.data);
-    toast.success('Checked out successfully!');
-    
-  } catch (error) {
-    console.error('Check-out error:', error);
-    toast.error(error.response?.data?.message || 'Failed to check out');
-  } finally {
-    setLoading(false);
-  }
-};
+      const checkOutData = {
+        location: location ? JSON.stringify(location) : null,
+        timestamp: new Date(),
+        totalSeconds: workingSeconds   // admin ke liye gold data
+      };
+
+      const response = await employeeAPI.checkOut(checkOutData);
+      setAttendanceStatus(response.data);
+      toast.success('Checked out successfully!');
+
+    } catch (error) {
+      toast.error('Failed to check out');
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
   const formatTime = (date) => {
-    if (!date) return '--:--';
-    return new Date(date).toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
+    if (!date) return "--:--:--";
+    return new Date(date).toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false
     });
   };
+
 
   const formatDate = (date) => {
     return date.toLocaleDateString('en-US', {
@@ -138,6 +157,41 @@ const handleCheckOut = async () => {
   const isCheckedIn = attendanceStatus?.checkIn && !attendanceStatus?.checkOut;
   const isCheckedOut = attendanceStatus?.checkIn && attendanceStatus?.checkOut;
 
+  useEffect(() => {
+    if (attendanceStatus?.checkIn && !attendanceStatus?.checkOut) {
+      const checkInTime = new Date(attendanceStatus.checkIn);
+      const now = new Date();
+      const diffInSeconds = Math.floor((now - checkInTime) / 1000);
+
+      setWorkingSeconds(diffInSeconds);
+      setTimerRunning(true);
+    } else {
+      setTimerRunning(false);
+      setWorkingSeconds(0); // reset on checkout or fresh day
+    }
+  }, [attendanceStatus]);
+
+  useEffect(() => {
+    let interval = null;
+
+    if (timerRunning) {
+      interval = setInterval(() => {
+        setWorkingSeconds(prev => prev + 1);
+      }, 1000);
+    }
+
+    return () => clearInterval(interval);
+  }, [timerRunning]);
+  const formatDuration = (seconds) => {
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+
+    return `${hrs.toString().padStart(2, '0')}:${mins
+      .toString()
+      .padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
   return (
     <div className="auto-attendance">
       <div className="attendance-header">
@@ -149,8 +203,13 @@ const handleCheckOut = async () => {
       <div className="time-display">
         <FiClock className="clock-icon" />
         <div className="time-info">
-          <h2>{currentTime.toLocaleTimeString('en-US', { hour12: false })}</h2>
-          <p>Current Time</p>
+          <h2>
+            {attendanceStatus?.checkIn
+              ? formatTime(attendanceStatus.checkIn)
+              : "--:--:--"}
+          </h2>
+          <p>Check In Time</p>
+
         </div>
       </div>
 
@@ -205,21 +264,21 @@ const handleCheckOut = async () => {
         <div className="check-in-methods">
           <h3>Choose Check-In Method</h3>
           <div className="methods-grid">
-            <button 
+            <button
               className={`method-card ${checkInMethod === 'auto' ? 'active' : ''}`}
               onClick={() => setCheckInMethod('auto')}
             >
               <FiWifi />
               <span>Auto (Wi-Fi)</span>
             </button>
-            <button 
+            <button
               className={`method-card ${checkInMethod === 'manual' ? 'active' : ''}`}
               onClick={() => setCheckInMethod('manual')}
             >
               <FiMapPin />
               <span>Manual</span>
             </button>
-            <button 
+            <button
               className={`method-card ${checkInMethod === 'qr' ? 'active' : ''}`}
               onClick={() => setCheckInMethod('qr')}
             >
@@ -247,7 +306,7 @@ const handleCheckOut = async () => {
       {/* Action Buttons */}
       <div className="action-buttons">
         {!isCheckedIn && !isCheckedOut && (
-          <button 
+          <button
             className="btn-check-in"
             onClick={handleCheckIn}
             disabled={loading}
@@ -264,7 +323,7 @@ const handleCheckOut = async () => {
         )}
 
         {isCheckedIn && (
-          <button 
+          <button
             className="btn-check-out"
             onClick={handleCheckOut}
             disabled={loading}
