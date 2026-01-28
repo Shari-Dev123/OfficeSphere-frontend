@@ -1,15 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { adminAPI } from '../../../utils/api';
-import { FiPlus, FiEdit2, FiTrash2, FiSearch, FiMail, FiPhone, FiBriefcase } from 'react-icons/fi';
-import { toast } from 'react-toastify';
-import './ClientList.css';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { adminAPI } from "../../../utils/api";
+import {
+  FiPlus,
+  FiEdit2,
+  FiTrash2,
+  FiSearch,
+  FiMail,
+  FiPhone,
+  FiBriefcase,
+} from "react-icons/fi";
+import { toast } from "react-toastify";
+import "./ClientList.css";
 
 function ClientList() {
   const navigate = useNavigate();
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [filteredClients, setFilteredClients] = useState([]);
 
   useEffect(() => {
@@ -24,10 +32,65 @@ function ClientList() {
     try {
       setLoading(true);
       const response = await adminAPI.getClients();
-      setClients(response.data.clients || []);
+
+      console.log("📊 Client API Response:", response.data); // DEBUG LOG
+
+      // Check what the actual response structure is
+      let clientsData = [];
+
+      if (response.data && response.data.data) {
+        // If response has data.data (array of clients)
+        clientsData = response.data.data;
+      } else if (response.data && Array.isArray(response.data)) {
+        // If response.data is directly an array
+        clientsData = response.data;
+      } else if (response.data && response.data.clients) {
+        // If response has data.clients
+        clientsData = response.data.clients;
+      }
+
+      console.log("📋 Extracted clients data:", clientsData);
+
+      // Transform data to match frontend expectations
+      const transformedClients = clientsData.map((client) => {
+        // If client has a userId populated with user data
+        const userData = client.userId || client.user || {};
+
+        return {
+          _id: client._id,
+          name:
+            userData.name ||
+            client.name ||
+            client.contactPerson?.name ||
+            "No Name",
+          email:
+            userData.email ||
+            client.email ||
+            client.companyEmail ||
+            client.contactPerson?.email ||
+            "No Email",
+          phone:
+            userData.phone ||
+            client.phone ||
+            client.companyPhone ||
+            client.contactPerson?.phone ||
+            "",
+          company: client.companyName || client.company || "No Company",
+          companyName: client.companyName,
+          clientId: client.clientId,
+          status: client.isActive ? "active" : "inactive",
+          avatar: userData.avatar,
+          address: client.address || {},
+          // Add projects count if available
+          projectsCount: client.projects?.length || client.totalProjects || 0,
+        };
+      });
+
+      console.log("🔄 Transformed clients:", transformedClients);
+      setClients(transformedClients);
     } catch (error) {
-      console.error('Error fetching clients:', error);
-      toast.error('Failed to load clients');
+      console.error("Error fetching clients:", error);
+      toast.error("Failed to load clients");
     } finally {
       setLoading(false);
     }
@@ -39,10 +102,11 @@ function ClientList() {
       return;
     }
 
-    const filtered = clients.filter(client =>
-      client.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      client.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      client.company?.toLowerCase().includes(searchTerm.toLowerCase())
+    const filtered = clients.filter(
+      (client) =>
+        client.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        client.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        client.company?.toLowerCase().includes(searchTerm.toLowerCase()),
     );
     setFilteredClients(filtered);
   };
@@ -54,16 +118,16 @@ function ClientList() {
 
     try {
       await adminAPI.deleteClient(id);
-      toast.success('Client deleted successfully');
+      toast.success("Client deleted successfully");
       fetchClients();
     } catch (error) {
-      console.error('Error deleting client:', error);
-      toast.error('Failed to delete client');
+      console.error("Error deleting client:", error);
+      toast.error("Failed to delete client");
     }
   };
 
   const handleEdit = (id) => {
-    toast.info('Edit functionality coming soon');
+    toast.info("Edit functionality coming soon");
   };
 
   if (loading) {
@@ -85,7 +149,10 @@ function ClientList() {
           <h1>Clients</h1>
           <p>Manage your client accounts</p>
         </div>
-        <button className="btn btn-primary" onClick={() => navigate('/admin/clients/add')}>
+        <button
+          className="btn btn-primary"
+          onClick={() => navigate("/admin/clients/add")}
+        >
           <FiPlus /> Add Client
         </button>
       </div>
@@ -110,13 +177,13 @@ function ClientList() {
         <div className="stat-item">
           <span className="stat-label">Active</span>
           <span className="stat-value stat-success">
-            {clients.filter(c => c.status === 'active').length}
+            {clients.filter((c) => c.status === "active").length}
           </span>
         </div>
         <div className="stat-item">
           <span className="stat-label">Inactive</span>
           <span className="stat-value stat-warning">
-            {clients.filter(c => c.status === 'inactive').length}
+            {clients.filter((c) => c.status === "inactive").length}
           </span>
         </div>
       </div>
@@ -131,7 +198,7 @@ function ClientList() {
                   {client.avatar ? (
                     <img src={client.avatar} alt={client.name} />
                   ) : (
-                    <span>{client.name?.charAt(0) || 'C'}</span>
+                    <span>{client.name?.charAt(0) || "C"}</span>
                   )}
                 </div>
                 <div className="client-actions">
@@ -141,6 +208,7 @@ function ClientList() {
                     title="Edit"
                   >
                     <FiEdit2 />
+                    <span>Edit</span>
                   </button>
                   <button
                     className="action-btn delete-btn"
@@ -148,6 +216,7 @@ function ClientList() {
                     title="Delete"
                   >
                     <FiTrash2 />
+                    <span>Delete</span>
                   </button>
                 </div>
               </div>
@@ -159,7 +228,7 @@ function ClientList() {
                     <FiBriefcase /> {client.company}
                   </p>
                 )}
-                
+
                 <div className="client-contact">
                   <div className="contact-item">
                     <FiMail />
@@ -175,12 +244,13 @@ function ClientList() {
               </div>
 
               <div className="client-footer">
-                <span className={`status-badge ${client.status || 'active'}`}>
-                  {client.status || 'Active'}
+                <span className={`status-badge ${client.status || "active"}`}>
+                  {client.status || "Active"}
                 </span>
                 {client.projectsCount !== undefined && (
                   <span className="projects-count">
-                    {client.projectsCount} {client.projectsCount === 1 ? 'Project' : 'Projects'}
+                    {client.projectsCount}{" "}
+                    {client.projectsCount === 1 ? "Project" : "Projects"}
                   </span>
                 )}
               </div>
@@ -195,11 +265,14 @@ function ClientList() {
           <h3>No Clients Found</h3>
           <p>
             {searchTerm
-              ? 'No clients match your search criteria'
-              : 'Start by adding your first client'}
+              ? "No clients match your search criteria"
+              : "Start by adding your first client"}
           </p>
           {!searchTerm && (
-            <button className="btn btn-primary" onClick={() => navigate('/admin/clients/add')}>
+            <button
+              className="btn btn-primary"
+              onClick={() => navigate("/admin/clients/add")}
+            >
               <FiPlus /> Add First Client
             </button>
           )}

@@ -30,7 +30,7 @@ function MyTasks() {
     try {
       setLoading(true);
       const response = await employeeAPI.getMyTasks();
-      setTasks(response.data);
+          setTasks(response.data.tasks || []); 
     } catch (error) {
       console.error('Error fetching tasks:', error);
       toast.error('Failed to load tasks');

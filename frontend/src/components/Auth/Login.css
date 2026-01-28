@@ -266,38 +266,6 @@
   text-decoration: underline;
 }
 
-/* Demo Credentials */
-.demo-credentials {
-  margin-top: 30px;
-  padding: 20px;
-  background: #f3f4f6;
-  border-radius: 10px;
-  border-left: 4px solid #667eea;
-}
-
-.demo-title {
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 10px;
-  font-size: 13px;
-}
-
-.demo-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.demo-item {
-  font-size: 12px;
-  color: #6b7280;
-}
-
-.demo-item strong {
-  color: #374151;
-  font-weight: 600;
-}
-
 /* Background Animation */
 .background-animation {
   position: absolute;

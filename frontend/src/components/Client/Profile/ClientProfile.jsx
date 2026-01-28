@@ -1,85 +1,97 @@
-import React, { useState, useEffect } from 'react';
-import { clientAPI } from '../../../utils/api';
-import { useAuth } from '../../../hooks/useAuth';
-import { toast } from 'react-toastify';
-import { 
-  FiUser, 
-  FiMail, 
-  FiPhone, 
-  FiMapPin, 
-  FiHome,      // ← Changed from FiBuilding
+import React, { useState, useEffect, useRef } from "react";
+import { clientAPI } from "../../../utils/api";
+import { useAuth } from "../../../hooks/useAuth";
+import { toast } from "react-toastify";
+import {
+  FiUser,
+  FiMail,
+  FiPhone,
+  FiMapPin,
+  FiHome,
   FiGlobe,
   FiEdit2,
   FiSave,
   FiX,
-  FiLock
-} from 'react-icons/fi';
-import './ClientProfile.css';
+  FiLock,
+} from "react-icons/fi";
+import "./ClientProfile.css";
 
 const ClientProfile = () => {
-  const { user, updateUser } = useAuth();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState(false);
-  const [activeTab, setActiveTab] = useState('personal');
+  const [activeTab, setActiveTab] = useState("personal");
+  const hasFetchedRef = useRef(false); // ← Prevent duplicate calls
 
   const [personalInfo, setPersonalInfo] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
-    phone: user?.phone || '',
-    avatar: user?.avatar || '',
+    name: "",
+    email: "",
+    phone: "",
+    avatar: "",
   });
 
   const [companyInfo, setCompanyInfo] = useState({
-    companyName: '',
-    industry: '',
-    companySize: '',
-    website: '',
-    address: '',
-    city: '',
-    state: '',
-    zipCode: '',
-    country: '',
-    taxId: '',
+    companyName: "",
+    industry: "",
+    companySize: "",
+    website: "",
+    address: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    country: "",
+    taxId: "",
   });
 
   const [passwordData, setPasswordData] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
   });
 
   useEffect(() => {
-    fetchProfile();
+    if (!hasFetchedRef.current) {
+      hasFetchedRef.current = true;
+      fetchProfile();
+    }
   }, []);
 
   const fetchProfile = async () => {
     try {
       setLoading(true);
       const response = await clientAPI.getProfile();
-      if (response.data) {
-        const profile = response.data;
+
+      // ✅ FIX: Access response.data.data (backend returns { success: true, data: {...} })
+      if (response.data && response.data.data) {
+        const profile = response.data.data;
+
+        console.log("Profile data loaded:", profile);
+
+        // Set personal info
         setPersonalInfo({
-          name: profile.name || '',
-          email: profile.email || '',
-          phone: profile.phone || '',
-          avatar: profile.avatar || '',
+          name: profile.name || user?.name || "",
+          email: profile.email || user?.email || "",
+          phone: profile.phone || user?.phone || "",
+          avatar: profile.avatar || user?.avatar || "",
         });
+
+        // Set company info
         setCompanyInfo({
-          companyName: profile.companyName || '',
-          industry: profile.industry || '',
-          companySize: profile.companySize || '',
-          website: profile.website || '',
-          address: profile.address || '',
-          city: profile.city || '',
-          state: profile.state || '',
-          zipCode: profile.zipCode || '',
-          country: profile.country || '',
-          taxId: profile.taxId || '',
+          companyName: profile.companyName || "",
+          industry: profile.industry || "",
+          companySize: profile.companySize || "",
+          website: profile.companyWebsite || profile.website || "",
+          address: profile.address?.street || "",
+          city: profile.address?.city || "",
+          state: profile.address?.state || "",
+          zipCode: profile.address?.zipCode || "",
+          country: profile.address?.country || "",
+          taxId: profile.taxInfo?.taxId || "",
         });
       }
     } catch (error) {
-      console.error('Error fetching profile:', error);
-      toast.error('Failed to load profile');
+      console.error("Error fetching profile:", error);
+      toast.error("Failed to load profile");
     } finally {
       setLoading(false);
     }
@@ -87,47 +99,71 @@ const ClientProfile = () => {
 
   const handlePersonalChange = (e) => {
     const { name, value } = e.target;
-    setPersonalInfo(prev => ({
+    setPersonalInfo((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleCompanyChange = (e) => {
     const { name, value } = e.target;
-    setCompanyInfo(prev => ({
+    setCompanyInfo((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
-    setPasswordData(prev => ({
+    setPasswordData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSaveProfile = async () => {
     try {
       setLoading(true);
-      
+
       const profileData = {
         ...personalInfo,
         ...companyInfo,
       };
 
       const response = await clientAPI.updateProfile(profileData);
-      
-      if (response.data) {
-        updateUser(response.data);
-        toast.success('Profile updated successfully!');
+
+      // ✅ FIX: Access response.data.data
+      if (response.data && response.data.data) {
+        const updatedProfile = response.data.data;
+
+        // Update local state
+        setPersonalInfo({
+          name: updatedProfile.name || "",
+          email: updatedProfile.email || "",
+          phone: updatedProfile.phone || "",
+          avatar: updatedProfile.avatar || "",
+        });
+
+        setCompanyInfo({
+          companyName: updatedProfile.companyName || "",
+          industry: updatedProfile.industry || "",
+          companySize: updatedProfile.companySize || "",
+          website:
+            updatedProfile.companyWebsite || updatedProfile.website || "",
+          address: updatedProfile.address?.street || "",
+          city: updatedProfile.address?.city || "",
+          state: updatedProfile.address?.state || "",
+          zipCode: updatedProfile.address?.zipCode || "",
+          country: updatedProfile.address?.country || "",
+          taxId: updatedProfile.taxInfo?.taxId || "",
+        });
+
+        toast.success("Profile updated successfully!");
         setEditing(false);
       }
     } catch (error) {
-      console.error('Error updating profile:', error);
-      toast.error('Failed to update profile');
+      console.error("Error updating profile:", error);
+      toast.error("Failed to update profile");
     } finally {
       setLoading(false);
     }
@@ -136,39 +172,42 @@ const ClientProfile = () => {
   const handleChangePassword = async (e) => {
     e.preventDefault();
 
-    // Validate passwords
-    if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
-      toast.error('Please fill all password fields');
+    if (
+      !passwordData.currentPassword ||
+      !passwordData.newPassword ||
+      !passwordData.confirmPassword
+    ) {
+      toast.error("Please fill all password fields");
       return;
     }
 
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      toast.error('New passwords do not match');
+      toast.error("New passwords do not match");
       return;
     }
 
     if (passwordData.newPassword.length < 6) {
-      toast.error('Password must be at least 6 characters long');
+      toast.error("Password must be at least 6 characters long");
       return;
     }
 
     try {
       setLoading(true);
-      
+
       await clientAPI.changePassword({
         currentPassword: passwordData.currentPassword,
         newPassword: passwordData.newPassword,
       });
 
-      toast.success('Password changed successfully!');
+      toast.success("Password changed successfully!");
       setPasswordData({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: '',
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
       });
     } catch (error) {
-      console.error('Error changing password:', error);
-      toast.error(error.response?.data?.message || 'Failed to change password');
+      console.error("Error changing password:", error);
+      toast.error(error.response?.data?.message || "Failed to change password");
     } finally {
       setLoading(false);
     }
@@ -186,7 +225,11 @@ const ClientProfile = () => {
           </button>
         ) : (
           <div className="edit-actions">
-            <button className="btn-save" onClick={handleSaveProfile} disabled={loading}>
+            <button
+              className="btn-save"
+              onClick={handleSaveProfile}
+              disabled={loading}
+            >
               <FiSave /> Save
             </button>
             <button className="btn-cancel" onClick={() => setEditing(false)}>
@@ -267,7 +310,11 @@ const ClientProfile = () => {
           </button>
         ) : (
           <div className="edit-actions">
-            <button className="btn-save" onClick={handleSaveProfile} disabled={loading}>
+            <button
+              className="btn-save"
+              onClick={handleSaveProfile}
+              disabled={loading}
+            >
               <FiSave /> Save
             </button>
             <button className="btn-cancel" onClick={() => setEditing(false)}>
@@ -498,46 +545,40 @@ const ClientProfile = () => {
     <div className="client-profile">
       <div className="profile-header">
         <div className="profile-avatar">
-          {personalInfo.avatar ? (
-            <img src={personalInfo.avatar} alt={personalInfo.name} />
-          ) : (
-            <div className="avatar-placeholder">
-              <FiUser />
-            </div>
-          )}
+          {user?.name?.charAt(0).toUpperCase()}
         </div>
         <div className="profile-info">
-          <h1>{personalInfo.name}</h1>
-          <p className="profile-email">{personalInfo.email}</p>
+          <h1>{personalInfo.name || "Loading..."}</h1>
+          <p className="profile-email">{personalInfo.email || "Loading..."}</p>
           <p className="profile-role">Client</p>
         </div>
       </div>
 
       <div className="profile-tabs">
         <button
-          className={`tab-btn ${activeTab === 'personal' ? 'active' : ''}`}
-          onClick={() => setActiveTab('personal')}
+          className={`tab-btn ${activeTab === "personal" ? "active" : ""}`}
+          onClick={() => setActiveTab("personal")}
         >
           <FiUser /> Personal Info
         </button>
         <button
-          className={`tab-btn ${activeTab === 'company' ? 'active' : ''}`}
-          onClick={() => setActiveTab('company')}
+          className={`tab-btn ${activeTab === "company" ? "active" : ""}`}
+          onClick={() => setActiveTab("company")}
         >
           <FiHome /> Company Info
         </button>
         <button
-          className={`tab-btn ${activeTab === 'security' ? 'active' : ''}`}
-          onClick={() => setActiveTab('security')}
+          className={`tab-btn ${activeTab === "security" ? "active" : ""}`}
+          onClick={() => setActiveTab("security")}
         >
           <FiLock /> Security
         </button>
       </div>
 
       <div className="profile-content">
-        {activeTab === 'personal' && renderPersonalInfo()}
-        {activeTab === 'company' && renderCompanyInfo()}
-        {activeTab === 'security' && renderSecurity()}
+        {activeTab === "personal" && renderPersonalInfo()}
+        {activeTab === "company" && renderCompanyInfo()}
+        {activeTab === "security" && renderSecurity()}
       </div>
     </div>
   );

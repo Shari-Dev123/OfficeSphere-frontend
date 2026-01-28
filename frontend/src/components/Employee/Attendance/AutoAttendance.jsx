@@ -74,47 +74,48 @@ function AutoAttendance() {
   };
 
   const handleCheckIn = async () => {
-    try {
-      setLoading(true);
-      
-      const checkInData = {
-        method: checkInMethod,
-        location: location || null,
-        timestamp: new Date(),
-      };
+  try {
+    setLoading(true);
+    const locationType = location ? 'Field' : 'Office';
+    const checkInData = {
+      method: checkInMethod,
+      location: location ? JSON.stringify(location) : null, // <-- stringify here
+      timestamp: new Date(),
+    };
 
-      const response = await employeeAPI.checkIn(checkInData);
-      setAttendanceStatus(response.data);
-      toast.success('Checked in successfully!');
-      
-    } catch (error) {
-      console.error('Check-in error:', error);
-      toast.error(error.response?.data?.message || 'Failed to check in');
-    } finally {
-      setLoading(false);
-    }
-  };
+    const response = await employeeAPI.checkIn(checkInData);
+    setAttendanceStatus(response.data);
+    toast.success('Checked in successfully!');
+    
+  } catch (error) {
+    console.error('Check-in error:', error);
+    toast.error(error.response?.data?.message || 'Failed to check in');
+  } finally {
+    setLoading(false);
+  }
+};
 
-  const handleCheckOut = async () => {
-    try {
-      setLoading(true);
-      
-      const checkOutData = {
-        location: location || null,
-        timestamp: new Date(),
-      };
+const handleCheckOut = async () => {
+  try {
+    setLoading(true);
 
-      const response = await employeeAPI.checkOut(checkOutData);
-      setAttendanceStatus(response.data);
-      toast.success('Checked out successfully!');
-      
-    } catch (error) {
-      console.error('Check-out error:', error);
-      toast.error(error.response?.data?.message || 'Failed to check out');
-    } finally {
-      setLoading(false);
-    }
-  };
+    const checkOutData = {
+      location: location ? JSON.stringify(location) : null, // <-- stringify here
+      timestamp: new Date(),
+    };
+
+    const response = await employeeAPI.checkOut(checkOutData);
+    setAttendanceStatus(response.data);
+    toast.success('Checked out successfully!');
+    
+  } catch (error) {
+    console.error('Check-out error:', error);
+    toast.error(error.response?.data?.message || 'Failed to check out');
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const formatTime = (date) => {
     if (!date) return '--:--';

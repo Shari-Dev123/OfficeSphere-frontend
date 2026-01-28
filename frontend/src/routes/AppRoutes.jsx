@@ -29,6 +29,7 @@ import MyTasks from '../Components/Employee/Tasks/MyTasks';
 import AutoAttendance from '../Components/Employee/Attendance/AutoAttendance';
 import MyProjects from '../Components/Employee/Projects/MyProjects';
 import DailyReportForm from '../Components/Employee/DailyReport/DailyReportForm';
+import EmployeeMeetings from '../Components/Employee/Meetings/EmployeeMeetings'; 
 import EmployeeProfile from '../Components/Employee/Profile/EmployeeProfile';
 
 // Client Components
@@ -221,6 +222,7 @@ function AppRoutes() {
         <Route path="attendance" element={<AutoAttendance />} />
         <Route path="projects" element={<MyProjects />} />
         <Route path="daily-report" element={<DailyReportForm />} />
+        <Route path="meetings" element={<EmployeeMeetings />} />
         <Route path="profile" element={<EmployeeProfile />} />
       </Route>
 

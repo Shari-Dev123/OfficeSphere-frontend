@@ -161,21 +161,31 @@
 }
 
 .edit-btn {
-  background: #e0e7ff;
-  color: #4f46e5;
+  background: #e0e7ff;    /* Light indigo background */
+  color: #4f46e5;         /* Indigo text */
+  padding: 0 16px !;        /* Horizontal padding */
+  height: 40px !;           /* Fixed height */
+  gap: 8px;               /* Space between icon and text */
 }
 
 .edit-btn:hover {
-  background: #c7d2fe;
+  background: #4f46e5;    /* Solid indigo on hover */
+  color: white;           /* White text on hover */
+  transform: scale(1.05); /* Slight scale up */
 }
 
 .delete-btn {
-  background: #fee2e2;
-  color: #dc2626;
+  background: #fee2e2;    /* Light red background */
+  color: #dc2626;         /* Red text */
+  padding: 0 16px;        /* Horizontal padding */
+  height: 40px;           /* Fixed height */
+  gap: 8px;               /* Space between icon and text */
 }
 
 .delete-btn:hover {
-  background: #fecaca;
+  background: #dc2626;    /* Solid red on hover */
+  color: white;           /* White text on hover */
+  transform: scale(1.05); /* Slight scale up */
 }
 
 /* Employee Info */

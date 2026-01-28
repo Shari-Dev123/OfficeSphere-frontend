@@ -192,12 +192,14 @@ function AddEmployee() {
                   onChange={handleChange}
                 >
                   <option value="">Select Department</option>
-                  <option value="development">Development</option>
-                  <option value="design">Design</option>
-                  <option value="marketing">Marketing</option>
-                  <option value="sales">Sales</option>
-                  <option value="hr">Human Resources</option>
-                  <option value="finance">Finance</option>
+                  <option value="Development">Development</option>
+                  <option value="Design">Design</option>
+                  <option value="Marketing">Marketing</option>
+                  <option value="Sales">Sales</option>
+                  <option value="Hr">Human Resources</option>
+                  <option value="Finance">Finance</option>
+                  <option value="Operations">Operations</option> 
+                  <option value="Management">Management</option>
                 </select>
               </div>
 
