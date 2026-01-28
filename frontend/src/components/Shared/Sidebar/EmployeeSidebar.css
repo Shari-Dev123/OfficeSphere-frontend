@@ -2,10 +2,11 @@
 .employee-sidebar {
   width: 260px;
   background: linear-gradient(180deg, #065f46 0%, #064e3b 100%);
-  height: calc(100vh - 70px);
+  /* height: calc(100vh - 70px); */
+  height: 100%;
   position: fixed;
   left: 0;
-  top: 70px;
+  top: 0;
   overflow-y: auto;
   transition: transform 0.3s ease;
   z-index: 50;
@@ -19,9 +20,11 @@
 
 .employee-sidebar .sidebar-header h3 {
   color: white;
-  font-size: 18px;
+  font-size: 23px;
   font-weight: 700;
   margin: 0;
+  margin-top: 39px;
+
   letter-spacing: 0.5px;
 }
 
@@ -89,7 +92,7 @@
   .employee-sidebar {
     transform: translateX(-100%);
   }
-  
+
   .employee-sidebar.open {
     transform: translateX(0);
   }
