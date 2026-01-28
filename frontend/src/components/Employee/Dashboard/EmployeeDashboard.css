@@ -13,7 +13,7 @@
   padding: 24px;
   /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
   /* background: linear-gradient(135deg, #20634a 0%, #5ac18e 100%); */
-      background: linear-gradient(135deg, #20634a 0%, #12241b 100%);
+  background: linear-gradient(135deg, #20634a 0%, #1a5035 100%);
   color: #ffffff !important;
 
 
@@ -38,8 +38,8 @@
   opacity: 0.9;
 }
 
-.current-date{
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+.current-date {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
 }
 
 .current-date p {
