@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import { employeeAPI } from "../../../utils/api";
 import { useAuth } from "../../../hooks/useAuth";
 import { toast } from "react-toastify";
-import { FiSave, FiCalendar, FiClock } from "react-icons/fi";
+import { FiSave, FiCalendar, FiClock, } from "react-icons/fi";
 import { MdAssignment } from "react-icons/md";
 import "./DailyReportForm.css";
+import { FaPaperPlane, FaRoad,FaLightbulb   } from "react-icons/fa";
+
 
 function DailyReportForm() {
   const { user } = useAuth();
@@ -166,7 +168,7 @@ function DailyReportForm() {
         {/* Challenges Faced */}
         <div className="form-section">
           <label htmlFor="challengesFaced" className="section-label">
-            Challenges/Blockers Faced
+            <FaRoad /> Challenges/Blockers Faced
           </label>
           <textarea
             id="challengesFaced"
@@ -185,7 +187,7 @@ function DailyReportForm() {
         {/* Tomorrow's Plan */}
         <div className="form-section">
           <label htmlFor="tomorrowPlan" className="section-label">
-            Tomorrow's Plan
+            <FaPaperPlane /> Tomorrow's Plan
           </label>
           <textarea
             id="tomorrowPlan"
@@ -227,7 +229,7 @@ function DailyReportForm() {
         {/* Additional Notes */}
         <div className="form-section">
           <label htmlFor="notes" className="section-label">
-            Additional Notes/Suggestions
+           <FaLightbulb  /> Additional Notes/Suggestions
           </label>
           <textarea
             id="notes"

@@ -7,31 +7,36 @@
 }
 
 /* ========== HEADER ========== */
-.profile-header {
+.employee-profile-header {
+  background: linear-gradient(135deg, #005461 0%, #005461 100%);
+  padding: 40px;
+  border-radius: 16px;
   display: flex;
   justify-content: space-between;
+  gap: 24px;
   align-items: center;
   margin-bottom: 32px;
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
 }
 
-.profile-header h1 {
+.employee-profile-header h1 {
   font-size: 32px;
   font-weight: 700;
-  color: #1a202c;
+  color: white;
   margin: 0;
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.profile-header h1 svg {
-  color: #667eea;
+.employee-profile-header h1 svg {
+  color: white;
 }
 
 .edit-btn,
 .change-password-btn {
   padding: 12px 24px;
-  background: #667eea;
+  background: linear-gradient(135deg, #249E94 0%, #249E94 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -46,7 +51,7 @@
 
 .edit-btn:hover,
 .change-password-btn:hover {
-  background: #5568d3;
+  background: #249E94;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
@@ -73,7 +78,7 @@
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #249E94 0%, #249E94 100%);
   color: white;
   display: flex;
   align-items: center;
@@ -87,14 +92,15 @@
   font-size: 28px;
   font-weight: 700;
   color: #1a202c;
-  margin: 0 0 8px 0;
+  margin: 0 0 -13px 0;
 }
 
 .profile-role {
   font-size: 16px;
-  color: #667eea;
+  color: black !important;
   font-weight: 600;
   margin: 4px 0;
+  margin-left: -15px;
   text-transform: capitalize;
 }
 
@@ -125,7 +131,7 @@
 }
 
 .section-title svg {
-  color: #667eea;
+  color: #249E94;
   font-size: 22px;
 }
 
@@ -165,7 +171,7 @@
 }
 
 .form-group label svg {
-  color: #667eea;
+  color: #249E94;
   font-size: 16px;
 }
 
@@ -173,7 +179,7 @@
 .form-group select,
 .form-group textarea {
   padding: 12px 16px;
-  border: 2px solid #e2e8f0;
+  border: 2px solid #e2eff0;
   border-radius: 8px;
   font-size: 15px;
   color: #1a202c;
@@ -186,15 +192,15 @@
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #249E94;
+  box-shadow: 0 0 0 3px rgba(93, 241, 252, 0.1);
 }
 
 .form-group input:disabled,
 .form-group select:disabled,
 .form-group textarea:disabled {
   background: #f7fafc;
-  color: #4a5568;
+  color: #4a6668;
   cursor: not-allowed;
 }
 
@@ -255,6 +261,7 @@
   font-size: 28px;
   font-weight: 700;
   margin-bottom: 8px;
+  color: white !important;
 }
 
 .employee-stat-label {
@@ -274,7 +281,7 @@
 
 .save-btn {
   padding: 14px 32px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #249E94 0%, #249E94 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -289,7 +296,7 @@
 
 .save-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 6px 16px rgba(102, 230, 234, 0.4);
 }
 
 .cancel-btn {
@@ -336,7 +343,7 @@
 }
 
 .section-header h3 svg {
-  color: #667eea;
+  color: #249E94;
 }
 
 .password-form {
@@ -355,7 +362,7 @@
 
 .spinner {
   border: 4px solid #f3f4f6;
-  border-top: 4px solid #667eea;
+  border-top: 4px solid #249E94;
   border-radius: 50%;
   width: 48px;
   height: 48px;
@@ -366,6 +373,7 @@
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
@@ -383,7 +391,7 @@
     padding: 16px;
   }
 
-  .profile-header {
+  .employee-profile-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
@@ -393,6 +401,10 @@
   .change-password-btn {
     width: 100%;
     justify-content: center;
+  }
+
+  .change-password-btn:hover {
+    background: linear-gradient(135deg, #249E94 0%, #249E94 100%) !important;
   }
 
   .profile-card {

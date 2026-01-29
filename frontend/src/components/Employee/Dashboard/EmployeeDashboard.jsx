@@ -213,6 +213,9 @@ function EmployeeDashboard() {
           ) : (
             <div className="no-data">
               <p>No tasks scheduled for today</p>
+              <button className="btn-primary" onClick={() => window.location.href = '/employee/tasks'}>
+                Check Tasks
+              </button>
             </div>
           )}
         </div>
@@ -241,6 +244,9 @@ function EmployeeDashboard() {
           ) : (
             <div className="no-data">
               <p>No upcoming meetings</p>
+              <button className="btn-primary" onClick={() => window.location.href = '/employee/meetings'}>
+                Check Meetings
+              </button>
             </div>
           )}
         </div>
@@ -265,6 +271,9 @@ function EmployeeDashboard() {
           ) : (
             <div className="no-data">
               <p>No recent activity</p>
+              <button className="btn-primary" onClick={() => window.location.href = '/employee/activities'}>
+                Check Activities
+              </button>
             </div>
           )}
         </div>
