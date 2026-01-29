@@ -102,7 +102,7 @@ function EmployeeDashboard() {
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-icon" style={{ backgroundColor: '#e3f2fd' }}>
-            <MdAssignment style={{ color: '#2196f3' }} />
+            <MdAssignment style={{ color: '#249E94' }} />
           </div>
           <div className="stat-info">
             <h3>{dashboardData.myTasks || 0}</h3>
@@ -112,7 +112,7 @@ function EmployeeDashboard() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ backgroundColor: '#e8f5e9' }}>
-            <FiCheckCircle style={{ color: '#4caf50' }} />
+            <FiCheckCircle style={{ color: '#249E94' }} />
           </div>
           <div className="stat-info">
             <h3>{dashboardData.completedTasks || 0}</h3>
@@ -121,8 +121,8 @@ function EmployeeDashboard() {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon" style={{ backgroundColor: '#fff3e0' }}>
-            <FiClock style={{ color: '#ff9800' }} />
+          <div className="stat-icon" style={{ backgroundColor: '#e8f5e9' }}>
+            <FiClock style={{ color: '#249E94' }} />
           </div>
           <div className="stat-info">
             <h3>{dashboardData.todayHours || '0h'}</h3>
@@ -132,7 +132,7 @@ function EmployeeDashboard() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ backgroundColor: '#f3e5f5' }}>
-            <FiTrendingUp style={{ color: '#9c27b0' }} />
+            <FiTrendingUp style={{ color: '#249E94' }} />
           </div>
           <div className="stat-info">
             <h3>{dashboardData.thisWeekHours || '0h'}</h3>
@@ -213,6 +213,9 @@ function EmployeeDashboard() {
           ) : (
             <div className="no-data">
               <p>No tasks scheduled for today</p>
+              <button className="btn-primary" onClick={() => window.location.href = '/employee/tasks'}>
+                Check Tasks
+              </button>
             </div>
           )}
         </div>
@@ -241,6 +244,9 @@ function EmployeeDashboard() {
           ) : (
             <div className="no-data">
               <p>No upcoming meetings</p>
+              <button className="btn-primary" onClick={() => window.location.href = '/employee/meetings'}>
+                Check Meetings
+              </button>
             </div>
           )}
         </div>
@@ -265,6 +271,9 @@ function EmployeeDashboard() {
           ) : (
             <div className="no-data">
               <p>No recent activity</p>
+              <button className="btn-primary" onClick={() => window.location.href = '/employee/activities'}>
+                Check Activities
+              </button>
             </div>
           )}
         </div>

@@ -25,7 +25,7 @@
 }
 
 .form-header h1 svg {
-  color: #667eea;
+  color: #249E94;
 }
 
 .form-header p {
@@ -39,7 +39,7 @@
   align-items: center;
   gap: 8px;
   padding: 12px 20px;
- background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+ background: linear-gradient(135deg, #249E94 0%, #249E94 100%);
 
   color: white;
   border-radius: 8px;
@@ -75,7 +75,7 @@
 }
 
 .section-label svg {
-  color: #667eea;
+  color: #249E94;
   font-size: 20px;
 }
 
@@ -96,8 +96,8 @@
 .date-input:focus,
 .hours-input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #249E94;
+  box-shadow: 0 0 0 3px rgba(85, 211, 250, 0.1);
 }
 
 .form-textarea {
@@ -115,8 +115,8 @@
 
 .form-textarea:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #249E94 !important;
+  box-shadow: 0 0 0 3px rgba(100, 245, 225, 0.1);
 }
 
 .form-textarea::placeholder {
@@ -142,7 +142,7 @@
 
 .submit-btn {
   padding: 16px 48px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #249E94 0%, #249E94 100%) !important;
   color: white;
   border: none;
   border-radius: 12px;
@@ -239,7 +239,7 @@
   background: #f7fafc;
   padding: 24px;
   border-radius: 12px;
-  border-left: 4px solid #667eea;
+  border-left: 4px solid #249E94;
 }
 
 .tips-section h3 {
@@ -267,7 +267,7 @@
 
 .tips-section li::before {
   content: '✓';
-  color: #48bb78;
+  color: #249E94;
   font-weight: 700;
   font-size: 16px;
 }

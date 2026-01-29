@@ -259,7 +259,7 @@ function EmployeeProfile() {
 
   return (
     <div className="employee-profile">
-      <div className="profile-header">
+      <div className="employee-profile-header">
         <h1>
           <FiUser /> My Profile
         </h1>

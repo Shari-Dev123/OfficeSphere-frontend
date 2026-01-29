@@ -117,8 +117,8 @@
 }
 
 .filter-btn:hover {
-  border-color: var(--primary-color);
-  color: var(--primary-color);
+  border-color: #249E94;
+  color: white;
   background: rgba(33, 150, 243, 0.05);
 }
 

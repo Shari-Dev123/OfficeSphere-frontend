@@ -11,8 +11,6 @@
   align-items: center;
   margin-bottom: 32px;
   padding: 24px;
-  /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
-  /* background: linear-gradient(135deg, #20634a 0%, #5ac18e 100%); */
   background: linear-gradient(135deg, #005461 0%, #005461 100%);
   color: #ffffff !important;
 
@@ -39,7 +37,7 @@
 }
 
 .current-date {
-  background: linear-gradient(135deg, #0C7779 0%, #0C7779 100%) !important;
+  background: linear-gradient(135deg, #249E94 0%, #249E94 100%) !important;
 }
 
 .current-date p {
@@ -127,7 +125,8 @@
 
 .dashboard-section h2 svg {
   font-size: 24px;
-  color: #667eea;
+  /* color: #667eea; */
+  color: #249E94
 }
 
 /* Attendance Widget */
@@ -195,7 +194,8 @@
 }
 
 .btn-primary {
-  background: #667eea;
+  /* background: #667eea; */
+  background: linear-gradient(135deg, #249E94 0%, #249E94 100%) !important;
   color: white;
   border: none;
   padding: 12px 24px;
@@ -443,7 +443,8 @@
 }
 
 .action-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
+  background: linear-gradient(135deg, #249E94 0%, #249E94 100%);
   color: white;
   border: none;
   padding: 24px 16px;
