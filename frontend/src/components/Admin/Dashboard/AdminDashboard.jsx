@@ -9,7 +9,6 @@ import "./AdminDashboard.css";
 
 function AdminDashboard() {
   const navigate = useNavigate();
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     totalEmployees: 0,
