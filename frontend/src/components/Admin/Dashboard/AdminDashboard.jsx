@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 import { adminAPI } from "../../../utils/api";
 import StatCard from "./StatCard";
 import { FiUsers, FiUserCheck, FiBriefcase, FiClock, FiArrowRight } from "react-icons/fi";
