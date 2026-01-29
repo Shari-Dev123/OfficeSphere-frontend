@@ -32,10 +32,17 @@ function ClientMeetings() {
   const fetchMeetings = async () => {
     try {
       setLoading(true);
+      console.log('🔍 Fetching client meetings...');
+      
       const response = await clientAPI.getMyMeetings();
-      setMeetings(response.data.meetings || []);
+      
+      console.log('✅ Meetings response:', response);
+      console.log('✅ Meetings data:', response.data);
+      
+      setMeetings(response.data.meetings || response.data.data || []);
     } catch (error) {
-      console.error('Error fetching meetings:', error);
+      console.error('❌ Error fetching meetings:', error);
+      console.error('❌ Error response:', error.response?.data);
       toast.error('Failed to load meetings');
     } finally {
       setLoading(false);
@@ -44,21 +51,87 @@ function ClientMeetings() {
 
   const handleScheduleMeeting = async (e) => {
     e.preventDefault();
+    
     try {
-      const meetingDateTime = new Date(`${formData.date}T${formData.time}`);
+      console.log('====================================');
+      console.log('📅 Scheduling meeting...');
+      console.log('====================================');
+      console.log('Form data:', formData);
       
-      await clientAPI.scheduleMeeting({
-        ...formData,
-        dateTime: meetingDateTime
-      });
+      // ✅ Validate required fields
+      if (!formData.title || !formData.date || !formData.time) {
+        toast.error('Please fill in all required fields');
+        return;
+      }
+
+      // ✅ Create meeting date/time
+      const meetingDateTime = new Date(`${formData.date}T${formData.time}`);
+      console.log('📅 Meeting date/time:', meetingDateTime);
+      
+      // ✅ Validate date is in future
+      if (meetingDateTime < new Date()) {
+        toast.error('Meeting date must be in the future');
+        return;
+      }
+
+      // ✅ Build meeting data in format backend expects
+      const meetingData = {
+        title: formData.title.trim(),
+        description: formData.description.trim() || '',
+        dateTime: meetingDateTime.toISOString(), // ISO format
+        duration: parseInt(formData.duration),
+        meetingType: formData.meetingType,
+        status: 'scheduled' // Default status
+      };
+
+      // ✅ Add location or meeting link based on type
+      if (formData.meetingType === 'online') {
+        if (formData.meetingLink && formData.meetingLink.trim()) {
+          meetingData.meetingLink = formData.meetingLink.trim();
+        }
+      } else if (formData.meetingType === 'in-person') {
+        if (!formData.location || !formData.location.trim()) {
+          toast.error('Location is required for in-person meetings');
+          return;
+        }
+        meetingData.location = formData.location.trim();
+      }
+
+      // ✅ Add project if selected
+      if (formData.projectId && formData.projectId.trim()) {
+        meetingData.projectId = formData.projectId.trim();
+      }
+
+      console.log('📤 Sending meeting data:', meetingData);
+      console.log('====================================');
+
+      const response = await clientAPI.scheduleMeeting(meetingData);
+      
+      console.log('====================================');
+      console.log('✅ Meeting scheduled successfully');
+      console.log('Response:', response.data);
+      console.log('====================================');
 
       toast.success('Meeting scheduled successfully!');
       setShowScheduleModal(false);
       resetForm();
       fetchMeetings();
+      
     } catch (error) {
-      console.error('Error scheduling meeting:', error);
-      toast.error(error.response?.data?.message || 'Failed to schedule meeting');
+      console.error('====================================');
+      console.error('❌ Error scheduling meeting');
+      console.error('====================================');
+      console.error('Error:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      console.error('====================================');
+      
+      // ✅ Show specific error message from backend
+      const errorMessage = error.response?.data?.message 
+        || error.response?.data?.error
+        || 'Failed to schedule meeting';
+      
+      toast.error(errorMessage);
     }
   };
 
@@ -68,12 +141,18 @@ function ClientMeetings() {
     }
 
     try {
+      console.log('🗑️ Cancelling meeting:', meetingId);
+      
       await clientAPI.cancelMeeting(meetingId);
+      
       toast.success('Meeting cancelled successfully');
       fetchMeetings();
     } catch (error) {
-      console.error('Error cancelling meeting:', error);
-      toast.error('Failed to cancel meeting');
+      console.error('❌ Error cancelling meeting:', error);
+      console.error('❌ Error response:', error.response?.data);
+      
+      const errorMessage = error.response?.data?.message || 'Failed to cancel meeting';
+      toast.error(errorMessage);
     }
   };
 
@@ -194,7 +273,9 @@ function ClientMeetings() {
                   )}
                 </div>
 
-                <p className="meeting-description">{meeting.description}</p>
+                {meeting.description && (
+                  <p className="meeting-description">{meeting.description}</p>
+                )}
 
                 <div className="meeting-details">
                   <div className="detail-item">
@@ -214,7 +295,7 @@ function ClientMeetings() {
                     ) : (
                       <>
                         <FiMapPin className="detail-icon" />
-                        <span>{meeting.location}</span>
+                        <span>{meeting.location || 'Location TBD'}</span>
                       </>
                     )}
                   </div>
@@ -262,7 +343,10 @@ function ClientMeetings() {
       {/* Schedule Meeting Modal */}
       <Modal
         isOpen={showScheduleModal}
-        onClose={() => setShowScheduleModal(false)}
+        onClose={() => {
+          setShowScheduleModal(false);
+          resetForm();
+        }}
         title="Schedule New Meeting"
       >
         <form onSubmit={handleScheduleMeeting} className="schedule-form">
@@ -274,6 +358,7 @@ function ClientMeetings() {
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               placeholder="Enter meeting title"
               required
+              maxLength={100}
             />
           </div>
 
@@ -284,6 +369,7 @@ function ClientMeetings() {
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Meeting agenda and description"
               rows="3"
+              maxLength={500}
             />
           </div>
 
@@ -311,7 +397,7 @@ function ClientMeetings() {
           </div>
 
           <div className="form-group">
-            <label>Duration (minutes)</label>
+            <label>Duration</label>
             <select
               value={formData.duration}
               onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
@@ -336,13 +422,16 @@ function ClientMeetings() {
 
           {formData.meetingType === 'online' ? (
             <div className="form-group">
-              <label>Meeting Link</label>
+              <label>Meeting Link (Optional)</label>
               <input
                 type="url"
                 value={formData.meetingLink}
                 onChange={(e) => setFormData({ ...formData, meetingLink: e.target.value })}
-                placeholder="https://zoom.us/j/..."
+                placeholder="https://zoom.us/j/... or https://meet.google.com/..."
               />
+              <small className="form-hint">
+                Leave empty if admin will provide the link
+              </small>
             </div>
           ) : (
             <div className="form-group">
@@ -361,11 +450,15 @@ function ClientMeetings() {
             <button 
               type="button" 
               className="cancel-btn"
-              onClick={() => setShowScheduleModal(false)}
+              onClick={() => {
+                setShowScheduleModal(false);
+                resetForm();
+              }}
             >
               Cancel
             </button>
             <button type="submit" className="submit-btn">
+              <FiPlus />
               Schedule Meeting
             </button>
           </div>
