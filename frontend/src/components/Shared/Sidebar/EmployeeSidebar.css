@@ -1,7 +1,7 @@
 /* Employee Sidebar */
 .employee-sidebar {
   width: 260px;
-  background: linear-gradient(180deg, #065f46 0%, #064e3b 100%);
+  background: linear-gradient(180deg, #005461 0%, #005461 100%);
   /* height: calc(100vh - 70px); */
   height: 100%;
   position: fixed;
@@ -52,7 +52,7 @@
 }
 
 .employee-sidebar .sidebar-item.active {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, #0C7779 0%, #0C7779 100%);
   color: white;
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
 }
@@ -91,6 +91,7 @@
 @media (max-width: 768px) {
   .employee-sidebar {
     transform: translateX(-100%);
+    margin-top: 34px;
   }
 
   .employee-sidebar.open {

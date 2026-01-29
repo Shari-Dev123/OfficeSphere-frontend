@@ -1,5 +1,6 @@
 /* Make sure the body and html take full width */
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   width: 100%;
@@ -46,7 +47,7 @@ html, body {
 .navbar-brand h2 {
   font-size: 29px;
   font-weight: 700;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #249E94 0%, #249E94 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -64,64 +65,115 @@ html, body {
   position: relative;
 }
 
-/* Icon Button */
+/* Notification Bell Button - Stylish Version */
 .navbar-icon-btn {
   position: relative;
-  background: none;
+  /* background: linear-gradient(145deg, #f0fdf4, #d1fae5);  */
+  background: linear-gradient(135deg, #249E94 0%, #249E94 100%);
   border: none;
   font-size: 20px;
-  color: #6b7280;
+  color:  white;
+  /* dark green icon */
   cursor: pointer;
-  padding: 10px;
-  border-radius: 8px;
-  transition: all 0.2s ease;
+  padding: 12px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+
+  /* Neumorphic shadow effect */
+  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1),
+    -5px -5px 15px rgba(255, 255, 255, 0.7);
 }
 
+/* Hover effect */
 .navbar-icon-btn:hover {
-  background: #f3f4f6;
-  color: #374151;
+  background: linear-gradient(145deg, #249E94, #249E94);
+  /* slightly darker green */
+  color: white;
+  transform: translateY(-2px) scale(1.1);
+  box-shadow: 6px 6px 18px rgba(0, 0, 0, 0.15),
+    -6px -6px 18px rgba(255, 255, 255, 0.8);
 }
 
 /* Notification Badge */
 .notification-badge {
   position: absolute;
-  top: 6px;
-  right: 6px;
+  top: 5px;
+  right: 5px;
   background: #ef4444;
+  /* red badge */
   color: white;
   font-size: 10px;
   font-weight: 700;
-  padding: 2px 5px;
-  border-radius: 10px;
-  min-width: 16px;
-  text-align: center;
+  padding: 2px 6px;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  animation: pulse 1.5s infinite;
 }
 
-/* User Button */
+/* Pulse Animation for unread notifications */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+
+/* User Button - Stylish Version */
 .navbar-user-btn {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: none;
+  /* background: linear-gradient(145deg, #f0f0ff, #e0e7ff); */
+  background: linear-gradient(145deg, #f0fdf4, #d1fae5); 
+  /* soft gradient */
   border: none;
   cursor: pointer;
-  padding: 8px 12px;
-  border-radius: 8px;
-  transition: background 0.2s ease;
+  padding: 10px 16px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+
+  /* Neumorphic shadow effect */
+  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1),
+    -5px -5px 15px rgba(255, 255, 255, 0.7);
 }
 
+/* Hover effect */
 .navbar-user-btn:hover {
-  background: #f3f4f6;
+  background: linear-gradient(145deg, #f0fdf4, #b2f1d1); 
+  /* slightly darker gradient */
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 6px 6px 18px rgba(0, 0, 0, 0.15),
+    -6px -6px 18px rgba(255, 255, 255, 0.8);
 }
 
+/* User Icon */
 .user-icon {
-  font-size: 32px;
-  color: #667eea;
+  font-size: 36px;
+  color: #249E94;
+  /* deep indigo */
+  transition: all 0.3s ease;
 }
 
+.navbar-user-btn:hover .user-icon {
+  color: #249E94;
+  /* slightly lighter on hover */
+}
+
+/* User Info */
 .user-info {
   display: flex;
   flex-direction: column;
@@ -131,15 +183,17 @@ html, body {
 
 .user-name {
   font-size: 14px;
-  font-weight: 600;
-  color: #1f2937;
+  font-weight: 700;
+  color: black;
 }
 
 .user-role {
   font-size: 12px;
-  color: #6b7280;
+  color: black;
   text-transform: capitalize;
+  font-weight: 500;
 }
+
 
 /* Dropdown Menu */
 .dropdown-menu {
@@ -159,6 +213,7 @@ html, body {
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -266,19 +321,20 @@ html, body {
 
 .user-avatar-large {
   font-size: 48px;
-  color: #667eea;
+  color: #249E94;
 }
 
 .user-menu-name {
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   color: #1f2937;
   margin: 0 0 4px 0;
 }
 
 .user-menu-email {
+  font-weight: 500;
   font-size: 12px;
-  color: #6b7280;
+  color: black;
   margin: 0;
 }
 
@@ -294,7 +350,7 @@ html, body {
   padding: 10px 12px;
   background: none;
   border: none;
-  color: #374151;
+  color: black;
   font-size: 14px;
   cursor: pointer;
   border-radius: 6px;
@@ -329,19 +385,19 @@ html, body {
   .navbar {
     padding: 0 16px;
   }
-  
+
   .navbar-toggle {
     display: flex;
   }
-  
+
   .navbar-brand h2 {
     font-size: 20px;
   }
-  
+
   .user-info {
     display: none;
   }
-  
+
   .dropdown-menu {
     right: -8px;
   }

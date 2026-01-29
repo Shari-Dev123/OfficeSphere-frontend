@@ -24,7 +24,7 @@
 }
 
 .header-left h1 svg {
-  color: #667eea;
+  color: #249E94 !important;
 }
 
 .header-left p {
@@ -52,19 +52,19 @@
 }
 
 .filter-buttons button:hover {
-  border-color: #667eea;
-  color: #667eea;
+  border-color: #249E94;
+  color: #249E94;
 }
 
 .filter-buttons button.active {
-  background: #667eea;
-  border-color: #667eea;
+  background: #249E94;
+  border-color: #249E94;
   color: white;
 }
 
 /* Active Timer Banner */
 .active-timer-banner {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #249E94 0%, #249E94 100%);
   color: white;
   padding: 16px 24px;
   border-radius: 12px;
