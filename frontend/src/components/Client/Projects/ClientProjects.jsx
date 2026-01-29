@@ -51,18 +51,23 @@ function ClientProjects() {
   }, [searchTerm, filterStatus, projects]);
 
   const fetchProjects = async () => {
-    try {
-      setLoading(true);
-      const response = await clientAPI.getMyProjects();
-      setProjects(response.data.projects || []);
-      setFilteredProjects(response.data.projects || []);
-    } catch (error) {
-      console.error('Error fetching projects:', error);
-      toast.error('Failed to load projects');
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    setLoading(true);
+    const response = await clientAPI.getMyProjects();
+    
+    // ✅ FIXED: Backend sends projects in 'data' field
+    const projectsArray = response.data.data || [];
+    
+    console.log('✅ Loaded projects:', projectsArray.length);
+    setProjects(projectsArray);
+    setFilteredProjects(projectsArray);
+  } catch (error) {
+    console.error('Error fetching projects:', error);
+    toast.error('Failed to load projects');
+  } finally {
+    setLoading(false);
+  }
+};
 
   const filterProjects = () => {
     let filtered = [...projects];

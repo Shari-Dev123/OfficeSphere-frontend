@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { adminAPI } from "../../../utils/api";
 import StatCard from "./StatCard";
-import { FiUsers, FiUserCheck, FiBriefcase, FiClock } from "react-icons/fi";
+import { FiUsers, FiUserCheck, FiBriefcase, FiClock, FiArrowRight } from "react-icons/fi";
 import { toast } from "react-toastify";
 import "./AdminDashboard.css";
 
 function AdminDashboard() {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     totalEmployees: 0,
@@ -15,26 +17,31 @@ function AdminDashboard() {
   });
   const [recentActivity, setRecentActivity] = useState([]);
   const [attendanceData, setAttendanceData] = useState([]);
+  const [recentProjects, setRecentProjects] = useState([]);
 
   useEffect(() => {
     fetchDashboardData();
+    fetchRecentProjects();
   }, []);
+
+  // 🔍 DEBUG: Monitor recentProjects state changes
+  useEffect(() => {
+    console.log('🔍 STATE UPDATE - recentProjects:', recentProjects);
+    console.log('🔍 STATE UPDATE - length:', recentProjects.length);
+  }, [recentProjects]);
 
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
       const response = await adminAPI.getDashboardStats();
 
-      console.log("🔍 Dashboard API Response:", response.data); // Debug log
+      console.log("🔍 Dashboard API Response:", response.data);
 
-      // Check response structure
       let dashboardData = {};
 
       if (response.data && response.data.data) {
-        // Backend returns { success: true, data: { ... } }
         dashboardData = response.data.data;
       } else if (response.data) {
-        // If response.data is already the dashboard data
         dashboardData = response.data;
       }
 
@@ -57,6 +64,67 @@ function AdminDashboard() {
     }
   };
 
+  const fetchRecentProjects = async () => {
+    try {
+      console.log('🔍 Starting fetchRecentProjects...');
+      
+      const response = await adminAPI.getProjects();
+      
+      console.log('====================================');
+      console.log('📊 PROJECTS FETCH DEBUG');
+      console.log('====================================');
+      console.log('Full response:', response);
+      console.log('response.data:', response.data);
+      console.log('response.data.projects:', response.data.projects);
+      console.log('response.data.data:', response.data.data);
+      console.log('====================================');
+      
+      // Get projects from response
+      const projects = response.data.projects || response.data.data || [];
+      
+      console.log('✅ Projects array:', projects);
+      console.log('✅ Projects length:', projects.length);
+      console.log('✅ First project:', projects[0]);
+      console.log('✅ Is array?', Array.isArray(projects));
+      console.log('====================================');
+      
+      // Set state
+      const recent = projects.slice(0, 5);
+      console.log('✅ Setting recentProjects to:', recent);
+      console.log('✅ Recent length:', recent.length);
+      
+      setRecentProjects(recent);
+      
+      console.log('✅ setRecentProjects called');
+      
+    } catch (error) {
+      console.error('❌ Error fetching projects:', error);
+      console.error('❌ Error details:', error.response?.data);
+    }
+  };
+
+  const getStatusColor = (status) => {
+    const statusMap = {
+      'Planning': 'planning',
+      'In Progress': 'in-progress',
+      'Completed': 'completed',
+      'On Hold': 'on-hold',
+    };
+    return statusMap[status] || 'planning';
+  };
+
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+    });
+  };
+
+  // 🔍 DEBUG: Log render
+  console.log('🎨 RENDERING AdminDashboard');
+  console.log('🎨 recentProjects in render:', recentProjects);
+  console.log('🎨 recentProjects.length:', recentProjects.length);
+
   if (loading) {
     return (
       <div className="admin-dashboard">
@@ -77,7 +145,10 @@ function AdminDashboard() {
           <p>Welcome back! Here's what's happening today.</p>
         </div>
         <div className="dashboard-actions">
-          <button className="btn btn-primary" onClick={fetchDashboardData}>
+          <button className="btn btn-primary" onClick={() => {
+            fetchDashboardData();
+            fetchRecentProjects();
+          }}>
             <FiClock /> Refresh
           </button>
         </div>
@@ -104,6 +175,8 @@ function AdminDashboard() {
           value={stats.activeProjects}
           icon={<FiBriefcase />}
           color="warning"
+          onClick={() => navigate('/admin/projects')}
+          style={{ cursor: 'pointer' }}
         />
         <StatCard
           title="Pending Tasks"
@@ -115,6 +188,72 @@ function AdminDashboard() {
 
       {/* Content Grid */}
       <div className="dashboard-content">
+        {/* Recent Projects Card */}
+        <div className="dashboard-card projects-overview-card">
+          <div className="card-header">
+            <h3><FiBriefcase /> Recent Projects ({recentProjects.length})</h3>
+            <button 
+              className="view-all-btn"
+              onClick={() => navigate('/admin/projects')}
+            >
+              View All <FiArrowRight />
+            </button>
+          </div>
+          <div className="card-body">
+            {/* 🔍 DEBUG: Show what's happening */}
+            {console.log('🎨 Rendering projects section, length:', recentProjects.length)}
+            
+            {recentProjects.length > 0 ? (
+              <div className="projects-list">
+                {console.log('🎨 Rendering projects list')}
+                {recentProjects.map((project, index) => {
+                  console.log(`🎨 Rendering project ${index}:`, project);
+                  return (
+                    <div 
+                      key={project._id} 
+                      className="project-item"
+                      onClick={() => navigate(`/admin/projects/${project._id}`)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <div className="project-info">
+                        <h4>{project.name}</h4>
+                        <div className="project-meta">
+                          <span>Client: {project.client?.companyName || 'N/A'}</span>
+                          {project.endDate && (
+                            <>
+                              <span>•</span>
+                              <span>Due: {formatDate(project.endDate)}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      <span className={`project-status-badge ${getStatusColor(project.status)}`}>
+                        {project.status}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="empty-state">
+                {console.log('🎨 Rendering empty state')}
+                <FiBriefcase style={{ fontSize: '48px', color: '#d1d5db' }} />
+                <p>No projects yet</p>
+                <p style={{ fontSize: '12px', color: '#999', marginTop: '8px' }}>
+                  Debug: recentProjects.length = {recentProjects.length}
+                </p>
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => navigate('/admin/projects/add')}
+                  style={{ marginTop: '12px' }}
+                >
+                  Create First Project
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Real-time Attendance */}
         <div className="dashboard-card">
           <div className="card-header">
@@ -188,11 +327,17 @@ function AdminDashboard() {
           </div>
           <div className="card-body">
             <div className="quick-actions-grid">
-              <button className="quick-action-btn">
+              <button 
+                className="quick-action-btn"
+                onClick={() => navigate('/admin/employees/add')}
+              >
                 <FiUsers />
                 <span>Add Employee</span>
               </button>
-              <button className="quick-action-btn">
+              <button 
+                className="quick-action-btn"
+                onClick={() => navigate('/admin/projects/add')}
+              >
                 <FiBriefcase />
                 <span>New Project</span>
               </button>
