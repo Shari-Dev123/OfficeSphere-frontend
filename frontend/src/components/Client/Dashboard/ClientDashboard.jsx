@@ -22,9 +22,15 @@ function ClientDashboard() {
     try {
       setLoading(true);
       const response = await clientAPI.getDashboard();
-      setDashboardData(response.data.stats);
-      setRecentUpdates(response.data.recentUpdates || []);
-      setUpcomingDeadlines(response.data.upcomingDeadlines || []);
+
+      console.log('📊 Dashboard Response:', response.data);
+
+      // Handle both possible response structures
+      const data = response.data.data || response.data;
+
+      setDashboardData(data.stats || response.data.stats);
+      setRecentUpdates(data.recentUpdates || []);
+      setUpcomingDeadlines(data.upcomingDeadlines || []);
     } catch (error) {
       console.error('Error fetching dashboard:', error);
       toast.error('Failed to load dashboard data');
@@ -109,7 +115,7 @@ function ClientDashboard() {
         {stats.map((stat, index) => (
           <Card key={index} className="stat-card">
             <div className="stat-content">
-              <div 
+              <div
                 className="stat-icon"
                 style={{ backgroundColor: stat.bgColor, color: stat.color }}
               >
@@ -145,7 +151,7 @@ function ClientDashboard() {
                     <p>{update.description}</p>
                     <span className="update-time">{formatDate(update.date)}</span>
                   </div>
-                  <div 
+                  <div
                     className="update-status"
                     style={{ color: getStatusColor(update.status) }}
                   >
@@ -180,11 +186,11 @@ function ClientDashboard() {
                     </div>
                     <div className="deadline-date">
                       <span className={`days-badge ${daysLeft <= 3 ? 'urgent' : ''}`}>
-                        {daysLeft > 0 
+                        {daysLeft > 0
                           ? `${daysLeft} days left`
-                          : daysLeft === 0 
-                          ? 'Today'
-                          : 'Overdue'
+                          : daysLeft === 0
+                            ? 'Today'
+                            : 'Overdue'
                         }
                       </span>
                       <span className="date-text">{formatDate(deadline.deadline)}</span>
