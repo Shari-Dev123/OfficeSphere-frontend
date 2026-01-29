@@ -120,8 +120,11 @@ export const adminAPI = {
   deleteProject: (id) => api.delete(`/admin/projects/${id}`),
 
   // ============ Attendance ============
+  // ✅ CRITICAL FIX: Use /admin/attendance endpoint (matching your backend adminController.js)
+  getDailyAttendance: (params) => api.get('/admin/attendance', { params }),
+  
+  // Keep other attendance endpoints for backward compatibility
   getAllAttendance: (params) => api.get('/attendance/admin', { params }),
-  getDailyAttendance: (params) => api.get('/attendance/admin/daily', { params }),
   getMonthlyAttendance: (params) => api.get('/attendance/admin/monthly', { params }),
   getAttendanceReport: (params) => api.get('/attendance/admin/report', { params }),
   getLateArrivals: (params) => api.get('/attendance/admin/late', { params }),
