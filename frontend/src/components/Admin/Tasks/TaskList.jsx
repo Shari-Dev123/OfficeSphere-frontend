@@ -198,10 +198,10 @@ function TaskList() {
                     {task.priority || 'Medium'}
                   </span>
                 </div>
-                <div className="task-actions">
+                <div className="admin-task-actions">
                   {/* ✅ FIXED: Added onClick handler */}
                   <button 
-                    className="action-btn edit-btn" 
+                    className="admin-action-btn admin-edit-btn" 
                     onClick={() => handleEdit(task._id)}
                     title="Edit Task"
                   >
@@ -209,7 +209,7 @@ function TaskList() {
                     <span>Edit</span>
                   </button>
                   <button
-                    className="action-btn delete-btn"
+                    className="admin-action-btn admin-delete-btn"
                     onClick={() => handleDelete(task._id, task.title)}
                     title="Delete Task"
                   >

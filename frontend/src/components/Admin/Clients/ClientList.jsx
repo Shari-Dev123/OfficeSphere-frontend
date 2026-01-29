@@ -201,9 +201,9 @@ function ClientList() {
                     <span>{client.name?.charAt(0) || "C"}</span>
                   )}
                 </div>
-                <div className="client-actions">
+                <div className="admin-client-actions">
                   <button
-                    className="action-btn edit-btn"
+                    className="admin-action-btn admin-edit-btn"
                     onClick={() => handleEdit(client._id)}
                     title="Edit"
                   >
@@ -211,7 +211,7 @@ function ClientList() {
                     <span>Edit</span>
                   </button>
                   <button
-                    className="action-btn delete-btn"
+                    className="admin-action-btn admin-delete-btn"
                     onClick={() => handleDelete(client._id, client.name)}
                     title="Delete"
                   >

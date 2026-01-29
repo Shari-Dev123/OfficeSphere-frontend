@@ -143,13 +143,13 @@
   object-fit: cover;
 }
 
-.client-actions {
+.admin-client-actions {
   display: flex;
   gap: 8px;
 }
 
-.action-btn {
-  width: 36px;
+.admin-action-btn {
+  width: 100px;
   height: 36px;
   border-radius: 8px;
   border: none;
@@ -161,21 +161,21 @@
   font-size: 16px;
 }
 
-.edit-btn {
+.admin-edit-btn {
   background: #e0e7ff;
   color: #4f46e5;
 }
 
-.edit-btn:hover {
+.admin-edit-btn:hover {
   background: #c7d2fe;
 }
 
-.delete-btn {
+.admin-delete-btn {
   background: #fee2e2;
   color: #dc2626;
 }
 
-.delete-btn:hover {
+.admin-delete-btn:hover {
   background: #fecaca;
 }
 

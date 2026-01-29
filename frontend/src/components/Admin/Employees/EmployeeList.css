@@ -142,13 +142,13 @@
   object-fit: cover;
 }
 
-.employee-actions {
+.admin-employee-actions {
   display: flex;
   gap: 8px;
 }
 
-.action-btn {
-  width: 36px;
+.admin-action-btn {
+  width: 100px;
   height: 36px;
   border-radius: 8px;
   border: none;
@@ -160,21 +160,21 @@
   font-size: 16px;
 }
 
-.edit-btn {
+.admin-edit-btn {
   background: #e0e7ff;    /* Light indigo background */
   color: #4f46e5;         /* Indigo text */
-  padding: 0 16px !;        /* Horizontal padding */
-  height: 40px !;           /* Fixed height */
+  padding: 0 16px;        /* Horizontal padding */
+  height: 40px;           /* Fixed height */
   gap: 8px;               /* Space between icon and text */
 }
 
-.edit-btn:hover {
+.admin-edit-btn:hover {
   background: #4f46e5;    /* Solid indigo on hover */
   color: white;           /* White text on hover */
   transform: scale(1.05); /* Slight scale up */
 }
 
-.delete-btn {
+.admin-delete-btn {
   background: #fee2e2;    /* Light red background */
   color: #dc2626;         /* Red text */
   padding: 0 16px;        /* Horizontal padding */
@@ -182,7 +182,7 @@
   gap: 8px;               /* Space between icon and text */
 }
 
-.delete-btn:hover {
+.admin-delete-btn:hover {
   background: #dc2626;    /* Solid red on hover */
   color: white;           /* White text on hover */
   transform: scale(1.05); /* Slight scale up */

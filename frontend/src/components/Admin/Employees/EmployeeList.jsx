@@ -141,9 +141,9 @@ function EmployeeList() {
                 <div className="employee-avatar">
                   {employee?.name?.charAt(0).toUpperCase()}
                 </div>
-                <div className="employee-actions">
+                <div className="admin-employee-actions">
                   <button
-                    className="action-btn edit-btn"
+                    className="admin-action-btn admin-edit-btn"
                     onClick={() => handleEdit(employee._id)}
                     title="Edit"
                   >
@@ -151,7 +151,7 @@ function EmployeeList() {
                     <span>Edit</span>
                   </button>
                   <button
-                    className="action-btn delete-btn"
+                    className="admin-action-btn admin-delete-btn"
                     onClick={() => handleDelete(employee._id, employee.name)}
                     title="Delete"
                   >
