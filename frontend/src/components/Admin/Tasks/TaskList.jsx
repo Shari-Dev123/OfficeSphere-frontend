@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { adminAPI } from '../../../utils/api';
 import { FiPlus, FiEdit2, FiTrash2, FiClock, FiUser, FiCalendar } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import './TaskList.css';
 
 function TaskList() {
+  const navigate = useNavigate(); // ✅ Already have this
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('all'); // all, pending, in-progress, completed
+  const [filter, setFilter] = useState('all');
 
   useEffect(() => {
     fetchTasks();
@@ -17,10 +19,15 @@ function TaskList() {
     try {
       setLoading(true);
       const response = await adminAPI.getTasks();
-      setTasks(response.data.tasks || []);
+      console.log('Tasks response:', response.data);
+      
+      // ✅ Handle nested 'data' structure
+      const tasksData = response.data.data || response.data.tasks || response.data || [];
+      setTasks(Array.isArray(tasksData) ? tasksData : []);
     } catch (error) {
       console.error('Error fetching tasks:', error);
       toast.error('Failed to load tasks');
+      setTasks([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
@@ -39,6 +46,20 @@ function TaskList() {
       console.error('Error deleting task:', error);
       toast.error('Failed to delete task');
     }
+  };
+
+  // ✅ NEW: Handle Edit button
+  const handleEdit = (id) => {
+    navigate(`/admin/tasks/edit/${id}`);
+    // OR if you don't have edit page yet:
+    // toast.info('Edit functionality coming soon');
+  };
+
+  // ✅ NEW: Handle Create Task button
+  const handleCreateTask = () => {
+    navigate('/admin/tasks/create');
+    // OR if you don't have create page yet:
+    // toast.info('Create task page coming soon');
   };
 
   const getFilteredTasks = () => {
@@ -109,7 +130,11 @@ function TaskList() {
           <h1>Tasks</h1>
           <p>Manage and assign tasks to employees</p>
         </div>
-        <button className="btn btn-primary">
+        {/* ✅ FIXED: Added onClick handler */}
+        <button 
+          className="btn btn-primary"
+          onClick={handleCreateTask}
+        >
           <FiPlus /> Create Task
         </button>
       </div>
@@ -174,15 +199,22 @@ function TaskList() {
                   </span>
                 </div>
                 <div className="task-actions">
-                  <button className="action-btn edit-btn" title="Edit">
+                  {/* ✅ FIXED: Added onClick handler */}
+                  <button 
+                    className="action-btn edit-btn" 
+                    onClick={() => handleEdit(task._id)}
+                    title="Edit Task"
+                  >
                     <FiEdit2 />
+                    <span>Edit</span>
                   </button>
                   <button
                     className="action-btn delete-btn"
                     onClick={() => handleDelete(task._id, task.title)}
-                    title="Delete"
+                    title="Delete Task"
                   >
                     <FiTrash2 />
+                    <span>Delete</span>
                   </button>
                 </div>
               </div>
@@ -196,11 +228,15 @@ function TaskList() {
                 <div className="task-meta">
                   <div className="meta-item">
                     <FiUser />
-                    <span>{task.assignedTo?.name || 'Unassigned'}</span>
+                    <span>
+                      {task.assignedTo?.name || 
+                       task.assignedTo?.userId?.name || 
+                       'Unassigned'}
+                    </span>
                   </div>
                   <div className="meta-item">
                     <FiCalendar />
-                    <span>{formatDate(task.deadline)}</span>
+                    <span>{formatDate(task.dueDate || task.deadline)}</span>
                   </div>
                   <div className="meta-item">
                     <FiClock />
@@ -215,7 +251,7 @@ function TaskList() {
                 </span>
                 {task.project && (
                   <span className="project-tag">
-                    {task.project.name}
+                    {task.project.name || task.project}
                   </span>
                 )}
               </div>
@@ -231,7 +267,11 @@ function TaskList() {
               ? `No ${filter.replace('-', ' ')} tasks`
               : 'Start by creating your first task'}
           </p>
-          <button className="btn btn-primary">
+          {/* ✅ FIXED: Added onClick handler */}
+          <button 
+            className="btn btn-primary"
+            onClick={handleCreateTask}
+          >
             <FiPlus /> Create First Task
           </button>
         </div>

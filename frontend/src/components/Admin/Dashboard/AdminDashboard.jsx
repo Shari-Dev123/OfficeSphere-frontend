@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { adminAPI } from "../../../utils/api";
 import StatCard from "./StatCard";
 import { FiUsers, FiUserCheck, FiBriefcase, FiClock } from "react-icons/fi";
@@ -6,6 +7,7 @@ import { toast } from "react-toastify";
 import "./AdminDashboard.css";
 
 function AdminDashboard() {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     totalEmployees: 0,
@@ -55,6 +57,22 @@ function AdminDashboard() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleAddEmployee = () => {
+    navigate("/admin/employees/add");
+  };
+
+  const handleNewProject = () => {
+    navigate("/admin/projects/add");
+  };
+
+  const handleAssignTask = () => {
+    navigate("/admin/tasks");
+  };
+
+  const handleScheduleMeeting = () => {
+    navigate("/admin/meetings/schedule");
   };
 
   if (loading) {
@@ -188,19 +206,22 @@ function AdminDashboard() {
           </div>
           <div className="card-body">
             <div className="quick-actions-grid">
-              <button className="quick-action-btn">
+              <button className="quick-action-btn" onClick={handleAddEmployee}>
                 <FiUsers />
                 <span>Add Employee</span>
               </button>
-              <button className="quick-action-btn">
+              <button className="quick-action-btn" onClick={handleNewProject}>
                 <FiBriefcase />
                 <span>New Project</span>
               </button>
-              <button className="quick-action-btn">
+              <button className="quick-action-btn" onClick={handleAssignTask}>
                 <FiClock />
                 <span>Assign Task</span>
               </button>
-              <button className="quick-action-btn">
+              <button
+                className="quick-action-btn"
+                onClick={handleScheduleMeeting}
+              >
                 <FiUserCheck />
                 <span>Schedule Meeting</span>
               </button>
