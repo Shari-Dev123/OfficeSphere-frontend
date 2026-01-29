@@ -65,7 +65,7 @@ function MyProjects() {
     <div className="my-projects">
       <div className="projects-header">
         <h1><FiFolder /> My Projects</h1>
-        <p>{projects.length} active projects</p>
+        <p>{projects.length} Active Projects</p>
       </div>
 
       <div className="projects-grid">

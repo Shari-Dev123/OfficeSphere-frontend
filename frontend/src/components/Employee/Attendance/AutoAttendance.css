@@ -23,7 +23,8 @@
 
 /* Time Display */
 .time-display {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
+  background: linear-gradient(135deg, #249E94 0%, #249E94 100%);
   padding: 40px;
   border-radius: 16px;
   display: flex;
@@ -37,6 +38,13 @@
 .clock-icon {
   font-size: 64px;
   color: white;
+}
+
+.time-info {
+    background: #f7fafc;
+    padding: 16px;
+    border-radius: 8px;
+    border-left: 4px solid #249E94;
 }
 
 .time-info h2 {
@@ -63,15 +71,15 @@
 }
 
 .status-card.checked-in {
-  border-left: 6px solid #48bb78;
+  border-left: 6px solid #249E94;
 }
 
 .status-card.checked-out {
-  border-left: 6px solid #667eea;
+  border-left: 6px solid #249E94;
 }
 
 .status-card.not-checked-in {
-  border-left: 6px solid #f59e0b;
+  border-left: 6px solid #249E94;
 }
 
 .status-header {
@@ -86,11 +94,11 @@
 }
 
 .status-icon.success {
-  color: #48bb78;
+  color: #249E94;
 }
 
 .status-icon.warning {
-  color: #f59e0b;
+  color: #ff0000;
 }
 
 .status-header h3 {
@@ -176,9 +184,10 @@
 }
 
 .method-card.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
+  background: linear-gradient(135deg, #249E94 0%, #249E94 100%);
   color: white;
-  border-color: #667eea;
+  border-color: #249E94;
 }
 
 .method-card svg {
@@ -203,7 +212,7 @@
 
 .location-info svg {
   font-size: 24px;
-  color: #667eea;
+  color: #249E94;
   flex-shrink: 0;
   margin-top: 4px;
 }
@@ -249,14 +258,14 @@
 }
 
 .btn-check-in {
-  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  background: linear-gradient(135deg, #249E94 0%, #249E94 100%);
   color: white;
   box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
 }
 
 .btn-check-in:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(72, 187, 120, 0.4);
+  box-shadow: 0 6px 16px rgba(72, 183, 187, 0.4);
 }
 
 .btn-check-out {
@@ -363,8 +372,8 @@
 .quick-links button {
   padding: 12px 24px;
   background: white;
-  border: 2px solid #667eea;
-  color: #667eea;
+  border: 2px solid #249E94;
+  color: #249E94;
   border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
@@ -373,7 +382,7 @@
 }
 
 .quick-links button:hover {
-  background: #667eea;
+  background: #249E94;
   color: white;
 }
 
