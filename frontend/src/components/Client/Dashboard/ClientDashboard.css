@@ -5,47 +5,47 @@
 }
 
 /* Dashboard Header */
-.dashboard-header {
+.client-dashboard-header {
   margin-bottom: 24px;
 }
 
-.welcome-section h1 {
+.client-welcome-section h1 {
   font-size: 28px;
   font-weight: 700;
   color: #1f2937;
   margin-bottom: 8px;
 }
 
-.welcome-section p {
+.client-welcome-section p {
   font-size: 16px;
   color: #6b7280;
 }
 
 /* Stats Grid */
-.stats-grid {
+.client-stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 20px;
   margin-bottom: 24px;
 }
 
-.stat-card {
+.client-stat-card {
   padding: 20px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.stat-card:hover {
+.client-stat-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
 }
 
-.stat-content {
+.client-stat-content {
   display: flex;
   align-items: center;
   gap: 16px;
 }
 
-.stat-icon {
+.client-stat-icon {
   width: 60px;
   height: 60px;
   display: flex;
@@ -56,17 +56,17 @@
   flex-shrink: 0;
 }
 
-.stat-details {
+.client-stat-details {
   flex: 1;
 }
 
-.stat-title {
+.client-stat-title {
   font-size: 14px;
   color: #6b7280;
   margin-bottom: 4px;
 }
 
-.stat-value {
+.client-stat-value {
   font-size: 32px;
   font-weight: 700;
   color: #1f2937;
@@ -246,24 +246,24 @@
 }
 
 /* Quick Actions Card */
-.quick-actions-card {
+.client-quick-actions-card {
   padding: 20px;
 }
 
-.quick-actions-card h3 {
+.client-quick-actions-card h3 {
   font-size: 18px;
   font-weight: 600;
   color: #1f2937;
   margin: 0 0 16px 0;
 }
 
-.quick-actions-grid {
+.client-quick-actions-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 12px;
 }
 
-.action-btn {
+.client-action-btn {
   padding: 16px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
@@ -279,16 +279,16 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.action-btn svg {
+.client-action-btn svg {
   font-size: 20px;
 }
 
-.action-btn:hover {
+.client-action-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
 }
 
-.action-btn:active {
+.client-action-btn:active {
   transform: translateY(0);
 }
 

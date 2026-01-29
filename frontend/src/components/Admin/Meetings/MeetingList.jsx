@@ -121,40 +121,40 @@ function MeetingList() {
 
       {/* Stats */}
       <div className="meeting-stats">
-        <div className="stat-item">
-          <div className="stat-icon total">
+        <div className="admin-stat-item">
+          <div className="admin-stat-icon total">
             <FiCalendar />
           </div>
-          <div className="stat-content">
-            <span className="stat-value">{stats.total}</span>
-            <span className="stat-label">Total Meetings</span>
+          <div className="admin-stat-content">
+            <span className="admin-stat-value">{stats.total}</span>
+            <span className="admin-stat-label">Total Meetings</span>
           </div>
         </div>
-        <div className="stat-item">
-          <div className="stat-icon today">
+        <div className="admin-stat-item">
+          <div className="admin-stat-icon today">
             <FiClock />
           </div>
-          <div className="stat-content">
-            <span className="stat-value">{stats.today}</span>
-            <span className="stat-label">Today</span>
+          <div className="admin-stat-content">
+            <span className="admin-stat-value">{stats.today}</span>
+            <span className="admin-stat-label">Today</span>
           </div>
         </div>
-        <div className="stat-item">
-          <div className="stat-icon upcoming">
+        <div className="admin-stat-item">
+          <div className="admin-stat-icon upcoming">
             <FiCalendar />
           </div>
-          <div className="stat-content">
-            <span className="stat-value">{stats.upcoming}</span>
-            <span className="stat-label">Upcoming</span>
+          <div className="admin-stat-content">
+            <span className="admin-stat-value">{stats.upcoming}</span>
+            <span className="admin-stat-label">Upcoming</span>
           </div>
         </div>
-        <div className="stat-item">
-          <div className="stat-icon past">
+        <div className="admin-stat-item">
+          <div className="admin-stat-icon past">
             <FiVideo />
           </div>
-          <div className="stat-content">
-            <span className="stat-value">{stats.past}</span>
-            <span className="stat-label">Past</span>
+          <div className="admin-stat-content">
+            <span className="admin-stat-value">{stats.past}</span>
+            <span className="admin-stat-label">Past</span>
           </div>
         </div>
       </div>

@@ -26,14 +26,14 @@
 }
 
 /* Task Stats */
-.task-stats {
+.admin-task-stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
   margin-bottom: 24px;
 }
 
-.stat-item {
+.admin-stat-item {
   background: white;
   padding: 20px;
   border-radius: 12px;
@@ -41,7 +41,7 @@
   text-align: center;
 }
 
-.stat-value {
+.admin-stat-value {
   display: block;
   font-size: 32px;
   font-weight: 700;
@@ -49,19 +49,19 @@
   margin-bottom: 8px;
 }
 
-.stat-value.stat-info {
+.admin-stat-value.admin-stat-info {
   color: #3b82f6;
 }
 
-.stat-value.stat-warning {
+.admin-stat-value.admin-stat-warning {
   color: #f59e0b;
 }
 
-.stat-value.stat-success {
+.admin-stat-value.admin-stat-success {
   color: #10b981;
 }
 
-.stat-label {
+.admin-stat-label {
   font-size: 14px;
   color: #6b7280;
   font-weight: 500;

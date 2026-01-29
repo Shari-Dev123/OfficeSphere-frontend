@@ -99,42 +99,42 @@ function EmployeeDashboard() {
       </div>
 
       {/* Stats Cards */}
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-icon" style={{ backgroundColor: '#e3f2fd' }}>
+      <div className="employee-stats-grid">
+        <div className="employee-stat-card">
+          <div className="employee-stat-icon" style={{ backgroundColor: '#e3f2fd' }}>
             <MdAssignment style={{ color: '#2196f3' }} />
           </div>
-          <div className="stat-info">
+          <div className="employee-stat-info">
             <h3>{dashboardData.myTasks || 0}</h3>
             <p>My Tasks</p>
           </div>
         </div>
 
-        <div className="stat-card">
-          <div className="stat-icon" style={{ backgroundColor: '#e8f5e9' }}>
+        <div className="employee-stat-card">
+          <div className="employee-stat-icon" style={{ backgroundColor: '#e8f5e9' }}>
             <FiCheckCircle style={{ color: '#4caf50' }} />
           </div>
-          <div className="stat-info">
+          <div className="employee-stat-info">
             <h3>{dashboardData.completedTasks || 0}</h3>
             <p>Completed</p>
           </div>
         </div>
 
-        <div className="stat-card">
-          <div className="stat-icon" style={{ backgroundColor: '#fff3e0' }}>
+        <div className="employee-stat-card">
+          <div className="employee-stat-icon" style={{ backgroundColor: '#fff3e0' }}>
             <FiClock style={{ color: '#ff9800' }} />
           </div>
-          <div className="stat-info">
+          <div className="employee-stat-info">
             <h3>{dashboardData.todayHours || '0h'}</h3>
             <p>Today's Hours</p>
           </div>
         </div>
 
-        <div className="stat-card">
-          <div className="stat-icon" style={{ backgroundColor: '#f3e5f5' }}>
+        <div className="employee-stat-card">
+          <div className="employee-stat-icon" style={{ backgroundColor: '#f3e5f5' }}>
             <FiTrendingUp style={{ color: '#9c27b0' }} />
           </div>
-          <div className="stat-info">
+          <div className="employee-stat-info">
             <h3>{dashboardData.thisWeekHours || '0h'}</h3>
             <p>This Week</p>
           </div>

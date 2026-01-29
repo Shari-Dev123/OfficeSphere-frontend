@@ -516,25 +516,25 @@ const AdminSettings = () => {
 
       <div className="settings-tabs">
         <button
-          className={`tab-btn ${activeTab === 'company' ? 'active' : ''}`}
+          className={`admin-tab-btn ${activeTab === 'company' ? 'active' : ''}`}
           onClick={() => setActiveTab('company')}
         >
           <FiHome /> Company
         </button>
         <button
-          className={`tab-btn ${activeTab === 'work' ? 'active' : ''}`}
+          className={`admin-tab-btn ${activeTab === 'work' ? 'active' : ''}`}
           onClick={() => setActiveTab('work')}
         >
           <FiClock /> Working Hours
         </button>
         <button
-          className={`tab-btn ${activeTab === 'attendance' ? 'active' : ''}`}
+          className={`admin-tab-btn ${activeTab === 'attendance' ? 'active' : ''}`}
           onClick={() => setActiveTab('attendance')}
         >
           <FiSettings /> Attendance
         </button>
         <button
-          className={`tab-btn ${activeTab === 'email' ? 'active' : ''}`}
+          className={`admin-tab-btn ${activeTab === 'email' ? 'active' : ''}`}
           onClick={() => setActiveTab('email')}
         >
           <FiMail /> Notifications

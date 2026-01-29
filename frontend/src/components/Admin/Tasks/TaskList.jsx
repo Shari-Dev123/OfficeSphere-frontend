@@ -140,22 +140,22 @@ function TaskList() {
       </div>
 
       {/* Stats */}
-      <div className="task-stats">
-        <div className="stat-item">
-          <span className="stat-value">{stats.total}</span>
-          <span className="stat-label">Total Tasks</span>
+      <div className="admin-task-stats">
+        <div className="admin-stat-item">
+          <span className="admin-stat-value">{stats.total}</span>
+          <span className="admin-stat-label">Total Tasks</span>
         </div>
-        <div className="stat-item">
-          <span className="stat-value stat-info">{stats.pending}</span>
-          <span className="stat-label">Pending</span>
+        <div className="admin-stat-item">
+          <span className="admin-stat-value admin-stat-info">{stats.pending}</span>
+          <span className="admin-stat-label">Pending</span>
         </div>
-        <div className="stat-item">
-          <span className="stat-value stat-warning">{stats.inProgress}</span>
-          <span className="stat-label">In Progress</span>
+        <div className="admin-stat-item">
+          <span className="admin-stat-value admin-stat-warning">{stats.inProgress}</span>
+          <span className="admin-stat-label">In Progress</span>
         </div>
-        <div className="stat-item">
-          <span className="stat-value stat-success">{stats.completed}</span>
-          <span className="stat-label">Completed</span>
+        <div className="admin-stat-item">
+          <span className="admin-stat-value admin-stat-success">{stats.completed}</span>
+          <span className="admin-stat-label">Completed</span>
         </div>
       </div>
 
