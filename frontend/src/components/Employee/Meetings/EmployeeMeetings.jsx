@@ -201,21 +201,21 @@ function EmployeeMeetings() {
           />
         </div>
 
-        <div className="filter-buttons">
+        <div className="employee-filter-buttons">
           <button
-            className={`filter-btn ${filterType === 'all' ? 'active' : ''}`}
+            className={`employee-filter-btn ${filterType === 'all' ? 'active' : ''}`}
             onClick={() => setFilterType('all')}
           >
             <FiFilter /> All Meetings
           </button>
           <button
-            className={`filter-btn ${filterType === 'upcoming' ? 'active' : ''}`}
+            className={`employee-filter-btn ${filterType === 'upcoming' ? 'active' : ''}`}
             onClick={() => setFilterType('upcoming')}
           >
             <FiCalendar /> Upcoming
           </button>
           <button
-            className={`filter-btn ${filterType === 'past' ? 'active' : ''}`}
+            className={`employee-filter-btn ${filterType === 'past' ? 'active' : ''}`}
             onClick={() => setFilterType('past')}
           >
             <FiClock /> Past

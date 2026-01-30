@@ -328,30 +328,30 @@ function ClientProjects() {
                   </div>
                 </div>
 
-                <div className="project-stats">
-                  <div className="stat-item">
-                    <BiTask className="stat-icon" />
-                    <div className="stat-details">
-                      <span className="stat-value">{project.tasksCompleted}/{project.totalTasks}</span>
-                      <span className="stat-label">Tasks</span>
+                <div className="client-project-stats">
+                  <div className="client-stat-item">
+                    <BiTask className="client-stat-icon" />
+                    <div className="client-stat-details">
+                      <span className="client-stat-value">{project.tasksCompleted}/{project.totalTasks}</span>
+                      <span className="client-stat-label">Tasks</span>
                     </div>
                   </div>
 
-                  <div className="stat-item">
-                    <FiCheckCircle className="stat-icon" />
-                    <div className="stat-details">
-                      <span className="stat-value">{project.milestonesCompleted}/{project.totalMilestones}</span>
-                      <span className="stat-label">Milestones</span>
+                  <div className="client-stat-item">
+                    <FiCheckCircle className="client-stat-icon" />
+                    <div className="client-stat-details">
+                      <span className="client-stat-value">{project.milestonesCompleted}/{project.totalMilestones}</span>
+                      <span className="client-stat-label">Milestones</span>
                     </div>
                   </div>
 
-                  <div className="stat-item">
-                    <FiClock className="stat-icon" />
-                    <div className="stat-details">
-                      <span className={`stat-value ${daysLeft <= 7 ? 'urgent' : ''}`}>
+                  <div className="client-stat-item">
+                    <FiClock className="client-stat-icon" />
+                    <div className="client-stat-details">
+                      <span className={`client-stat-value ${daysLeft <= 7 ? 'urgent' : ''}`}>
                         {daysLeft > 0 ? `${daysLeft} days` : 'Overdue'}
                       </span>
-                      <span className="stat-label">Remaining</span>
+                      <span className="client-stat-label">Remaining</span>
                     </div>
                   </div>
                 </div>

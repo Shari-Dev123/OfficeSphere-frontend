@@ -96,13 +96,13 @@
   box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
 }
 
-.filter-buttons {
+.employee-filter-buttons {
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
 }
 
-.filter-btn {
+.employee-filter-btn {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -116,19 +116,19 @@
   transition: all 0.3s ease;
 }
 
-.filter-btn:hover {
+.employee-filter-btn:hover {
   border-color: #249E94;
   color: white;
   background: rgba(33, 150, 243, 0.05);
 }
 
-.filter-btn.active {
+.employee-filter-btn.active {
   background: var(--primary-color);
   color: white;
   border-color: var(--primary-color);
 }
 
-.filter-btn svg {
+.employee-filter-btn svg {
   font-size: 1rem;
 }
 

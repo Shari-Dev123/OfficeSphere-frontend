@@ -152,6 +152,7 @@ export const adminAPI = {
   getPerformanceReport: (params) => api.get('/reports/admin/performance', { params }),
   getProductivityReport: (params) => api.get('/reports/admin/productivity', { params }),
   getAttendanceReportData: (params) => api.get('/reports/admin/attendance', { params }),
+    getEmployeeReport: (params) => api.get('/reports/admin/employee', { params }),
   exportReport: (reportType, params) =>
     api.get(`/reports/admin/${reportType}/export`, {
       params,

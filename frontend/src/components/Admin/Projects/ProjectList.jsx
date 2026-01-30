@@ -254,33 +254,33 @@ function ProjectList() {
           />
         </div>
 
-        <div className="status-filter">
+        <div className="admin-status-filter">
           <button
-            className={`filter-btn ${filterStatus === 'all' ? 'active' : ''}`}
+            className={`admin-filter-btn ${filterStatus === 'all' ? 'active' : ''}`}
             onClick={() => setFilterStatus('all')}
           >
             All ({projects.length})
           </button>
           <button
-            className={`filter-btn ${filterStatus === 'planning' ? 'active' : ''}`}
+            className={`admin-filter-btn ${filterStatus === 'planning' ? 'active' : ''}`}
             onClick={() => setFilterStatus('planning')}
           >
             Planning ({projects.filter(p => p.status === 'Planning').length})
           </button>
           <button
-            className={`filter-btn ${filterStatus === 'active' ? 'active' : ''}`}
+            className={`admin-filter-btn ${filterStatus === 'active' ? 'active' : ''}`}
             onClick={() => setFilterStatus('active')}
           >
             In Progress ({projects.filter(p => p.status === 'In Progress').length})
           </button>
           <button
-            className={`filter-btn ${filterStatus === 'completed' ? 'active' : ''}`}
+            className={`admin-filter-btn ${filterStatus === 'completed' ? 'active' : ''}`}
             onClick={() => setFilterStatus('completed')}
           >
             Completed ({projects.filter(p => p.status === 'Completed').length})
           </button>
           <button
-            className={`filter-btn ${filterStatus === 'on-hold' ? 'active' : ''}`}
+            className={`admin-filter-btn ${filterStatus === 'on-hold' ? 'active' : ''}`}
             onClick={() => setFilterStatus('on-hold')}
           >
             On Hold ({projects.filter(p => p.status === 'On Hold').length})
