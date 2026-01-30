@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { clientAPI } from '../../../utils/api';
+import { useSocket } from '../../../context/SocketContext'; // ✅ ADD
 import { FiTrendingUp, FiClock, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
 import { BiTask } from 'react-icons/bi';
 import { MdOutlineSchedule } from 'react-icons/md';
@@ -9,6 +10,7 @@ import { toast } from 'react-toastify';
 import './ClientDashboard.css';
 
 function ClientDashboard() {
+  const { socket } = useSocket(); // ✅ ADD
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState(null);
   const [recentUpdates, setRecentUpdates] = useState([]);
@@ -18,14 +20,53 @@ function ClientDashboard() {
     fetchDashboardData();
   }, []);
 
+  // ✅ NEW: Real-time listeners
+  useEffect(() => {
+    if (!socket) return;
+
+    const clientId = localStorage.getItem('userId');
+    socket.emit('join-room', { role: 'client', userId: clientId });
+
+    // Listen for project updates
+    socket.on('project-updated', (data) => {
+      console.log('🔔 Project updated:', data);
+      toast.info(`Project updated: ${data.project.name}`);
+      fetchDashboardData(); // Auto refresh
+    });
+
+    // Listen for new projects
+    socket.on('project-created', (data) => {
+      console.log('🔔 New project created:', data);
+      toast.info(`New project: ${data.project.name}`);
+      fetchDashboardData();
+    });
+
+    // Listen for meeting schedules
+    socket.on('meeting-scheduled', (data) => {
+      console.log('🔔 Meeting scheduled:', data);
+      toast.info(`Meeting scheduled: ${data.meeting.title}`);
+      fetchDashboardData();
+    });
+
+    // Listen for milestone completions
+    socket.on('milestone-completed', (data) => {
+      console.log('🔔 Milestone completed:', data);
+      toast.success(`Milestone completed: ${data.milestone.name}`);
+      fetchDashboardData();
+    });
+
+    return () => {
+      socket.off('project-updated');
+      socket.off('project-created');
+      socket.off('meeting-scheduled');
+      socket.off('milestone-completed');
+    };
+  }, [socket]);
+
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
       const response = await clientAPI.getDashboard();
-
-      console.log('📊 Dashboard Response:', response.data);
-
-      // Handle both possible response structures
       const data = response.data.data || response.data;
 
       setDashboardData(data.stats || response.data.stats);
@@ -38,11 +79,6 @@ function ClientDashboard() {
       setLoading(false);
     }
   };
-
-  if (loading) {
-    return <Loader />;
-  }
-
   const stats = [
     {
       title: 'Active Projects',

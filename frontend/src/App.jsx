@@ -6,10 +6,12 @@ import { ProjectProvider } from './context/ProjectContext';
 import AppRoutes from './routes/AppRoutes';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { SocketProvider } from './context/SocketContext';
 import './App.css';
 
 function App() {
   return (
+    <SocketProvider>
     <BrowserRouter>
       <AuthProvider>
         <AttendanceProvider>
@@ -34,6 +36,7 @@ function App() {
         </AttendanceProvider>
       </AuthProvider>
     </BrowserRouter>
+    </SocketProvider>
   );
 }
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { employeeAPI } from '../../../utils/api';
 import { useAuth } from '../../../hooks/useAuth';
+import { useSocket } from '../../../context/SocketContext'; // ✅ ADD
 import { toast } from 'react-toastify';
 import { FiClock, FiCheckCircle, FiAlertCircle, FiTrendingUp } from 'react-icons/fi';
 import { MdAssignment, MdMeetingRoom } from 'react-icons/md';
@@ -8,6 +9,7 @@ import './EmployeeDashboard.css';
 
 function EmployeeDashboard() {
   const { user } = useAuth();
+  const { socket } = useSocket(); // ✅ ADD
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState({
     myTasks: 0,
@@ -26,20 +28,56 @@ function EmployeeDashboard() {
     fetchDashboardData();
   }, []);
 
+  // ✅ NEW: Real-time listeners
+  useEffect(() => {
+    if (!socket) return;
+
+    const employeeId = localStorage.getItem('userId');
+    socket.emit('join-room', { role: 'employee', userId: employeeId });
+
+    // Listen for new task assignments
+    socket.on('task-assigned', (data) => {
+      console.log('🔔 New task assigned:', data);
+      toast.info(`New task assigned: ${data.task.title}`);
+      fetchDashboardData(); // Refresh
+    });
+
+    // Listen for task updates
+    socket.on('task-updated', (data) => {
+      console.log('🔔 Task updated:', data);
+      toast.info('Task updated');
+      fetchDashboardData();
+    });
+
+    // Listen for project assignments
+    socket.on('project-assigned', (data) => {
+      console.log('🔔 Added to project:', data);
+      toast.info(`Added to project: ${data.project.name}`);
+      fetchDashboardData();
+    });
+
+    // Listen for meeting schedules
+    socket.on('meeting-scheduled', (data) => {
+      console.log('🔔 Meeting scheduled:', data);
+      toast.info(`Meeting scheduled: ${data.meeting.title}`);
+      fetchDashboardData();
+    });
+
+    return () => {
+      socket.off('task-assigned');
+      socket.off('task-updated');
+      socket.off('project-assigned');
+      socket.off('meeting-scheduled');
+    };
+  }, [socket]);
+
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
       
-      // Fetch dashboard stats
       const dashResponse = await employeeAPI.getDashboard();
-      
-      // Fetch today's tasks
       const tasksResponse = await employeeAPI.getMyTasks();
-      
-      // Fetch attendance status
       const attendanceResponse = await employeeAPI.getAttendanceStatus();
-      
-      // Fetch upcoming meetings
       const meetingsResponse = await employeeAPI.getMyMeetings();
 
       setDashboardData({
