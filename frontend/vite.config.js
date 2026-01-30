@@ -15,6 +15,9 @@ export default defineConfig({
       '@context': path.resolve(__dirname, './src/context'),
       '@hooks': path.resolve(__dirname, './src/hooks'),
       '@assets': path.resolve(__dirname, './src/assets'),
+      // ✅ Fix: Force single React instance
+      'react': path.resolve(__dirname, './node_modules/react'),
+      'react-dom': path.resolve(__dirname, './node_modules/react-dom'),
     },
   },
   
@@ -23,7 +26,17 @@ export default defineConfig({
     open: true,
     host: true,
     proxy: {
-      '/api': 'http://localhost:5000',  // <-- ye add karo
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
+      },
+      // ✅ Add socket.io proxy
+      '/socket.io': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        ws: true,
+      }
     }
   },
   

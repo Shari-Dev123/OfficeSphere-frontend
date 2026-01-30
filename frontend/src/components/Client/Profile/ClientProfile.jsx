@@ -21,7 +21,7 @@ const ClientProfile = () => {
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState(false);
   const [activeTab, setActiveTab] = useState("personal");
-  const hasFetchedRef = useRef(false); // ← Prevent duplicate calls
+  const hasFetchedRef = useRef(false);
 
   const [personalInfo, setPersonalInfo] = useState({
     name: "",
@@ -61,11 +61,10 @@ const ClientProfile = () => {
       setLoading(true);
       const response = await clientAPI.getProfile();
 
-      // ✅ FIX: Access response.data.data (backend returns { success: true, data: {...} })
       if (response.data && response.data.data) {
         const profile = response.data.data;
 
-        console.log("Profile data loaded:", profile);
+        console.log("✅ Profile data loaded:", profile);
 
         // Set personal info
         setPersonalInfo({
@@ -90,7 +89,7 @@ const ClientProfile = () => {
         });
       }
     } catch (error) {
-      console.error("Error fetching profile:", error);
+      console.error("❌ Error fetching profile:", error);
       toast.error("Failed to load profile");
     } finally {
       setLoading(false);
@@ -125,45 +124,120 @@ const ClientProfile = () => {
     try {
       setLoading(true);
 
+      console.log('====================================');
+      console.log('💾 SAVING CLIENT PROFILE');
+      console.log('====================================');
+
+      // ✅ Build clean profile data - only send non-empty strings
       const profileData = {
-        ...personalInfo,
-        ...companyInfo,
+        // Personal info - always send these
+        name: personalInfo.name?.trim() || '',
+        email: personalInfo.email?.trim() || '',
+        phone: personalInfo.phone?.trim() || '',
       };
+
+      // Only add avatar if it exists
+      if (personalInfo.avatar?.trim()) {
+        profileData.avatar = personalInfo.avatar.trim();
+      }
+
+      // Only add company info if they exist
+      if (companyInfo.companyName?.trim()) {
+        profileData.companyName = companyInfo.companyName.trim();
+      }
+
+      if (companyInfo.industry?.trim()) {
+        profileData.industry = companyInfo.industry.trim();
+      }
+
+      if (companyInfo.companySize?.trim()) {
+        profileData.companySize = companyInfo.companySize.trim();
+      }
+
+      if (companyInfo.website?.trim()) {
+        profileData.website = companyInfo.website.trim();
+      }
+
+      // Only add address fields if they exist
+      if (companyInfo.address?.trim()) {
+        profileData.address = companyInfo.address.trim();
+      }
+
+      if (companyInfo.city?.trim()) {
+        profileData.city = companyInfo.city.trim();
+      }
+
+      if (companyInfo.state?.trim()) {
+        profileData.state = companyInfo.state.trim();
+      }
+
+      if (companyInfo.zipCode?.trim()) {
+        profileData.zipCode = companyInfo.zipCode.trim();
+      }
+
+      if (companyInfo.country?.trim()) {
+        profileData.country = companyInfo.country.trim();
+      }
+
+      // Only add taxId if it exists
+      if (companyInfo.taxId?.trim()) {
+        profileData.taxId = companyInfo.taxId.trim();
+      }
+
+      console.log('📤 Sending profile data:', JSON.stringify(profileData, null, 2));
+      console.log('====================================');
 
       const response = await clientAPI.updateProfile(profileData);
 
-      // ✅ FIX: Access response.data.data
-      if (response.data && response.data.data) {
+      console.log('✅ Server response:', response.data);
+      console.log('====================================');
+
+      if (response.data && response.data.success) {
         const updatedProfile = response.data.data;
 
-        // Update local state
+        // Update local state with server response
         setPersonalInfo({
-          name: updatedProfile.name || "",
-          email: updatedProfile.email || "",
-          phone: updatedProfile.phone || "",
-          avatar: updatedProfile.avatar || "",
+          name: updatedProfile.name || '',
+          email: updatedProfile.email || '',
+          phone: updatedProfile.phone || '',
+          avatar: updatedProfile.avatar || '',
         });
 
         setCompanyInfo({
-          companyName: updatedProfile.companyName || "",
-          industry: updatedProfile.industry || "",
-          companySize: updatedProfile.companySize || "",
-          website:
-            updatedProfile.companyWebsite || updatedProfile.website || "",
-          address: updatedProfile.address?.street || "",
-          city: updatedProfile.address?.city || "",
-          state: updatedProfile.address?.state || "",
-          zipCode: updatedProfile.address?.zipCode || "",
-          country: updatedProfile.address?.country || "",
-          taxId: updatedProfile.taxInfo?.taxId || "",
+          companyName: updatedProfile.companyName || '',
+          industry: updatedProfile.industry || '',
+          companySize: updatedProfile.companySize || '',
+          website: updatedProfile.companyWebsite || updatedProfile.website || '',
+          address: updatedProfile.address?.street || '',
+          city: updatedProfile.address?.city || '',
+          state: updatedProfile.address?.state || '',
+          zipCode: updatedProfile.address?.zipCode || '',
+          country: updatedProfile.address?.country || '',
+          taxId: updatedProfile.taxInfo?.taxId || '',
         });
 
-        toast.success("Profile updated successfully!");
+        toast.success('✅ Profile updated successfully!');
         setEditing(false);
       }
     } catch (error) {
-      console.error("Error updating profile:", error);
-      toast.error("Failed to update profile");
+      console.error('====================================');
+      console.error('❌ PROFILE UPDATE ERROR');
+      console.error('====================================');
+      console.error('Full Error:', error);
+      console.error('Error Response:', error.response?.data);
+      console.error('Error Status:', error.response?.status);
+      console.error('====================================');
+
+      // Show detailed error message
+      const errorMessage = error.response?.data?.message 
+        || error.response?.data?.error
+        || 'Failed to update profile';
+      
+      const errorDetails = error.response?.data?.errors 
+        ? '\n' + error.response.data.errors.join('\n')
+        : '';
+
+      toast.error(`❌ ${errorMessage}${errorDetails}`);
     } finally {
       setLoading(false);
     }
@@ -230,7 +304,7 @@ const ClientProfile = () => {
               onClick={handleSaveProfile}
               disabled={loading}
             >
-              <FiSave /> Save
+              <FiSave /> {loading ? 'Saving...' : 'Save'}
             </button>
             <button className="btn-cancel" onClick={() => setEditing(false)}>
               <FiX /> Cancel
@@ -242,7 +316,7 @@ const ClientProfile = () => {
       <div className="profile-grid">
         <div className="form-group">
           <label>
-            <FiUser /> Full Name
+            <FiUser /> Full Name *
           </label>
           <input
             type="text"
@@ -251,12 +325,13 @@ const ClientProfile = () => {
             onChange={handlePersonalChange}
             disabled={!editing}
             className="form-input"
+            required
           />
         </div>
 
         <div className="form-group">
           <label>
-            <FiMail /> Email Address
+            <FiMail /> Email Address *
           </label>
           <input
             type="email"
@@ -265,6 +340,7 @@ const ClientProfile = () => {
             onChange={handlePersonalChange}
             disabled={!editing}
             className="form-input"
+            required
           />
         </div>
 
@@ -279,6 +355,7 @@ const ClientProfile = () => {
             onChange={handlePersonalChange}
             disabled={!editing}
             className="form-input"
+            placeholder="+1234567890"
           />
         </div>
 
@@ -315,7 +392,7 @@ const ClientProfile = () => {
               onClick={handleSaveProfile}
               disabled={loading}
             >
-              <FiSave /> Save
+              <FiSave /> {loading ? 'Saving...' : 'Save'}
             </button>
             <button className="btn-cancel" onClick={() => setEditing(false)}>
               <FiX /> Cancel
@@ -517,7 +594,7 @@ const ClientProfile = () => {
         </div>
 
         <button type="submit" className="btn-primary" disabled={loading}>
-          <FiLock /> Change Password
+          <FiLock /> {loading ? 'Changing...' : 'Change Password'}
         </button>
       </form>
 
@@ -545,7 +622,7 @@ const ClientProfile = () => {
     <div className="client-profile">
       <div className="profile-header">
         <div className="profile-avatar">
-          {user?.name?.charAt(0).toUpperCase()}
+          {personalInfo.name?.charAt(0).toUpperCase() || user?.name?.charAt(0).toUpperCase() || 'C'}
         </div>
         <div className="profile-info">
           <h1>{personalInfo.name || "Loading..."}</h1>

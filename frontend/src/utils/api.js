@@ -97,6 +97,13 @@ export const authAPI = {
 export const adminAPI = {
   // ============ Dashboard ============
   getDashboardStats: () => api.get('/admin/dashboard'),
+  getNotifications: () => api.get('/admin/notifications'),
+  markNotificationAsRead: (id) => api.patch(`/admin/notifications/${id}/read`),
+  markNotificationAsUnread: (id) => api.patch(`/admin/notifications/${id}/unread`),
+  markAllNotificationsAsRead: () => api.patch('/admin/notifications/mark-all-read'),
+  deleteNotification: (id) => api.delete(`/admin/notifications/${id}`),
+  deleteNotifications: (ids) => api.post('/admin/notifications/delete-many', { ids }),
+
   
 
   // ============ Employees ============
@@ -275,3 +282,4 @@ export const uploadAPI = {
     });
   },
 };
+

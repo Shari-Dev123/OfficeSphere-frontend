@@ -23,7 +23,7 @@ import EditTask from "../Components/Admin/Tasks/EditTask";
 import MeetingList from "../Components/Admin/Meetings/MeetingList";
 import ReportGenerator from "../Components/Admin/Reports/ReportGenerator";
 import AdminSettings from "../Components/Admin/Settings/AdminSettings"; // ← ADDED
-
+import AdminNotifications from '../Components/Admin/AdminNotifications/AdminNotifications.jsx'
 // Employee Components
 import EmployeeLayout from "../Components/Shared/Layout/EmployeeLayout";
 import EmployeeDashboard from "../Components/Employee/Dashboard/EmployeeDashboard";
@@ -199,7 +199,9 @@ function AppRoutes() {
             <AdminLayout />
           </PrivateRoute>
         }
+        
       >
+        <Route path="notifications" element={<AdminNotifications />} />
         <Route index element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="employees" element={<EmployeeList />} />

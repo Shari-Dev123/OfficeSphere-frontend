@@ -10,6 +10,7 @@ function AutoAttendance() {
   const [attendanceStatus, setAttendanceStatus] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [workingSeconds, setWorkingSeconds] = useState(0);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const [location, setLocation] = useState(null);
   const [checkInMethod, setCheckInMethod] = useState('auto');
@@ -19,17 +20,13 @@ function AutoAttendance() {
   const clockIntervalRef = useRef(null);
   const syncIntervalRef = useRef(null);
 
-  // Get current user ID from auth (adjust based on your auth setup)
+  // Derived state
+  const isCheckedIn = attendanceStatus?.checkInTime && !attendanceStatus?.checkOut;
+  const isCheckedOut = attendanceStatus?.checkInTime && attendanceStatus?.checkOut;
+
+  // Get current user ID from auth
   const getCurrentUserId = () => {
-    // Method 1: From localStorage
     const user = JSON.parse(localStorage.getItem('user') || '{}');
-    
-    // Method 2: From token (if you store it)
-    // const token = localStorage.getItem('token');
-    
-    // Method 3: From your auth context/state
-    // return authContext.user?.id;
-    
     return user?.id || user?._id || null;
   };
 
@@ -37,41 +34,244 @@ function AutoAttendance() {
   const isCurrentUserSession = () => {
     const currentUserId = getCurrentUserId();
     const storedUserId = localStorage.getItem('attendance_userId');
-    
-    console.log('👤 User Check:', {
-      currentUserId,
-      storedUserId,
-      matches: currentUserId === storedUserId
-    });
-    
+
     return currentUserId && storedUserId && currentUserId === storedUserId;
+  };
+
+  // Clear attendance data from localStorage
+  const clearAttendanceFromStorage = () => {
+    console.log('🧹 Clearing all attendance data from localStorage');
+    localStorage.removeItem('attendance_checkInTime');
+    localStorage.removeItem('attendance_checkInDate');
+    localStorage.removeItem('attendance_isActive');
+    localStorage.removeItem('attendance_userId');
+  };
+
+  // Check if there's an active session in localStorage
+  const checkLocalStorageSession = () => {
+    const isActive = localStorage.getItem('attendance_isActive');
+    const checkInTime = localStorage.getItem('attendance_checkInTime');
+    const checkInDate = localStorage.getItem('attendance_checkInDate');
+    const today = new Date().toDateString();
+
+    return isActive === 'true' && checkInTime && checkInDate === today;
+  };
+
+  // Format duration helper
+  const formatDuration = (seconds) => {
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+
+    return `${hrs.toString().padStart(2, '0')}:${mins
+      .toString()
+      .padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // ✅ FIX: Restore timer from localStorage - ALWAYS recalculate
+  const restoreTimerFromLocalStorage = () => {
+    const checkInTime = localStorage.getItem('attendance_checkInTime');
+
+    if (checkInTime) {
+      const checkIn = new Date(checkInTime);
+      const now = new Date();
+      const diffInSeconds = Math.floor((now - checkIn) / 1000);
+
+      console.log('⏰ Restoring timer:', {
+        checkInTime: checkIn.toISOString(),
+        currentTime: now.toISOString(),
+        elapsedSeconds: diffInSeconds,
+        elapsedFormatted: formatDuration(diffInSeconds)
+      });
+
+      // ✅ Immediately set the calculated seconds
+      setWorkingSeconds(diffInSeconds);
+      startTimer(checkIn);
+    }
+  };
+  const calculateElapsedSeconds = (checkInTime) => {
+    if (!checkInTime) return 0;
+    const now = new Date();
+    const checkIn = new Date(checkInTime);
+    return Math.floor((now - checkIn) / 1000);
+  };
+  // Start timer function
+  const startTimer = (checkInTime) => {
+    if (!checkInTime) return;
+
+    // ❗ Always clear previous interval first
+    if (timerIntervalRef.current) {
+      clearInterval(timerIntervalRef.current);
+    }
+
+    const checkIn = new Date(checkInTime);
+
+    // ⏱️ Set immediately
+    setWorkingSeconds(Math.floor((Date.now() - checkIn) / 1000));
+
+    // ⏱️ Single source of truth
+    timerIntervalRef.current = setInterval(() => {
+      setWorkingSeconds(
+        Math.floor((Date.now() - checkIn) / 1000)
+      );
+    }, 1000);
+  };
+
+  // Stop timer function
+  const stopTimer = () => {
+    console.log('⏹️ Stopping timer');
+
+    if (timerIntervalRef.current) {
+      clearInterval(timerIntervalRef.current);
+      timerIntervalRef.current = null;
+    }
+  };
+
+  // Sync with server
+  const syncWithServer = async () => {
+    try {
+      const res = await employeeAPI.getAttendanceStatus();
+      const serverData = res.data;
+
+      console.log('📡 Server sync response:', serverData);
+
+      // Check if we have active localStorage session for current user
+      const hasLocalSession = checkLocalStorageSession();
+      const isCurrentUser = isCurrentUserSession();
+
+      if (hasLocalSession && isCurrentUser) {
+        const localCheckInTime = localStorage.getItem('attendance_checkInTime');
+        const serverCheckInTime = serverData?.data?.checkInTime;
+
+        // If server says checked out but we have active local session
+        if (serverData?.data?.checkOut) {
+          console.warn('⚠️ Server shows checkout - accepting');
+          setAttendanceStatus(serverData.data);
+          clearAttendanceFromStorage();
+          stopTimer();
+          return;
+        }
+
+        // If times match, don't update state (keeps timer running)
+        if (serverCheckInTime && new Date(serverCheckInTime).toISOString() === localCheckInTime) {
+          console.log('✅ Server and localStorage in sync - keeping timer');
+          // ✅ FIX: Recalculate timer to sync with reality
+          restoreTimerFromLocalStorage();
+          return;
+        }
+      }
+
+      // Trust server data
+      if (serverData?.data) {
+        setAttendanceStatus(serverData.data);
+      }
+    } catch (err) {
+      console.error('❌ Server sync error:', err);
+    }
+  };
+
+  const fetchAttendanceStatus = async () => {
+    try {
+      const res = await employeeAPI.getAttendanceStatus();
+      const serverData = res.data;
+
+      console.log('📡 Initial fetch - Server response:', serverData);
+
+      // Check if we have a local session
+      const hasLocalSession = checkLocalStorageSession();
+      const isCurrentUser = isCurrentUserSession();
+
+      // ✅ FIX: If we have valid local session, restore timer first
+      if (hasLocalSession && isCurrentUser) {
+        console.log('✅ Valid local session found - Restoring timer from localStorage');
+        restoreTimerFromLocalStorage();
+
+        const localCheckInTime = localStorage.getItem('attendance_checkInTime');
+
+        if (serverData?.data?.checkInTime && !serverData?.data?.checkOut) {
+          const serverCheckInTime = new Date(serverData.data.checkInTime).toISOString();
+
+          if (localCheckInTime === serverCheckInTime) {
+            console.log('✅ Local and server times match - Keeping local timer');
+            // Set attendance status but timer is already running
+            setAttendanceStatus(serverData.data);
+            return;
+          }
+        }
+      }
+
+      // Otherwise, trust server data
+      console.log('📥 Setting attendance status from server');
+      if (serverData?.data) {
+        setAttendanceStatus(serverData.data);
+      } else {
+        setAttendanceStatus(null);
+      }
+
+    } catch (err) {
+      console.error('❌ Error fetching attendance status:', err);
+
+      // If fetch fails but we have local session for current user, keep timer running
+      const hasLocalSession = checkLocalStorageSession();
+      const isCurrentUser = isCurrentUserSession();
+
+      if (hasLocalSession && isCurrentUser) {
+        console.log('⚠️ Server fetch failed but local session exists - Restoring timer');
+        restoreTimerFromLocalStorage();
+      }
+    }
+  };
+
+  const getLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy
+          });
+          console.log('📍 Location detected:', position.coords);
+        },
+        (error) => {
+          console.error('❌ Error getting location:', error);
+          toast.warning('Location access denied. You can still check in manually.');
+        }
+      );
+    }
   };
 
   // Initialize on mount
   useEffect(() => {
     console.log('🚀 Component mounted - Starting initialization');
-    
+
     // Clear old attendance data if different user
     const currentUserId = getCurrentUserId();
     const storedUserId = localStorage.getItem('attendance_userId');
-    
+
     if (storedUserId && currentUserId !== storedUserId) {
       console.log('⚠️ Different user detected - Clearing old attendance data');
       clearAttendanceFromStorage();
     }
-    
-    // Check localStorage for existing session (only if same user)
+
+    // ✅ FIX: Check localStorage for existing session (only if same user)
     const hasActiveSession = checkLocalStorageSession();
-    
     if (hasActiveSession && isCurrentUserSession()) {
-      console.log('✅ Found active session for current user - Restoring timer');
+      const localCheckInTime = localStorage.getItem('attendance_checkInTime');
+      startTimer(localCheckInTime);  // Timer starts immediately
+    }
+    if (hasActiveSession && isCurrentUserSession()) {
+      console.log('✅ Found active session for current user - Restoring timer IMMEDIATELY');
       restoreTimerFromLocalStorage();
     } else if (hasActiveSession && !isCurrentUserSession()) {
       console.log('⚠️ Found session but different user - Clearing');
       clearAttendanceFromStorage();
     }
-    
-    // Fetch from server
+
+    // Mark as initialized BEFORE fetching from server
+    setIsInitialized(true);
+
+    // Fetch from server (this will update attendanceStatus)
     fetchAttendanceStatus();
     getLocation();
 
@@ -93,30 +293,47 @@ function AutoAttendance() {
       if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
       if (syncIntervalRef.current) clearInterval(syncIntervalRef.current);
     };
-  }, []);
+  }, []); // ✅ Empty dependency array - runs only once on mount
 
-  // Listen for logout event
+  // ✅ FIX: Listen for logout event and auto-checkout
   useEffect(() => {
-    const handleLogout = (e) => {
-      console.log('🚪 Logout detected - Clearing attendance data');
+    const handleLogout = async () => {
+      const hasLocalSession = checkLocalStorageSession();
+      const isCurrentUser = isCurrentUserSession();
+
+      if (hasLocalSession && isCurrentUser && isCheckedIn) {
+        const checkInTime = localStorage.getItem('attendance_checkInTime');
+        const totalSeconds = Math.floor(
+          (Date.now() - new Date(checkInTime)) / 1000
+        );
+
+        try {
+          await employeeAPI.checkOut({
+            timestamp: new Date().toISOString(),
+            totalSeconds,
+            autoCheckout: true,
+            reason: 'User logged out'
+          });
+        } catch (err) {
+          console.error('Auto checkout failed', err);
+        }
+      }
+
+      // HARD RESET
       clearAttendanceFromStorage();
+      localStorage.removeItem('daily_report_submitted');
+
       stopTimer();
       setWorkingSeconds(0);
       setAttendanceStatus(null);
     };
 
-    // Listen for custom logout event
-    window.addEventListener('user-logout', handleLogout);
-    
-    // Listen for storage changes (if logout happens in another tab)
     const handleStorageChange = (e) => {
-      // If auth token is removed, it means user logged out
       if (e.key === 'token' && !e.newValue) {
         console.log('🚪 Logout detected via storage event');
         handleLogout();
       }
-      
-      // If user data is removed
+
       if (e.key === 'user' && !e.newValue) {
         console.log('🚪 Logout detected via user removal');
         handleLogout();
@@ -125,231 +342,121 @@ function AutoAttendance() {
 
     window.addEventListener('storage', handleStorageChange);
 
+    // ✅ NEW: Listen for beforeunload (browser close/refresh)
+    const handleBeforeUnload = (e) => {
+      // Don't auto-checkout on refresh/close - just keep localStorage
+      console.log('🔄 Page unloading - Keeping attendance data in localStorage');
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
     return () => {
       window.removeEventListener('user-logout', handleLogout);
       window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, []);
+  }, [isCheckedIn, workingSeconds, location]);
 
-  // Clear attendance data from localStorage
-  const clearAttendanceFromStorage = () => {
-    console.log('🧹 Clearing all attendance data from localStorage');
-    localStorage.removeItem('attendance_checkInTime');
-    localStorage.removeItem('attendance_checkInDate');
-    localStorage.removeItem('attendance_isActive');
-    localStorage.removeItem('attendance_userId');
-  };
-
-  // Check if there's an active session in localStorage
-  const checkLocalStorageSession = () => {
-    const isActive = localStorage.getItem('attendance_isActive');
-    const checkInTime = localStorage.getItem('attendance_checkInTime');
-    const checkInDate = localStorage.getItem('attendance_checkInDate');
-    const today = new Date().toDateString();
-
-    console.log('📦 LocalStorage Check:', {
-      isActive,
-      checkInTime,
-      checkInDate,
-      today,
-      isToday: checkInDate === today
-    });
-
-    return isActive === 'true' && checkInTime && checkInDate === today;
-  };
-
-  // Restore timer from localStorage
-  const restoreTimerFromLocalStorage = () => {
-    const checkInTime = localStorage.getItem('attendance_checkInTime');
-    
-    if (checkInTime) {
-      const checkIn = new Date(checkInTime);
-      const now = new Date();
-      const diffInSeconds = Math.floor((now - checkIn) / 1000);
-      
-      console.log('⏰ Restoring timer:', {
-        checkInTime: checkIn.toISOString(),
-        currentTime: now.toISOString(),
-        elapsedSeconds: diffInSeconds,
-        elapsedFormatted: formatDuration(diffInSeconds)
-      });
-      
-      setWorkingSeconds(diffInSeconds);
-      startTimer(checkIn);
-    }
-  };
-
-  // Sync with server
-  const syncWithServer = async () => {
-    try {
-      const res = await employeeAPI.getAttendanceStatus();
-      const serverData = res.data;
-      
-      console.log('📡 Server response:', serverData);
-      
-      // Check if we have active localStorage session for current user
-      const hasLocalSession = checkLocalStorageSession();
-      const isCurrentUser = isCurrentUserSession();
-      
-      if (hasLocalSession && isCurrentUser) {
-        const localCheckInTime = localStorage.getItem('attendance_checkInTime');
-        const serverCheckInTime = serverData?.checkInTime;
-        
-        console.log('🔍 Comparing sessions:', {
-          localCheckInTime,
-          serverCheckInTime,
-          serverHasCheckOut: !!serverData?.checkOut
-        });
-        
-        // If server says checked out but we have active local session
-        if (serverData?.checkOut) {
-          console.warn('⚠️ Server shows checkout but localStorage shows active session');
-          console.warn('⚠️ Server data is more reliable - accepting checkout');
-          
-          // Trust server data for checkout
-          setAttendanceStatus(serverData);
-          clearAttendanceFromStorage();
-          return;
-        }
-        
-        // If check-in times match, we're in sync
-        if (serverCheckInTime && new Date(serverCheckInTime).getTime() === new Date(localCheckInTime).getTime()) {
-          console.log('✅ Server and localStorage in sync');
-          setAttendanceStatus(serverData);
-        }
-      } else {
-        // No local session or different user, trust server
-        console.log('📥 No local session or different user - accepting server data');
-        setAttendanceStatus(serverData);
-      }
-    } catch (err) {
-      console.error('❌ Server sync error:', err);
-    }
-  };
-
-  const fetchAttendanceStatus = async () => {
-    try {
-      const res = await employeeAPI.getAttendanceStatus();
-      const serverData = res.data;
-      
-      console.log('📡 Initial fetch - Server response:', serverData);
-      
-      // Always trust server data on initial fetch
-      setAttendanceStatus(serverData);
-      
-    } catch (err) {
-      console.error('❌ Error fetching attendance status:', err);
-      
-      // If fetch fails but we have local session for current user, keep timer running
-      const hasLocalSession = checkLocalStorageSession();
-      const isCurrentUser = isCurrentUserSession();
-      
-      if (hasLocalSession && isCurrentUser) {
-        console.log('⚠️ Server fetch failed but local session exists - continuing with local timer');
-        restoreTimerFromLocalStorage();
-      }
-    }
-  };
-
-  // Handle attendance status changes
+  // Handle attendance status changes - ONLY AFTER INITIALIZATION
   useEffect(() => {
+    // Skip if not initialized yet
+    if (!isInitialized) {
+      console.log('⏳ Skipping - Not initialized yet');
+      return;
+    }
+
     console.log('🔄 Attendance status changed:', attendanceStatus);
-    
+
     if (attendanceStatus?.checkInTime && !attendanceStatus?.checkOut) {
       // Checked in - start timer
       console.log('✅ Status: Checked In - Starting timer');
-      
+
       const checkInTime = new Date(attendanceStatus.checkInTime);
       const now = new Date();
       const initialSeconds = Math.floor((now - checkInTime) / 1000);
-      
+
       setWorkingSeconds(initialSeconds);
-      
+
       // Save to localStorage with user ID
       const currentUserId = getCurrentUserId();
       const today = new Date().toDateString();
-      
-      localStorage.setItem('attendance_checkInTime', checkInTime.toISOString());
-      localStorage.setItem('attendance_checkInDate', today);
-      localStorage.setItem('attendance_isActive', 'true');
-      localStorage.setItem('attendance_userId', currentUserId);
-      
-      console.log('💾 Saved to localStorage:', {
-        checkInTime: checkInTime.toISOString(),
-        date: today,
-        isActive: true,
-        userId: currentUserId
-      });
-      
+
+      const storedCheckInTime = localStorage.getItem('attendance_checkInTime');
+      if (storedCheckInTime !== checkInTime.toISOString()) {
+        localStorage.setItem('attendance_checkInTime', checkInTime.toISOString());
+        localStorage.setItem('attendance_checkInDate', today);
+        localStorage.setItem('attendance_isActive', 'true');
+        localStorage.setItem('attendance_userId', currentUserId);
+
+        console.log('💾 Saved to localStorage:', {
+          checkInTime: checkInTime.toISOString(),
+          date: today,
+          isActive: true,
+          userId: currentUserId
+        });
+      }
+
       startTimer(checkInTime);
-      
+
     } else if (attendanceStatus?.checkInTime && attendanceStatus?.checkOut) {
       // Checked out - stop timer
       console.log('🛑 Status: Checked Out - Stopping timer');
-      
+
       stopTimer();
-      
+
       const checkInTime = new Date(attendanceStatus.checkInTime);
       const checkOutTime = new Date(attendanceStatus.checkOut);
       const finalDuration = Math.floor((checkOutTime - checkInTime) / 1000);
-      
+
       setWorkingSeconds(finalDuration);
-      
-      // Clear localStorage
+
       clearAttendanceFromStorage();
       console.log('🧹 Cleared localStorage after checkout');
-      
+
+    } else if (attendanceStatus === null) {
+      // Status is null - check localStorage
+      console.log('⚠️ Status is NULL - checking localStorage');
+
+      const hasLocalSession = checkLocalStorageSession();
+      const isCurrentUser = isCurrentUserSession();
+
+      if (hasLocalSession && isCurrentUser) {
+        console.log('✅ Valid local session exists - Restoring timer');
+        restoreTimerFromLocalStorage();
+      } else {
+        console.log('❌ No valid session - clearing timer');
+        stopTimer();
+        setWorkingSeconds(0);
+        clearAttendanceFromStorage();
+      }
     } else {
       // Not checked in
-      console.log('⭕ Status: Not Checked In');
-      
-      stopTimer();
-      setWorkingSeconds(0);
-      
-      // Clear attendance data
-      clearAttendanceFromStorage();
+      console.log('⭕ Status: Not Checked In from server');
+
+      const hasLocalSession = checkLocalStorageSession();
+      const isCurrentUser = isCurrentUserSession();
+
+      if (!hasLocalSession || !isCurrentUser) {
+        console.log('🧹 No valid local session - clearing');
+        stopTimer();
+        setWorkingSeconds(0);
+        clearAttendanceFromStorage();
+      } else {
+        console.log('✅ Valid local session exists - Restoring timer');
+        restoreTimerFromLocalStorage();
+      }
     }
-  }, [attendanceStatus]);
+  }, [attendanceStatus, isInitialized]); // ✅ Proper dependency array
 
-  // Start timer function
-  const startTimer = (checkInTime) => {
-    console.log('▶️ Starting timer with check-in time:', checkInTime);
-    
-    // Clear existing interval if any
-    if (timerIntervalRef.current) {
-      clearInterval(timerIntervalRef.current);
-    }
-
-    // Start new interval that calculates from check-in time
-    timerIntervalRef.current = setInterval(() => {
-      const now = new Date();
-      const diffInSeconds = Math.floor((now - new Date(checkInTime)) / 1000);
-      setWorkingSeconds(diffInSeconds);
-    }, 1000);
-    
-    console.log('✅ Timer started successfully');
-  };
-
-  // Stop timer function
-  const stopTimer = () => {
-    console.log('⏹️ Stopping timer');
-    
-    if (timerIntervalRef.current) {
-      clearInterval(timerIntervalRef.current);
-      timerIntervalRef.current = null;
-    }
-  };
-
-  // Handle visibility change (tab switching)
+  // ✅ FIX: Handle visibility change (tab switching) - RESTORE TIMER
   useEffect(() => {
     const handleVisibilityChange = () => {
       console.log('👁️ Visibility changed - hidden:', document.hidden);
-      
+
       if (!document.hidden) {
-        // Tab is now visible
         const hasLocalSession = checkLocalStorageSession();
         const isCurrentUser = isCurrentUserSession();
-        
+
         if (hasLocalSession && isCurrentUser) {
           console.log('🔄 Tab visible - Recalculating timer from localStorage');
           restoreTimerFromLocalStorage();
@@ -359,10 +466,10 @@ function AutoAttendance() {
 
     const handleFocus = () => {
       console.log('🎯 Window focused');
-      
+
       const hasLocalSession = checkLocalStorageSession();
       const isCurrentUser = isCurrentUserSession();
-      
+
       if (hasLocalSession && isCurrentUser) {
         console.log('🔄 Window focused - Recalculating timer');
         restoreTimerFromLocalStorage();
@@ -378,25 +485,6 @@ function AutoAttendance() {
     };
   }, []);
 
-  const getLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setLocation({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            accuracy: position.coords.accuracy
-          });
-          console.log('📍 Location detected:', position.coords);
-        },
-        (error) => {
-          console.error('❌ Error getting location:', error);
-          toast.warning('Location access denied. You can still check in manually.');
-        }
-      );
-    }
-  };
-
   const handleCheckIn = async () => {
     try {
       setLoading(true);
@@ -408,7 +496,7 @@ function AutoAttendance() {
 
       const now = new Date();
       const currentUserId = getCurrentUserId();
-      
+
       const checkInData = {
         location: location ? {
           latitude: location.latitude,
@@ -428,7 +516,7 @@ function AutoAttendance() {
       localStorage.setItem('attendance_checkInDate', now.toDateString());
       localStorage.setItem('attendance_isActive', 'true');
       localStorage.setItem('attendance_userId', currentUserId);
-      
+
       console.log('💾 Saved to localStorage with userId:', currentUserId);
 
       // Update state
@@ -437,7 +525,12 @@ function AutoAttendance() {
 
     } catch (error) {
       console.error('❌ Check-in error:', error);
-      toast.error(error.response?.data?.message || 'Failed to check in');
+      const errorMessage = error.response?.data?.message || 'Failed to check in';
+      toast.error(errorMessage);
+
+      if (error.response?.data) {
+        console.error('Backend error details:', error.response.data);
+      }
     } finally {
       setLoading(false);
     }
@@ -462,22 +555,24 @@ function AutoAttendance() {
       console.log('📤 Sending check-out data:', checkOutData);
       const response = await employeeAPI.checkOut(checkOutData);
       console.log('✅ Check-out response:', response.data);
-      
-      // Clear localStorage
+
       clearAttendanceFromStorage();
       console.log('🧹 Cleared localStorage');
-      
-      // Stop timer
+
       stopTimer();
-      
-      // Update status
-      setAttendanceStatus(response.data);
-      
+
+      setAttendanceStatus(response.data.data);
+
       toast.success(`Checked out successfully! Total time: ${formatDuration(workingSeconds)}`);
 
     } catch (error) {
       console.error('❌ Check-out error:', error);
-      toast.error(error.response?.data?.message || 'Failed to check out');
+      const errorMessage = error.response?.data?.message || 'Failed to check out';
+      toast.error(errorMessage);
+
+      if (error.response?.data) {
+        console.error('Backend error details:', error.response.data);
+      }
     } finally {
       setLoading(false);
     }
@@ -502,24 +597,11 @@ function AutoAttendance() {
     });
   };
 
-  const formatDuration = (seconds) => {
-    const hrs = Math.floor(seconds / 3600);
-    const mins = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-
-    return `${hrs.toString().padStart(2, '0')}:${mins
-      .toString()
-      .padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
-
   const formatDurationForAdmin = (seconds) => {
     const hrs = Math.floor(seconds / 3600);
     const mins = Math.floor((seconds % 3600) / 60);
     return `${hrs}h ${mins}m`;
   };
-
-  const isCheckedIn = attendanceStatus?.checkInTime && !attendanceStatus?.checkOut;
-  const isCheckedOut = attendanceStatus?.checkInTime && attendanceStatus?.checkOut;
 
   return (
     <div className="auto-attendance">
@@ -533,19 +615,19 @@ function AutoAttendance() {
         <FiClock className="clock-icon" />
         <div className="time-info">
           <h2>
-            {isCheckedIn
+            {(isCheckedIn || workingSeconds > 0)
               ? formatDuration(workingSeconds)
               : isCheckedOut && attendanceStatus?.checkOut
                 ? formatDuration(
-                    Math.floor((new Date(attendanceStatus.checkOut) - new Date(attendanceStatus.checkInTime)) / 1000)
-                  )
+                  Math.floor((new Date(attendanceStatus.checkOut) - new Date(attendanceStatus.checkInTime)) / 1000)
+                )
                 : "--:--:--"}
           </h2>
           <p>
-            {isCheckedIn 
-              ? "Working Duration (Live)" 
-              : isCheckedOut 
-                ? "Total Working Time Today" 
+            {isCheckedIn
+              ? "Working Duration (Live)"
+              : isCheckedOut
+                ? "Total Working Time Today"
                 : "Not Checked In"}
           </p>
         </div>
