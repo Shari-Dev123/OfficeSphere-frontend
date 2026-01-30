@@ -4,11 +4,9 @@ import { adminAPI } from "../../../utils/api";
 import StatCard from "./StatCard";
 import { FiUsers, FiUserCheck, FiBriefcase, FiClock, FiArrowRight } from "react-icons/fi";
 import { toast } from "react-toastify";
-import { useSocket } from '../../../context/SocketContext';
 import "./AdminDashboard.css";
 
 function AdminDashboard() {
-  const { socket } = useSocket();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
@@ -20,94 +18,37 @@ function AdminDashboard() {
   const [recentActivity, setRecentActivity] = useState([]);
   const [attendanceData, setAttendanceData] = useState([]);
   const [recentProjects, setRecentProjects] = useState([]);
-  const [notifications, setNotifications] = useState([]); // ✅ NEW
 
   useEffect(() => {
     fetchDashboardData();
     fetchRecentProjects();
-    fetchTodayAttendance();
+    fetchTodayAttendance(); // ✅ NEW: Separate attendance fetch
   }, []);
 
-  // ✅ NEW: Real-time Socket Listeners
+  // 🔍 DEBUG: Monitor state changes
   useEffect(() => {
-    if (!socket) return;
-
-    console.log('🔌 Socket connected, setting up listeners...');
-
-    // Admin room join karo
-    socket.emit('join-room', { role: 'admin', userId: localStorage.getItem('userId') });
-
-    // Listen for employee attendance
-    socket.on('attendance-marked', (data) => {
-      console.log('🔔 Attendance marked:', data);
-      addNotification(`${data.employeeName} marked attendance`);
-      fetchTodayAttendance(); // Auto refresh
-      fetchDashboardData(); // Update stats
-    });
-
-    // Listen for task updates
-    socket.on('task-updated', (data) => {
-      console.log('🔔 Task updated:', data);
-      addNotification(`Task updated by employee`);
-      fetchDashboardData();
-    });
-
-    // Listen for project updates
-    socket.on('project-updated', (data) => {
-      console.log('🔔 Project updated:', data);
-      addNotification(`Project updated: ${data.project?.name}`);
-      fetchRecentProjects();
-      fetchDashboardData();
-    });
-
-    // Listen for client feedback
-    socket.on('feedback-submitted', (data) => {
-      console.log('🔔 Feedback received:', data);
-      addNotification(`New feedback from ${data.clientName}`);
-      fetchDashboardData();
-    });
-
-    // Listen for meeting updates
-    socket.on('meeting-updated', (data) => {
-      console.log('🔔 Meeting updated:', data);
-      addNotification(`Meeting updated`);
-      fetchDashboardData();
-    });
-
-    // Cleanup
-    return () => {
-      socket.off('attendance-marked');
-      socket.off('task-updated');
-      socket.off('project-updated');
-      socket.off('feedback-submitted');
-      socket.off('meeting-updated');
-    };
-  }, [socket]);
-
-  // ✅ NEW: Notification function
-  const addNotification = (message) => {
-    const notification = {
-      id: Date.now(),
-      message,
-      timestamp: new Date(),
-      read: false
-    };
-    setNotifications(prev => [notification, ...prev].slice(0, 10)); // Keep only 10
-    toast.info(message); // Show toast
-  };
-
-  // ✅ Mark notification as read
-  const markAsRead = (id) => {
-    setNotifications(prev =>
-      prev.map(n => n.id === id ? { ...n, read: true } : n)
-    );
-  };
+    console.log('🔍 STATE UPDATE - recentProjects:', recentProjects);
+    console.log('🔍 STATE UPDATE - recentProjects.length:', recentProjects.length);
+    console.log('🔍 STATE UPDATE - attendanceData:', attendanceData);
+    console.log('🔍 STATE UPDATE - attendanceData.length:', attendanceData.length);
+  }, [recentProjects, attendanceData]);
 
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
       const response = await adminAPI.getDashboardStats();
-      let dashboardData = response.data.data || response.data;
+
+      console.log("🔍 Dashboard API Response:", response.data);
+
+      let dashboardData = {};
+
+      if (response.data && response.data.data) {
+        dashboardData = response.data.data;
+      } else if (response.data) {
+        dashboardData = response.data;
+      }
+
+      console.log("📊 Dashboard Data:", dashboardData);
 
       setStats({
         totalEmployees: dashboardData.totalEmployees || 0,
@@ -117,6 +58,9 @@ function AdminDashboard() {
       });
 
       setRecentActivity(dashboardData.recentActivity || []);
+      
+      // ❌ DON'T set attendance here - we fetch it separately now
+      // setAttendanceData(dashboardData.attendanceData || []);
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
       toast.error("Failed to load dashboard data");
@@ -125,76 +69,155 @@ function AdminDashboard() {
     }
   };
 
+  // ✅ NEW: Separate function to fetch today's attendance
   const fetchTodayAttendance = async () => {
     try {
+      console.log('====================================');
+      console.log('🔍 Fetching today\'s attendance for dashboard...');
+      console.log('====================================');
+      
+      // Get today's date in YYYY-MM-DD format
       const today = new Date().toISOString().split('T')[0];
+      console.log('📅 Fetching attendance for date:', today);
+      
       const response = await adminAPI.getDailyAttendance({ date: today });
       
+      console.log('📊 ATTENDANCE API RESPONSE:');
+      console.log('Full response:', response);
+      console.log('response.data:', response.data);
+      console.log('response.data.attendance:', response.data.attendance);
+      console.log('response.data.stats:', response.data.stats);
+      
       if (response.data && response.data.attendance) {
-        const dashboardAttendance = response.data.attendance.slice(0, 5);
+        const attendanceList = response.data.attendance;
+        console.log('✅ Attendance data received:', attendanceList);
+        console.log('✅ Attendance length:', attendanceList.length);
+        console.log('✅ First record:', attendanceList[0]);
+        
+        // Take only first 5 for dashboard display
+        const dashboardAttendance = attendanceList.slice(0, 5);
+        console.log('✅ Setting dashboard attendance (first 5):', dashboardAttendance);
+        
         setAttendanceData(dashboardAttendance);
+        console.log('✅ Attendance data set successfully');
       } else {
+        console.log('⚠️ No attendance data in response');
         setAttendanceData([]);
       }
+      console.log('====================================');
     } catch (error) {
-      console.error('Error fetching attendance:', error);
+      console.error('====================================');
+      console.error('❌ Error fetching attendance for dashboard');
+      console.error('====================================');
+      console.error('Error:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('====================================');
       setAttendanceData([]);
     }
   };
 
   const fetchRecentProjects = async () => {
     try {
+      console.log('🔍 Starting fetchRecentProjects...');
+      
       const response = await adminAPI.getProjects();
+      
+      console.log('====================================');
+      console.log('📊 PROJECTS FETCH DEBUG');
+      console.log('====================================');
+      console.log('Full response:', response);
+      console.log('response.data:', response.data);
+      console.log('response.data.projects:', response.data.projects);
+      console.log('====================================');
+      
       const projects = response.data.projects || response.data.data || [];
+      
+      console.log('✅ Projects array:', projects);
+      console.log('✅ Projects length:', projects.length);
+      
       const recent = projects.slice(0, 5);
+      console.log('✅ Setting recentProjects to:', recent);
+      
       setRecentProjects(recent);
+      
+      console.log('✅ setRecentProjects called');
+      
     } catch (error) {
-      console.error('Error fetching projects:', error);
+      console.error('❌ Error fetching projects:', error);
+      console.error('❌ Error details:', error.response?.data);
     }
   };
 
-  // ... rest of your existing functions ...
+  const getStatusColor = (status) => {
+    const statusMap = {
+      'Planning': 'planning',
+      'In Progress': 'in-progress',
+      'Completed': 'completed',
+      'On Hold': 'on-hold',
+    };
+    return statusMap[status] || 'planning';
+  };
+
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+    });
+  };
+
+  const formatTime = (time) => {
+    if (!time) return 'Not checked in';
+    return new Date(time).toLocaleTimeString('en-US', { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
+  };
+
+  // 🔍 DEBUG: Log render
+  console.log('🎨 RENDERING AdminDashboard');
+  console.log('🎨 recentProjects.length:', recentProjects.length);
+  console.log('🎨 attendanceData.length:', attendanceData.length);
+
+  const handleAddEmployee = () => {
+    navigate("/admin/employees/add");
+  };
+
+  const handleNewProject = () => {
+    navigate("/admin/projects/add");
+  };
+
+  const handleAssignTask = () => {
+    navigate("/admin/tasks");
+  };
+
+  const handleScheduleMeeting = () => {
+    navigate("/admin/meetings/schedule");
+  };
+
+  if (loading) {
+    return (
+      <div className="admin-dashboard">
+        <div className="dashboard-loading">
+          <div className="spinner"></div>
+          <p>Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="admin-dashboard">
-      {/* Header with Notification Bell */}
+      {/* Header */}
       <div className="dashboard-header">
         <div>
           <h1>Admin Dashboard</h1>
           <p>Welcome back! Here's what's happening today.</p>
         </div>
         <div className="dashboard-actions">
-          {/* ✅ NEW: Notification Bell */}
-          <div className="notification-container">
-            <button className="notification-bell">
-              🔔
-              {notifications.filter(n => !n.read).length > 0 && (
-                <span className="notification-badge">
-                  {notifications.filter(n => !n.read).length}
-                </span>
-              )}
-            </button>
-            {notifications.length > 0 && (
-              <div className="notification-dropdown">
-                <h4>Notifications</h4>
-                {notifications.map(notif => (
-                  <div 
-                    key={notif.id} 
-                    className={`notification-item ${notif.read ? 'read' : 'unread'}`}
-                    onClick={() => markAsRead(notif.id)}
-                  >
-                    <p>{notif.message}</p>
-                    <small>{new Date(notif.timestamp).toLocaleTimeString()}</small>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
           <button className="btn btn-primary" onClick={() => {
             fetchDashboardData();
             fetchRecentProjects();
-            fetchTodayAttendance();
+            fetchTodayAttendance(); // ✅ Also refresh attendance
           }}>
             <FiClock /> Refresh
           </button>
