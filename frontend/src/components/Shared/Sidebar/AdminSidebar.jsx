@@ -9,7 +9,8 @@ import {
   FaTasks,
   FaCalendarAlt,
   FaChartBar,
-  FaCog
+  FaCog,
+  FaBell 
 } from 'react-icons/fa';
 import './AdminSidebar.css';
 
@@ -23,7 +24,10 @@ const AdminSidebar = ({ isOpen }) => {
     { path: '/admin/tasks', icon: <FaTasks />, label: 'Tasks' },
     { path: '/admin/meetings', icon: <FaCalendarAlt />, label: 'Meetings' },
     { path: '/admin/reports', icon: <FaChartBar />, label: 'Reports' },
+    { path: '/admin/notifications', icon: <FaBell />, label: 'Notifications' },
     { path: '/admin/settings', icon: <FaCog />, label: 'Settings' },
+    
+
   ];
 
   return (

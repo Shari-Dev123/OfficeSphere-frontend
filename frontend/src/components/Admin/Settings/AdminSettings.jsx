@@ -4,7 +4,7 @@ import { useAuth } from '../../../hooks/useAuth';
 import { toast } from 'react-toastify';
 import { 
   FiSave, 
-  FiHome,      // ← Changed from FiBuilding
+  FiHome,
   FiMail, 
   FiPhone, 
   FiMapPin, 
@@ -18,6 +18,7 @@ import './AdminSettings.css';
 const AdminSettings = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('company');
   
   const [companySettings, setCompanySettings] = useState({
@@ -65,24 +66,58 @@ const AdminSettings = () => {
   }, []);
 
   const fetchSettings = async () => {
-    try {
-      setLoading(true);
-      const response = await adminAPI.getSettings();
-      if (response.data) {
-        const settings = response.data;
-        setCompanySettings(settings.company || companySettings);
-        setWorkSettings(settings.work || workSettings);
-        setAttendanceSettings(settings.attendance || attendanceSettings);
-        setEmailSettings(settings.email || emailSettings);
+  try {
+    setLoading(true);
+    console.log('🔍 Fetching settings...'); // ✅ ADD
+    
+    const response = await adminAPI.getSettings();
+    
+    console.log('📥 Response:', response.data); // ✅ ADD
+    
+    if (response && response.data) {
+      const settings = response.data.data || response.data; // ✅ CHANGE: Add .data fallback
+      
+      console.log('✅ Settings received:', settings); // ✅ ADD
+      
+      // Update each setting only if it exists in the response
+      if (settings.company) {
+        setCompanySettings(prev => ({
+          ...prev,
+          ...settings.company
+        }));
       }
-    } catch (error) {
-      console.error('Error fetching settings:', error);
-      toast.error('Failed to load settings');
-    } finally {
-      setLoading(false);
+      if (settings.work) {
+        setWorkSettings(prev => ({
+          ...prev,
+          ...settings.work
+        }));
+      }
+      if (settings.attendance) {
+        setAttendanceSettings(prev => ({
+          ...prev,
+          ...settings.attendance
+        }));
+      }
+      if (settings.email) {
+        setEmailSettings(prev => ({
+          ...prev,
+          ...settings.email
+        }));
+      }
+      
+      toast.success('Settings loaded successfully');
     }
-  };
-
+  } catch (error) {
+    console.error('❌ Error fetching settings:', error); // ✅ CHANGE
+    if (error.response?.status === 404) {
+      toast.info('No saved settings found. Using default values.');
+    } else {
+      toast.error('Failed to load settings. Using default values.');
+    }
+  } finally {
+    setLoading(false);
+  }
+};
   const handleCompanyChange = (e) => {
     const { name, value } = e.target;
     setCompanySettings(prev => ({
@@ -115,25 +150,60 @@ const AdminSettings = () => {
     }));
   };
 
-  const handleSaveSettings = async () => {
-    try {
-      setLoading(true);
-      const allSettings = {
-        company: companySettings,
-        work: workSettings,
-        attendance: attendanceSettings,
-        email: emailSettings,
-      };
+ const handleSaveSettings = async () => {
+  try {
+    setSaving(true);
+    
+    // Prepare data for saving
+    const allSettings = {
+      company: companySettings,
+      work: workSettings,
+      attendance: attendanceSettings,
+      email: emailSettings,
+      // ❌ REMOVE: updatedBy and updatedAt (backend handles this)
+    };
 
-      await adminAPI.updateSettings(allSettings);
-      toast.success('Settings saved successfully!');
-    } catch (error) {
-      console.error('Error saving settings:', error);
-      toast.error('Failed to save settings');
-    } finally {
-      setLoading(false);
+    console.log('===================================='); // ✅ ADD
+    console.log('💾 Saving settings:', allSettings); // ✅ CHANGE
+    console.log('===================================='); // ✅ ADD
+
+    // Call API to save settings
+    const response = await adminAPI.updateSettings(allSettings);
+    
+    console.log('✅ Save response:', response.data); // ✅ ADD
+    console.log('===================================='); // ✅ ADD
+    
+    if (response && (response.status === 200 || response.status === 201)) {
+      toast.success('✅ Settings saved successfully!'); // ✅ CHANGE
+      
+      // Wait a bit then refresh to verify
+      setTimeout(() => { // ✅ ADD
+        fetchSettings();
+      }, 500);
+    } else {
+      throw new Error('Failed to save settings');
     }
-  };
+  } catch (error) {
+    console.error('===================================='); // ✅ ADD
+    console.error('❌ Error saving settings:', error);
+    console.error('Response:', error.response?.data); // ✅ ADD
+    console.error('===================================='); // ✅ ADD
+    
+    if (error.response) {
+      // Server responded with error
+      const errorMessage = error.response.data?.message || 'Failed to save settings';
+      toast.error(`Error: ${errorMessage}`);
+    } else if (error.request) {
+      // Request made but no response
+      toast.error('Server not responding. Please try again.');
+    } else {
+      // Other errors
+      toast.error('Failed to save settings. Please try again.');
+    }
+  } finally {
+    setSaving(false);
+  }
+};
 
   const renderCompanySettings = () => (
     <div className="settings-section">
@@ -150,6 +220,7 @@ const AdminSettings = () => {
             value={companySettings.companyName}
             onChange={handleCompanyChange}
             className="form-input"
+            placeholder="Enter company name"
           />
         </div>
 
@@ -163,6 +234,7 @@ const AdminSettings = () => {
             value={companySettings.email}
             onChange={handleCompanyChange}
             className="form-input"
+            placeholder="company@email.com"
           />
         </div>
 
@@ -176,6 +248,7 @@ const AdminSettings = () => {
             value={companySettings.phone}
             onChange={handleCompanyChange}
             className="form-input"
+            placeholder="+1 (555) 123-4567"
           />
         </div>
 
@@ -189,6 +262,7 @@ const AdminSettings = () => {
             value={companySettings.website}
             onChange={handleCompanyChange}
             className="form-input"
+            placeholder="www.company.com"
           />
         </div>
 
@@ -202,6 +276,7 @@ const AdminSettings = () => {
             value={companySettings.address}
             onChange={handleCompanyChange}
             className="form-input"
+            placeholder="Street address"
           />
         </div>
 
@@ -213,6 +288,7 @@ const AdminSettings = () => {
             value={companySettings.city}
             onChange={handleCompanyChange}
             className="form-input"
+            placeholder="City"
           />
         </div>
 
@@ -224,6 +300,7 @@ const AdminSettings = () => {
             value={companySettings.state}
             onChange={handleCompanyChange}
             className="form-input"
+            placeholder="State"
           />
         </div>
 
@@ -235,6 +312,7 @@ const AdminSettings = () => {
             value={companySettings.zipCode}
             onChange={handleCompanyChange}
             className="form-input"
+            placeholder="ZIP Code"
           />
         </div>
 
@@ -246,6 +324,7 @@ const AdminSettings = () => {
             value={companySettings.country}
             onChange={handleCompanyChange}
             className="form-input"
+            placeholder="Country"
           />
         </div>
       </div>
@@ -289,6 +368,8 @@ const AdminSettings = () => {
             value={workSettings.lunchBreak}
             onChange={handleWorkChange}
             className="form-input"
+            min="0"
+            max="120"
           />
         </div>
 
@@ -356,6 +437,8 @@ const AdminSettings = () => {
             value={attendanceSettings.lateThreshold}
             onChange={handleAttendanceChange}
             className="form-input"
+            min="0"
+            max="60"
           />
         </div>
 
@@ -367,6 +450,8 @@ const AdminSettings = () => {
             value={attendanceSettings.halfDayHours}
             onChange={handleAttendanceChange}
             className="form-input"
+            min="1"
+            max="12"
           />
         </div>
 
@@ -378,6 +463,8 @@ const AdminSettings = () => {
             value={attendanceSettings.fullDayHours}
             onChange={handleAttendanceChange}
             className="form-input"
+            min="1"
+            max="24"
           />
         </div>
 
@@ -392,6 +479,8 @@ const AdminSettings = () => {
             value={attendanceSettings.overtimeRate}
             onChange={handleAttendanceChange}
             className="form-input"
+            min="1"
+            max="3"
           />
         </div>
 
@@ -508,9 +597,9 @@ const AdminSettings = () => {
         <button 
           className="btn-primary"
           onClick={handleSaveSettings}
-          disabled={loading}
+          disabled={saving || loading}
         >
-          <FiSave /> Save All Settings
+          <FiSave /> {saving ? 'Saving...' : 'Save All Settings'}
         </button>
       </div>
 

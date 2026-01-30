@@ -97,6 +97,14 @@ export const authAPI = {
 export const adminAPI = {
   // ============ Dashboard ============
   getDashboardStats: () => api.get('/admin/dashboard'),
+  getNotifications: () => api.get('/admin/notifications'),
+  markNotificationAsRead: (id) => api.patch(`/admin/notifications/${id}/read`),
+  markNotificationAsUnread: (id) => api.patch(`/admin/notifications/${id}/unread`),
+  markAllNotificationsAsRead: () => api.patch('/admin/notifications/mark-all-read'),
+  deleteNotification: (id) => api.delete(`/admin/notifications/${id}`),
+  deleteNotifications: (ids) => api.post('/admin/notifications/delete-many', { ids }),
+
+  
 
   // ============ Employees ============
   getEmployees: (params) => api.get('/admin/employees', { params }),
@@ -120,10 +128,7 @@ export const adminAPI = {
   deleteProject: (id) => api.delete(`/admin/projects/${id}`),
 
   // ============ Attendance ============
-  // ✅ CRITICAL FIX: Use /admin/attendance endpoint (matching your backend adminController.js)
   getDailyAttendance: (params) => api.get('/admin/attendance', { params }),
-  
-  // Keep other attendance endpoints for backward compatibility
   getAllAttendance: (params) => api.get('/attendance/admin', { params }),
   getMonthlyAttendance: (params) => api.get('/attendance/admin/monthly', { params }),
   getAttendanceReport: (params) => api.get('/attendance/admin/report', { params }),
@@ -152,7 +157,7 @@ export const adminAPI = {
   getPerformanceReport: (params) => api.get('/reports/admin/performance', { params }),
   getProductivityReport: (params) => api.get('/reports/admin/productivity', { params }),
   getAttendanceReportData: (params) => api.get('/reports/admin/attendance', { params }),
-    getEmployeeReport: (params) => api.get('/reports/admin/employee', { params }),
+  getEmployeeReport: (params) => api.get('/reports/admin/employee', { params }),
   exportReport: (reportType, params) =>
     api.get(`/reports/admin/${reportType}/export`, {
       params,
@@ -277,3 +282,4 @@ export const uploadAPI = {
     });
   },
 };
+
