@@ -140,7 +140,7 @@ function Register() {
       <div className="register-card">
         {/* Header */}
         <div className="register-header">
-          <div className="logo-circle">
+          <div className="register-logo-circle">
             <FaUserTie size={40} />
           </div>
           <h1>Create Account</h1>
@@ -186,7 +186,7 @@ function Register() {
           </div>
 
           {/* Name Input */}
-          <div className="form-group">
+          <div className="register-form-group">
             <label htmlFor="name">Full Name *</label>
             <div className="input-with-icon">
               <FaUser className="input-icon" />
@@ -206,7 +206,7 @@ function Register() {
           </div>
 
           {/* Email Input */}
-          <div className="form-group">
+          <div className="register-form-group">
             <label htmlFor="email">Email Address *</label>
             <div className="input-with-icon">
               <FaEnvelope className="input-icon" />
@@ -226,7 +226,7 @@ function Register() {
           </div>
 
           {/* Phone Input */}
-          <div className="form-group">
+          <div className="register-form-group">
             <label htmlFor="phone">Phone Number</label>
             <div className="input-with-icon">
               <FaPhone className="input-icon" />
@@ -243,7 +243,7 @@ function Register() {
 
           {/* Company Input (for clients) */}
           {formData.role === "client" && (
-            <div className="form-group">
+            <div className="register-form-group">
               <label htmlFor="company">Company Name *</label>
               <div className="input-with-icon">
                 <FaBuilding className="input-icon" />
@@ -265,7 +265,7 @@ function Register() {
 
           {/* Department Input (for employees) */}
           {formData.role === "employee" && (
-            <div className="form-group">
+            <div className="register-form-group">
               <label htmlFor="department">Department *</label>
               <div className="input-with-icon">
                 <FaSitemap className="input-icon" />
@@ -295,7 +295,7 @@ function Register() {
 
           {/* Designation Input (for employees) */}
           {formData.role === "employee" && (
-            <div className="form-group">
+            <div className="register-form-group">
               <label htmlFor="designation">Designation *</label>
               <div className="input-with-icon">
                 <FaBriefcase className="input-icon" />
@@ -316,7 +316,7 @@ function Register() {
           )}
 
           {/* Password Input */}
-          <div className="form-group">
+          <div className="register-form-group">
             <label htmlFor="password">Password *</label>
             <div className="input-with-icon">
               <FaLock className="input-icon" />
@@ -343,7 +343,7 @@ function Register() {
           </div>
 
           {/* Confirm Password Input */}
-          <div className="form-group">
+          <div className="register-form-group">
             <label htmlFor="confirmPassword">Confirm Password *</label>
             <div className="input-with-icon">
               <FaLock className="input-icon" />

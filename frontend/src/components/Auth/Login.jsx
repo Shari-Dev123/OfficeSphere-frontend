@@ -65,7 +65,7 @@ function Login() {
       <div className="login-card">
         {/* Logo Section */}
         <div className="login-header">
-          <div className="logo-circle">
+          <div className="login-logo-circle">
             <FaUserCog size={40} />
           </div>
           <h1>OfficeSphere</h1>
@@ -75,12 +75,12 @@ function Login() {
         {/* Login Form */}
         <form className="login-form" onSubmit={handleSubmit}>
           {/* Role Selection */}
-          <div className="role-selection">
-            <label className="role-label">Select Role</label>
+          <div className="login-role-selection">
+            <label className="login-role-label">Select Role</label>
             <div className="role-buttons">
               <button
                 type="button"
-                className={`role-btn ${formData.role === 'admin' ? 'active' : ''}`}
+                className={`login-role-btn ${formData.role === 'admin' ? 'active' : ''}`}
                 onClick={() => setFormData({ ...formData, role: 'admin' })}
               >
                 <FaUserTie />
@@ -88,7 +88,7 @@ function Login() {
               </button>
               <button
                 type="button"
-                className={`role-btn ${formData.role === 'employee' ? 'active' : ''}`}
+                className={`login-role-btn ${formData.role === 'employee' ? 'active' : ''}`}
                 onClick={() => setFormData({ ...formData, role: 'employee' })}
               >
                 <FaUsers />
@@ -96,7 +96,7 @@ function Login() {
               </button>
               <button
                 type="button"
-                className={`role-btn ${formData.role === 'client' ? 'active' : ''}`}
+                className={`login-role-btn ${formData.role === 'client' ? 'active' : ''}`}
                 onClick={() => setFormData({ ...formData, role: 'client' })}
               >
                 <FaUser />
@@ -106,9 +106,9 @@ function Login() {
           </div>
 
           {/* Email Input */}
-          <div className="form-group">
+          <div className="login-form-group">
             <label htmlFor="email">Email Address</label>
-            <div className="input-with-icon">
+            <div className="login-input-with-icon">
               <FaUser className="input-icon" />
               <input
                 type="email"
@@ -123,9 +123,9 @@ function Login() {
           </div>
 
           {/* Password Input */}
-          <div className="form-group">
+          <div className="login-form-group">
             <label htmlFor="password">Password</label>
-            <div className="input-with-icon">
+            <div className="login-input-with-icon">
               <FaLock className="input-icon" />
               <input
                 type={showPassword ? 'text' : 'password'}

@@ -126,7 +126,7 @@ function EmployeeDashboard() {
           <h1>{getGreeting()}, {user?.name}!</h1>
           <p>Here's what's happening with your work today</p>
         </div>
-        <div className="current-date">
+        <div className="employee-current-date">
           <p>{new Date().toLocaleDateString('en-US', { 
             weekday: 'long', 
             year: 'numeric', 
@@ -211,7 +211,7 @@ function EmployeeDashboard() {
           ) : (
             <div className="no-attendance">
               <p>No attendance record for today</p>
-              <button className="btn-primary" onClick={() => window.location.href = '/employee/attendance'}>
+              <button className="employee-btn-primary" onClick={() => window.location.href = '/employee/attendance'}>
                 Mark Attendance
               </button>
             </div>
@@ -251,7 +251,7 @@ function EmployeeDashboard() {
           ) : (
             <div className="no-data">
               <p>No tasks scheduled for today</p>
-              <button className="btn-primary" onClick={() => window.location.href = '/employee/tasks'}>
+              <button className="employee-btn-primary" onClick={() => window.location.href = '/employee/tasks'}>
                 Check Tasks
               </button>
             </div>
@@ -282,7 +282,7 @@ function EmployeeDashboard() {
           ) : (
             <div className="no-data">
               <p>No upcoming meetings</p>
-              <button className="btn-primary" onClick={() => window.location.href = '/employee/meetings'}>
+              <button className="employee-btn-primary" onClick={() => window.location.href = '/employee/meetings'}>
                 Check Meetings
               </button>
             </div>
@@ -309,7 +309,7 @@ function EmployeeDashboard() {
           ) : (
             <div className="no-data">
               <p>No recent activity</p>
-              <button className="btn-primary" onClick={() => window.location.href = '/employee/activities'}>
+              <button className="employee-btn-primary" onClick={() => window.location.href = '/employee/activities'}>
                 Check Activities
               </button>
             </div>

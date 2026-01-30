@@ -249,7 +249,7 @@ function DailyReportForm() {
         <div className="form-actions">
           <button
             type="submit"
-            className="submit-btn"
+            className="employee-submit-btn "
             disabled={loading || submitted}
           >
             {loading ? (

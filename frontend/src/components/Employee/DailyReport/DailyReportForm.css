@@ -34,7 +34,7 @@
   font-size: 16px;
 }
 
-.current-date {
+.employee-current-date {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -47,7 +47,7 @@
   font-weight: 600;
 }
 
-.current-date svg {
+.employee-current-date svg {
   font-size: 18px;
 }
 
@@ -140,9 +140,9 @@
   border-top: 1px solid #e2e8f0;
 }
 
-.submit-btn {
+.employee-submit-btn {
   padding: 16px 48px;
-  background: linear-gradient(135deg, #249E94 0%, #249E94 100%) !important;
+  background: linear-gradient(135deg, #249E94 0%, #249E94 100%);
   color: white;
   border: none;
   border-radius: 12px;
@@ -153,22 +153,22 @@
   align-items: center;
   gap: 12px;
   transition: all 0.3s ease;
-  min-width: 200px;
+  width: 100%;
   justify-content: center;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
-.submit-btn:hover:not(:disabled) {
+.employee-submit-btn :hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
 }
 
-.submit-btn:disabled {
+.employee-submit-btn :disabled {
   opacity: 0.7;
   cursor: not-allowed;
 }
 
-.submit-btn svg {
+.employee-submit-btn svg {
   font-size: 20px;
 }
 
@@ -282,7 +282,7 @@
     flex-direction: column;
   }
 
-  .current-date {
+  .employee-current-date {
     width: 100%;
     justify-content: center;
   }
@@ -296,7 +296,7 @@
     max-width: 100%;
   }
 
-  .submit-btn {
+  .employee-submit-btn {
     width: 100%;
   }
 }

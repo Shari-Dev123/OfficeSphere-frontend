@@ -1,4 +1,4 @@
-.stat-card {
+.admin-stat-card {
   background: white;
   border-radius: 12px;
   padding: 24px;
@@ -7,34 +7,34 @@
   border-left: 4px solid transparent;
 }
 
-.stat-card:hover {
+.admin-stat-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
 }
 
 /* Color Variants */
-.stat-card-primary {
+.admin-stat-card-primary {
   border-left-color: #667eea;
 }
 
-.stat-card-success {
+.admin-stat-card-success {
   border-left-color: #10b981;
 }
 
-.stat-card-warning {
+.admin-stat-card-warning {
   border-left-color: #f59e0b;
 }
 
-.stat-card-danger {
+.admin-stat-card-danger {
   border-left-color: #ef4444;
 }
 
-.stat-card-info {
+.admin-stat-card-info {
   border-left-color: #3b82f6;
 }
 
 /* Header */
-.stat-card-header {
+.admin-stat-card-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -118,7 +118,7 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-  .stat-card {
+  .admin-stat-card {
     padding: 20px;
   }
 

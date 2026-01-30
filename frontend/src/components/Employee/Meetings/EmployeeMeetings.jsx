@@ -191,7 +191,7 @@ function EmployeeMeetings() {
 
       {/* Filters */}
       <div className="meetings-filters">
-        <div className="search-box">
+        <div className="employee-search-box">
           <FiSearch />
           <input
             type="text"

@@ -3,8 +3,8 @@ import './StatCard.css';
 
 function StatCard({ title, value, icon, color, trend }) {
   return (
-    <div className={`stat-card stat-card-${color}`}>
-      <div className="stat-card-header">
+    <div className={`admin-stat-card admin-stat-card-${color}`}>
+      <div className="admin-stat-card-header">
         <div className="stat-info">
           <p className="stat-title">{title}</p>
           <h3 className="stat-value">{value}</h3>

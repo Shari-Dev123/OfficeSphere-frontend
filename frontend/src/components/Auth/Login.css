@@ -40,7 +40,7 @@
   margin-bottom: 30px;
 }
 
-.logo-circle {
+.login-logo-circle {
   width: 80px;
   height: 80px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -66,11 +66,11 @@
 }
 
 /* Role Selection */
-.role-selection {
+.login-role-selection {
   margin-bottom: 25px;
 }
 
-.role-label {
+.login-role-label {
   display: block;
   font-size: 14px;
   font-weight: 600;
@@ -84,7 +84,7 @@
   gap: 10px;
 }
 
-.role-btn {
+.login-role-btn {
   padding: 15px 10px;
   border: 2px solid #e5e7eb;
   background: white;
@@ -99,19 +99,19 @@
   color: #6b7280;
 }
 
-.role-btn:hover {
+.login-role-btn:hover {
   border-color: #667eea;
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
 }
 
-.role-btn.active {
+.login-role-btn.active {
   border-color: #667eea;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
 }
 
-.role-btn svg {
+.login-role-btn svg {
   font-size: 24px;
 }
 
@@ -120,11 +120,11 @@
   margin-top: 20px;
 }
 
-.form-group {
+.login-form-group {
   margin-bottom: 20px;
 }
 
-.form-group label {
+.login-form-group label {
   display: block;
   font-size: 14px;
   font-weight: 600;
@@ -132,7 +132,7 @@
   margin-bottom: 8px;
 }
 
-.input-with-icon {
+.login-input-with-icon {
   position: relative;
   display: flex;
   align-items: center;
@@ -146,7 +146,7 @@
 }
 
 
-.input-with-icon input {
+.login-input-with-icon input {
   width: 100%;
   padding: 14px 45px !important;
   border: 2px solid #e5e7eb;
@@ -156,7 +156,7 @@
   background: #f9fafb;
 }
 
-.input-with-icon input:focus {
+.login-input-with-icon input:focus {
   outline: none;
   border-color: #667eea;
   background: white;
@@ -332,7 +332,7 @@
     grid-template-columns: 1fr;
   }
 
-  .role-btn {
+  .login-role-btn {
     flex-direction: row;
     justify-content: center;
   }

@@ -1,3 +1,8 @@
+/* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
+/* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
+
+
+
 .admin-dashboard {
   padding: 24px;
   background-color: #f5f7fa;
@@ -11,6 +16,7 @@
   align-items: center;
   margin-bottom: 32px;
 }
+
 /* Projects Card */
 .projects-overview-card {
   grid-column: span 2;
@@ -79,6 +85,7 @@
   background: #fef3c7;
   color: #92400e;
 }
+
 /* Notification Bell */
 .notification-container {
   position: relative;
@@ -168,6 +175,7 @@
 .notification-item:last-child {
   border-bottom: none;
 }
+
 .view-all-link {
   display: inline-flex;
   align-items: center;
@@ -183,6 +191,7 @@
 .view-all-link:hover {
   color: #2563eb;
 }
+
 .dashboard-header h1 {
   font-size: 28px;
   font-weight: 700;
@@ -446,8 +455,13 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .dashboard-loading p {

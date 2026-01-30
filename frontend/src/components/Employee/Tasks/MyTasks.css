@@ -13,7 +13,7 @@
   gap: 20px;
 }
 
-.header-left h1 {
+.tasks-header-left h1 {
   font-size: 32px;
   font-weight: 700;
   color: #1a202c;
@@ -23,11 +23,11 @@
   gap: 12px;
 }
 
-.header-left h1 svg {
+.tasks-header-left h1 svg {
   color: #249E94 !important;
 }
 
-.header-left p {
+.tasks-header-left p {
   color: #718096;
   margin: 0;
 }

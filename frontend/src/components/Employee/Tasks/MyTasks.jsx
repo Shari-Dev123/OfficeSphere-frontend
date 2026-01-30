@@ -107,7 +107,7 @@ function MyTasks() {
   return (
     <div className="my-tasks">
       <div className="tasks-header">
-        <div className="header-left">
+        <div className="tasks-header-left">
           <h1><MdAssignment /> My Tasks</h1>
           <p>{filteredTasks.length} tasks</p>
         </div>

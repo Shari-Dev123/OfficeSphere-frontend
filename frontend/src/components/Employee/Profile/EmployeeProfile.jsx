@@ -29,7 +29,7 @@ function EmployeeProfile() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     // Personal Info
     name: "",
@@ -38,7 +38,7 @@ function EmployeeProfile() {
     dateOfBirth: "",
     bloodGroup: "",
     bio: "",
-    
+
     // Work Info (Read-only, populated from profile)
     employeeId: "",
     designation: "",
@@ -47,19 +47,19 @@ function EmployeeProfile() {
     experience: "",
     reportingTo: "",
     skills: [],
-    
+
     // Address
     street: "",
     city: "",
     state: "",
     country: "",
     zipCode: "",
-    
+
     // Emergency Contact
     emergencyName: "",
     emergencyRelationship: "",
     emergencyPhone: "",
-    
+
     // Bank Details
     accountNumber: "",
     bankName: "",
@@ -99,8 +99,8 @@ function EmployeeProfile() {
         }
 
         // Format skills array to comma-separated string
-        const skillsString = Array.isArray(profileData.skills) 
-          ? profileData.skills.join(", ") 
+        const skillsString = Array.isArray(profileData.skills)
+          ? profileData.skills.join(", ")
           : "";
 
         // Get manager name if exists
@@ -117,7 +117,7 @@ function EmployeeProfile() {
           dateOfBirth: dob,
           bloodGroup: profileData.bloodGroup || "",
           bio: profileData.bio || "",
-          
+
           // Work Info (Read-only)
           employeeId: profileData.employeeId || "",
           designation: profileData.designation || "",
@@ -126,19 +126,19 @@ function EmployeeProfile() {
           experience: profileData.experience || 0,
           reportingTo: managerName,
           skills: skillsString,
-          
+
           // Address
           street: profileData.address?.street || "",
           city: profileData.address?.city || "",
           state: profileData.address?.state || "",
           country: profileData.address?.country || "",
           zipCode: profileData.address?.zipCode || "",
-          
+
           // Emergency Contact
           emergencyName: profileData.emergencyContact?.name || "",
           emergencyRelationship: profileData.emergencyContact?.relationship || "",
           emergencyPhone: profileData.emergencyContact?.phone || "",
-          
+
           // Bank Details
           accountNumber: profileData.bankDetails?.accountNumber || "",
           bankName: profileData.bankDetails?.bankName || "",
@@ -180,20 +180,20 @@ function EmployeeProfile() {
         dateOfBirth: formData.dateOfBirth,
         bloodGroup: formData.bloodGroup,
         bio: formData.bio,
-        
+
         // Address (send as comma-separated string)
         address: `${formData.street}, ${formData.city}, ${formData.state}, ${formData.country}, ${formData.zipCode}`,
-        
+
         // Emergency Contact
         emergencyContact: formData.emergencyName,
         emergencyRelationship: formData.emergencyRelationship,
         emergencyPhone: formData.emergencyPhone,
-        
+
         // Skills (convert comma-separated string to array)
         skills: formData.skills
           ? formData.skills.split(",").map(s => s.trim()).filter(Boolean)
           : [],
-        
+
         // Bank Details
         bankDetails: {
           accountNumber: formData.accountNumber,
@@ -272,8 +272,8 @@ function EmployeeProfile() {
 
       {/* Profile Avatar Section */}
       <div className="profile-card">
-        <div className="profile-avatar-section">
-          <div className="profile-avatar">
+        <div className="employee-profile-avatar-section">
+          <div className="employee-profile-avatar">
             {user?.name?.charAt(0).toUpperCase()}
           </div>
           <div className="profile-info">
@@ -286,13 +286,13 @@ function EmployeeProfile() {
 
         {/* Profile Form */}
         <form onSubmit={handleSubmit} className="profile-form">
-          
+
           {/* ========== PERSONAL INFORMATION ========== */}
           <div className="section-title">
             <FiUser /> Personal Information
           </div>
-          <div className="form-grid">
-            <div className="form-group">
+          <div className="employee-form-grid">
+            <div className="employee-form-group">
               <label><FiUser /> Full Name</label>
               <input
                 type="text"
@@ -304,7 +304,7 @@ function EmployeeProfile() {
               <small className="field-note">Contact admin to change name</small>
             </div>
 
-            <div className="form-group">
+            <div className="employee-form-group">
               <label><FiMail /> Email</label>
               <input
                 type="email"
@@ -316,7 +316,7 @@ function EmployeeProfile() {
               <small className="field-note">Contact admin to change email</small>
             </div>
 
-            <div className="form-group">
+            <div className="employee-form-group">
               <label><FiPhone /> Phone Number</label>
               <input
                 type="tel"
@@ -328,7 +328,7 @@ function EmployeeProfile() {
               />
             </div>
 
-            <div className="form-group">
+            <div className="employee-form-group">
               <label><FiCalendar /> Date of Birth</label>
               <input
                 type="date"
@@ -339,7 +339,7 @@ function EmployeeProfile() {
               />
             </div>
 
-            <div className="form-group">
+            <div className="employee-form-group">
               <label><FiHeart /> Blood Group</label>
               <select
                 name="bloodGroup"
@@ -361,7 +361,7 @@ function EmployeeProfile() {
           </div>
 
           {/* Bio */}
-          <div className="form-group full-width">
+          <div className="employee-form-group full-width">
             <label><FiFileText /> About Me / Bio</label>
             <textarea
               name="bio"
@@ -379,8 +379,8 @@ function EmployeeProfile() {
           <div className="section-title">
             <FiBriefcase /> Work Information
           </div>
-          <div className="form-grid">
-            <div className="form-group">
+          <div className="employee-form-grid">
+            <div className="employee-form-group">
               <label><FiBriefcase /> Employee ID</label>
               <input
                 type="text"
@@ -390,7 +390,7 @@ function EmployeeProfile() {
               />
             </div>
 
-            <div className="form-group">
+            <div className="employee-form-group">
               <label><FiBriefcase /> Designation</label>
               <input
                 type="text"
@@ -401,7 +401,7 @@ function EmployeeProfile() {
               <small className="field-note">Contact admin to update</small>
             </div>
 
-            <div className="form-group">
+            <div className="employee-form-group">
               <label><FiBriefcase /> Department</label>
               <input
                 type="text"
@@ -412,7 +412,7 @@ function EmployeeProfile() {
               <small className="field-note">Contact admin to update</small>
             </div>
 
-            <div className="form-group">
+            <div className="employee-form-group">
               <label><FiCalendar /> Joining Date</label>
               <input
                 type="date"
@@ -422,7 +422,7 @@ function EmployeeProfile() {
               />
             </div>
 
-            <div className="form-group">
+            <div className="employee-form-group">
               <label><FiTrendingUp /> Experience (Years)</label>
               <input
                 type="number"
@@ -432,7 +432,7 @@ function EmployeeProfile() {
               />
             </div>
 
-            <div className="form-group">
+            <div className="employee-form-group">
               <label><FiUser /> Reporting To</label>
               <input
                 type="text"
@@ -444,7 +444,7 @@ function EmployeeProfile() {
           </div>
 
           {/* Skills */}
-          <div className="form-group full-width">
+          <div className="employee-form-group full-width">
             <label><FiAward /> Skills</label>
             <input
               type="text"
@@ -461,8 +461,8 @@ function EmployeeProfile() {
           <div className="section-title">
             <FiHome /> Address
           </div>
-          <div className="form-grid">
-            <div className="form-group full-width">
+          <div className="employee-form-grid">
+            <div className="employee-form-group full-width">
               <label><FiMapPin /> Street Address</label>
               <input
                 type="text"
@@ -474,7 +474,7 @@ function EmployeeProfile() {
               />
             </div>
 
-            <div className="form-group">
+            <div className="employee-form-group">
               <label>City</label>
               <input
                 type="text"
@@ -486,7 +486,7 @@ function EmployeeProfile() {
               />
             </div>
 
-            <div className="form-group">
+            <div className="employee-form-group">
               <label>State/Province</label>
               <input
                 type="text"
@@ -498,7 +498,7 @@ function EmployeeProfile() {
               />
             </div>
 
-            <div className="form-group">
+            <div className="employee-form-group">
               <label>Country</label>
               <input
                 type="text"
@@ -510,7 +510,7 @@ function EmployeeProfile() {
               />
             </div>
 
-            <div className="form-group">
+            <div className="employee-form-group">
               <label>ZIP/Postal Code</label>
               <input
                 type="text"
@@ -527,8 +527,8 @@ function EmployeeProfile() {
           <div className="section-title">
             <FiAlertCircle /> Emergency Contact
           </div>
-          <div className="form-grid">
-            <div className="form-group">
+          <div className="employee-form-grid">
+            <div className="employee-form-group">
               <label>Contact Name</label>
               <input
                 type="text"
@@ -540,7 +540,7 @@ function EmployeeProfile() {
               />
             </div>
 
-            <div className="form-group">
+            <div className="employee-form-group">
               <label>Relationship</label>
               <input
                 type="text"
@@ -552,7 +552,7 @@ function EmployeeProfile() {
               />
             </div>
 
-            <div className="form-group full-width">
+            <div className="employee-form-group full-width">
               <label><FiPhone /> Emergency Phone</label>
               <input
                 type="tel"
@@ -569,8 +569,8 @@ function EmployeeProfile() {
           <div className="section-title">
             <FiCreditCard /> Bank Details
           </div>
-          <div className="form-grid">
-            <div className="form-group">
+          <div className="employee-form-grid">
+            <div className="employee-form-group">
               <label>Account Number</label>
               <input
                 type="text"
@@ -582,7 +582,7 @@ function EmployeeProfile() {
               />
             </div>
 
-            <div className="form-group">
+            <div className="employee-form-group">
               <label>Bank Name</label>
               <input
                 type="text"
@@ -594,7 +594,7 @@ function EmployeeProfile() {
               />
             </div>
 
-            <div className="form-group">
+            <div className="employee-form-group">
               <label>IFSC/SWIFT Code</label>
               <input
                 type="text"
@@ -606,7 +606,7 @@ function EmployeeProfile() {
               />
             </div>
 
-            <div className="form-group">
+            <div className="employee-form-group">
               <label>Account Holder Name</label>
               <input
                 type="text"
@@ -626,22 +626,22 @@ function EmployeeProfile() {
                 <FiAward /> Performance Statistics
               </div>
               <div className="performance-grid">
-                <div className="employee-stat-card">
+                <div className="stat-card">
                   <div className="employee-stat-icon">⭐</div>
                   <div className="employee-stat-value">{profile.performance.rating.toFixed(1)}/5.0</div>
                   <div className="employee-stat-label">Performance Rating</div>
                 </div>
-                <div className="employee-stat-card">
+                <div className="stat-card">
                   <div className="employee-stat-icon">✅</div>
                   <div className="employee-stat-value">{profile.performance.totalTasksCompleted || 0}</div>
                   <div className="employee-stat-label">Tasks Completed</div>
                 </div>
-                <div className="employee-stat-card">
+                <div className="stat-card">
                   <div className="employee-stat-icon">⏱️</div>
                   <div className="employee-stat-value">{profile.performance.onTimeCompletion || 0}%</div>
                   <div className="employee-stat-label">On-Time Completion</div>
                 </div>
-                <div className="employee-stat-card">
+                <div className="stat-card">
                   <div className="employee-stat-icon">📊</div>
                   <div className="employee-stat-value">{profile.performance.averageTaskTime || 0}h</div>
                   <div className="employee-stat-label">Avg Task Time</div>
@@ -657,7 +657,7 @@ function EmployeeProfile() {
               </button>
               <button
                 type="button"
-                className="cancel-btn"
+                className="employee-cancel-btn"
                 onClick={() => {
                   setEditing(false);
                   fetchProfile();
@@ -672,7 +672,7 @@ function EmployeeProfile() {
 
       {/* Change Password Section */}
       <div className="password-section">
-        <div className="section-header">
+        <div className="employee-section-header">
           <h3>
             <FiLock /> Change Password
           </h3>
@@ -688,7 +688,7 @@ function EmployeeProfile() {
 
         {changingPassword && (
           <form onSubmit={handlePasswordSubmit} className="password-form">
-            <div className="form-group">
+            <div className="employee-form-group">
               <label>Current Password</label>
               <input
                 type="password"
@@ -700,7 +700,7 @@ function EmployeeProfile() {
               />
             </div>
 
-            <div className="form-group">
+            <div className="employee-form-group">
               <label>New Password</label>
               <input
                 type="password"
@@ -713,7 +713,7 @@ function EmployeeProfile() {
               />
             </div>
 
-            <div className="form-group">
+            <div className="employee-form-group">
               <label>Confirm New Password</label>
               <input
                 type="password"
@@ -731,7 +731,7 @@ function EmployeeProfile() {
               </button>
               <button
                 type="button"
-                className="cancel-btn"
+                className="employee-cancel-btn"
                 onClick={() => {
                   setChangingPassword(false);
                   setPasswordData({

@@ -61,7 +61,7 @@
   margin-bottom: 30px;
 }
 
-.logo-circle {
+.register-logo-circle {
   width: 80px;
   height: 80px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -141,11 +141,11 @@
   margin-top: 20px;
 }
 
-.form-group {
+.register-form-group {
   margin-bottom: 18px;
 }
 
-.form-group label {
+.register-form-group label {
   display: block;
   font-size: 14px;
   font-weight: 600;
@@ -365,7 +365,7 @@
     justify-content: center;
   }
 
-  .form-group {
+  .register-form-group {
     margin-bottom: 16px;
   }
 
@@ -383,7 +383,7 @@
     padding: 25px 15px;
   }
 
-  .logo-circle {
+  .register-logo-circle {
     width: 70px;
     height: 70px;
   }

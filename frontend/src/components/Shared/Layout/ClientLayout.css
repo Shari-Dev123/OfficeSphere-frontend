@@ -11,13 +11,15 @@
   display: flex;
   flex-direction: column;
   transition: margin-left 0.3s ease;
-  margin-left: 260px;
+  margin-left: 0; /* 🔥 IMPORTANT */
 }
 
+/* Sidebar open */
 .client-main-content.sidebar-open {
   margin-left: 260px;
 }
 
+/* Sidebar closed */
 .client-main-content.sidebar-closed {
   margin-left: 70px;
 }
@@ -26,57 +28,20 @@
 .client-content-wrapper {
   flex: 1;
   padding: 24px;
-  margin-top: 70px; /* Space for fixed navbar */
+  margin-top: 70px;
   overflow-y: auto;
   background: linear-gradient(135deg, #fef3c7 0%, #fef9e7 100%);
 }
 
-/* Scrollbar Styling */
-.client-content-wrapper::-webkit-scrollbar {
-  width: 8px;
-}
-
-.client-content-wrapper::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-.client-content-wrapper::-webkit-scrollbar-thumb {
-  background: #f59e0b;
-  border-radius: 4px;
-}
-
-.client-content-wrapper::-webkit-scrollbar-thumb:hover {
-  background: #d97706;
-}
-
-/* Responsive Design */
+/* Responsive */
 @media (max-width: 1024px) {
-  .client-main-content {
-    margin-left: 0;
-  }
-
-  .client-main-content.sidebar-open {
-    margin-left: 0;
-  }
-
+  .client-main-content,
+  .client-main-content.sidebar-open,
   .client-main-content.sidebar-closed {
-    margin-left: 0;
+    margin-left: 0; /* 🔥 mobile pe sidebar overlay banay */
   }
 
   .client-content-wrapper {
     padding: 16px;
-  }
-}
-
-@media (max-width: 768px) {
-  .client-content-wrapper {
-    padding: 12px;
-    margin-top: 60px;
-  }
-}
-
-@media (max-width: 480px) {
-  .client-content-wrapper {
-    padding: 8px;
   }
 }
