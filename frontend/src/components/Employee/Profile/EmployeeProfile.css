@@ -238,8 +238,8 @@
   margin: 20px 0;
 }
 
-.stat-card {
-  background: linear-gradient(135deg, #249E94 0%, #249E94 100%);
+.employee-stat-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 24px;
   border-radius: 12px;
   text-align: center;
@@ -248,7 +248,7 @@
   transition: transform 0.3s ease;
 }
 
-.stat-card:hover {
+.employee-stat-card:hover {
   transform: translateY(-4px);
 }
 
@@ -257,14 +257,14 @@
   margin-bottom: 12px;
 }
 
-.stat-value {
+.employee-stat-value {
   font-size: 28px;
   font-weight: 700;
   margin-bottom: 8px;
   color: white !important;
 }
 
-.stat-label {
+.employee-stat-label {
   font-size: 13px;
   opacity: 0.9;
   font-weight: 500;

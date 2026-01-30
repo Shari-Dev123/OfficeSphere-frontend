@@ -105,50 +105,50 @@ function AttendanceMonitor() {
 
       {/* Stats Cards */}
       <div className="attendance-stats">
-        <div className="stat-card">
-          <div className="stat-icon total">
+        <div className="attendance-stat-card">
+          <div className="attendance-stat-icon total">
             <FiUsers />
           </div>
-          <div className="stat-content">
-            <p className="stat-label">Total Employees</p>
-            <h3 className="stat-value">{stats.total}</h3>
+          <div className="attendance-stat-content">
+            <p className="attendance-stat-label">Total Employees</p>
+            <h3 className="attendance-stat-value">{stats.total}</h3>
           </div>
         </div>
 
-        <div className="stat-card">
-          <div className="stat-icon present">
+        <div className="attendance-stat-card">
+          <div className="attendance-stat-icon present">
             <FiCheckCircle />
           </div>
-          <div className="stat-content">
-            <p className="stat-label">Present</p>
-            <h3 className="stat-value">{stats.present}</h3>
-            <span className="stat-percentage">
+          <div className="attendance-stat-content">
+            <p className="attendance-stat-label">Present</p>
+            <h3 className="attendance-stat-value">{stats.present}</h3>
+            <span className="attendance-stat-percentage">
               {stats.total > 0 ? Math.round((stats.present / stats.total) * 100) : 0}%
             </span>
           </div>
         </div>
 
-        <div className="stat-card">
-          <div className="stat-icon late">
+        <div className="attendance-stat-card">
+          <div className="attendance-stat-icon late">
             <FiAlertCircle />
           </div>
-          <div className="stat-content">
-            <p className="stat-label">Late</p>
-            <h3 className="stat-value">{stats.late}</h3>
-            <span className="stat-percentage">
+          <div className="attendance-stat-content">
+            <p className="attendance-stat-label">Late</p>
+            <h3 className="attendance-stat-value">{stats.late}</h3>
+            <span className="attendance-stat-percentage">
               {stats.total > 0 ? Math.round((stats.late / stats.total) * 100) : 0}%
             </span>
           </div>
         </div>
 
-        <div className="stat-card">
-          <div className="stat-icon absent">
+        <div className="attendance-stat-card">
+          <div className="attendance-stat-icon absent">
             <FiXCircle />
           </div>
-          <div className="stat-content">
-            <p className="stat-label">Absent</p>
-            <h3 className="stat-value">{stats.absent}</h3>
-            <span className="stat-percentage">
+          <div className="attendance-stat-content">
+            <p className="attendance-stat-label">Absent</p>
+            <h3 className="attendance-stat-value">{stats.absent}</h3>
+            <span className="attendance-stat-percentage">
               {stats.total > 0 ? Math.round((stats.absent / stats.total) * 100) : 0}%
             </span>
           </div>

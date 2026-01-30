@@ -24,7 +24,7 @@
   border-bottom: 2px solid #e5e7eb;
 }
 
-.tab-btn {
+.admin-tab-btn {
   padding: 12px 24px;
   border: none;
   background: transparent;
@@ -39,12 +39,12 @@
   transition: all 0.3s ease;
 }
 
-.tab-btn:hover {
+.admin-tab-btn:hover {
   color: #2563eb;
   background: #f3f4f6;
 }
 
-.tab-btn.active {
+.admin-tab-btn.active {
   color: #2563eb;
   border-bottom-color: #2563eb;
 }

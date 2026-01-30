@@ -33,7 +33,7 @@
   margin-bottom: 24px;
 }
 
-.stat-item {
+.admin-stat-item {
   background: white;
   padding: 20px;
   border-radius: 12px;
@@ -43,7 +43,7 @@
   gap: 16px;
 }
 
-.stat-icon {
+.admin-stat-icon {
   width: 48px;
   height: 48px;
   border-radius: 10px;
@@ -54,31 +54,31 @@
   flex-shrink: 0;
 }
 
-.stat-icon.total {
+.admin-stat-icon.total {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
 }
 
-.stat-icon.today {
+.admin-stat-icon.today {
   background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
   color: white;
 }
 
-.stat-icon.upcoming {
+.admin-stat-icon.upcoming {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
 }
 
-.stat-icon.past {
+.admin-stat-icon.past {
   background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
   color: white;
 }
 
-.stat-content {
+.admin-stat-content {
   flex: 1;
 }
 
-.stat-value {
+.admin-stat-value {
   display: block;
   font-size: 24px;
   font-weight: 700;
@@ -86,7 +86,7 @@
   margin-bottom: 4px;
 }
 
-.stat-label {
+.admin-stat-label {
   font-size: 13px;
   color: #6b7280;
   font-weight: 500;

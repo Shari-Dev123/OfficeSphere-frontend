@@ -26,14 +26,14 @@
 }
 
 /* Task Stats */
-.task-stats {
+.admin-task-stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
   margin-bottom: 24px;
 }
 
-.stat-item {
+.admin-stat-item {
   background: white;
   padding: 20px;
   border-radius: 12px;
@@ -41,7 +41,7 @@
   text-align: center;
 }
 
-.stat-value {
+.admin-stat-value {
   display: block;
   font-size: 32px;
   font-weight: 700;
@@ -49,19 +49,19 @@
   margin-bottom: 8px;
 }
 
-.stat-value.stat-info {
+.admin-stat-value.admin-stat-info {
   color: #3b82f6;
 }
 
-.stat-value.stat-warning {
+.admin-stat-value.admin-stat-warning {
   color: #f59e0b;
 }
 
-.stat-value.stat-success {
+.admin-stat-value.admin-stat-success {
   color: #10b981;
 }
 
-.stat-label {
+.admin-stat-label {
   font-size: 14px;
   color: #6b7280;
   font-weight: 500;
@@ -165,13 +165,13 @@
   color: #6b7280;
 }
 
-.task-actions {
+.admin-task-actions {
   display: flex;
   gap: 8px;
 }
 
-.action-btn {
-  width: 32px;
+.admin-action-btn {
+  width: 100px;
   height: 32px;
   border-radius: 6px;
   border: none;
@@ -183,21 +183,21 @@
   font-size: 14px;
 }
 
-.edit-btn {
+.admin-edit-btn {
   background: #e0e7ff;
   color: #4f46e5;
 }
 
-.edit-btn:hover {
+.admin-edit-btn:hover {
   background: #c7d2fe;
 }
 
-.delete-btn {
+.admin-delete-btn {
   background: #fee2e2;
   color: #dc2626;
 }
 
-.delete-btn:hover {
+.admin-delete-btn:hover {
   background: #fecaca;
 }
 
@@ -220,6 +220,7 @@
   margin: 0 0 16px 0;
   line-height: 1.6;
   display: -webkit-box;
+  line-clamp: 2; 
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;

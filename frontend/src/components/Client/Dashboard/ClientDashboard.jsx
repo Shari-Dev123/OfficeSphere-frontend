@@ -139,27 +139,27 @@ function ClientDashboard() {
   return (
     <div className="client-dashboard">
       {/* Welcome Section */}
-      <div className="dashboard-header">
-        <div className="welcome-section">
+      <div className="client-dashboard-header">
+        <div className="client-welcome-section">
           <h1>Welcome back! 👋</h1>
           <p>Here's what's happening with your projects today</p>
         </div>
       </div>
 
       {/* Stats Grid */}
-      <div className="stats-grid">
+      <div className="client-stats-grid">
         {stats.map((stat, index) => (
-          <Card key={index} className="stat-card">
-            <div className="stat-content">
+          <Card key={index} className="client-stat-card">
+            <div className="client-stat-content">
               <div
-                className="stat-icon"
+                className="client-stat-icon"
                 style={{ backgroundColor: stat.bgColor, color: stat.color }}
               >
                 {stat.icon}
               </div>
-              <div className="stat-details">
-                <p className="stat-title">{stat.title}</p>
-                <h2 className="stat-value">{stat.value}</h2>
+              <div className="client-stat-details">
+                <p className="client-stat-title">{stat.title}</p>
+                <h2 className="client-stat-value">{stat.value}</h2>
               </div>
             </div>
           </Card>
@@ -244,22 +244,22 @@ function ClientDashboard() {
       </div>
 
       {/* Quick Actions */}
-      <Card className="quick-actions-card">
+      <Card className="client-quick-actions-card">
         <h3>Quick Actions</h3>
-        <div className="quick-actions-grid">
-          <button className="action-btn">
+        <div className="client-quick-actions-grid">
+          <button className="client-action-btn">
             <BiTask />
             <span>View All Projects</span>
           </button>
-          <button className="action-btn">
+          <button className="client-action-btn">
             <MdOutlineSchedule />
             <span>Schedule Meeting</span>
           </button>
-          <button className="action-btn">
+          <button className="client-action-btn">
             <FiCheckCircle />
             <span>Approve Milestones</span>
           </button>
-          <button className="action-btn">
+          <button className="client-action-btn">
             <FiTrendingUp />
             <span>View Reports</span>
           </button>
