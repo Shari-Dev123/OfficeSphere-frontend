@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { adminAPI } from "../../../utils/api";
 import StatCard from "./StatCard";
-import { FiUsers, FiUserCheck, FiBriefcase, FiClock, FiArrowRight } from "react-icons/fi";
+import { FiUsers, FiUserCheck, FiBriefcase, FiClock, FiArrowRight, FiRefreshCw } from "react-icons/fi";
 import { toast } from "react-toastify";
 import "./AdminDashboard.css";
 
 function AdminDashboard() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [stats, setStats] = useState({
     totalEmployees: 0,
     presentToday: 0,
@@ -18,20 +19,32 @@ function AdminDashboard() {
   const [recentActivity, setRecentActivity] = useState([]);
   const [attendanceData, setAttendanceData] = useState([]);
   const [recentProjects, setRecentProjects] = useState([]);
+  const [lastRefreshTime, setLastRefreshTime] = useState(new Date());
+
+  // Use ref for polling interval
+  const pollingIntervalRef = useRef(null);
 
   useEffect(() => {
+    // Initial data fetch
     fetchDashboardData();
     fetchRecentProjects();
-    fetchTodayAttendance(); // ✅ NEW: Separate attendance fetch
-  }, []);
+    fetchTodayAttendance();
 
-  // 🔍 DEBUG: Monitor state changes
-  useEffect(() => {
-    console.log('🔍 STATE UPDATE - recentProjects:', recentProjects);
-    console.log('🔍 STATE UPDATE - recentProjects.length:', recentProjects.length);
-    console.log('🔍 STATE UPDATE - attendanceData:', attendanceData);
-    console.log('🔍 STATE UPDATE - attendanceData.length:', attendanceData.length);
-  }, [recentProjects, attendanceData]);
+    // ✅ NEW: Set up auto-refresh polling every 30 seconds
+    console.log('🔄 Setting up auto-refresh polling (30s interval)');
+    pollingIntervalRef.current = setInterval(() => {
+      console.log('🔄 Auto-refreshing dashboard data...');
+      refreshDashboardData();
+    }, 30000); // 30 seconds
+
+    // Cleanup on unmount
+    return () => {
+      if (pollingIntervalRef.current) {
+        console.log('🧹 Cleaning up polling interval');
+        clearInterval(pollingIntervalRef.current);
+      }
+    };
+  }, []);
 
   const fetchDashboardData = async () => {
     try {
@@ -59,8 +72,6 @@ function AdminDashboard() {
 
       setRecentActivity(dashboardData.recentActivity || []);
       
-      // ❌ DON'T set attendance here - we fetch it separately now
-      // setAttendanceData(dashboardData.attendanceData || []);
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
       toast.error("Failed to load dashboard data");
@@ -69,14 +80,49 @@ function AdminDashboard() {
     }
   };
 
-  // ✅ NEW: Separate function to fetch today's attendance
+  // ✅ NEW: Refresh function for auto-polling (doesn't show loading spinner)
+  const refreshDashboardData = async () => {
+    try {
+      setRefreshing(true);
+      
+      // Fetch attendance (most important for live updates)
+      await fetchTodayAttendance();
+      
+      // Fetch stats
+      const response = await adminAPI.getDashboardStats();
+      let dashboardData = {};
+
+      if (response.data && response.data.data) {
+        dashboardData = response.data.data;
+      } else if (response.data) {
+        dashboardData = response.data;
+      }
+
+      setStats({
+        totalEmployees: dashboardData.totalEmployees || 0,
+        presentToday: dashboardData.presentToday || 0,
+        activeProjects: dashboardData.activeProjects || 0,
+        pendingTasks: dashboardData.pendingTasks || 0,
+      });
+
+      setLastRefreshTime(new Date());
+      console.log('✅ Dashboard refreshed successfully');
+      
+    } catch (error) {
+      console.error("Error refreshing dashboard:", error);
+      // Don't show toast on auto-refresh errors to avoid annoying users
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  // ✅ IMPROVED: Separate function to fetch today's attendance
   const fetchTodayAttendance = async () => {
     try {
       console.log('====================================');
       console.log('🔍 Fetching today\'s attendance for dashboard...');
       console.log('====================================');
       
-      // Get today's date in YYYY-MM-DD format
       const today = new Date().toISOString().split('T')[0];
       console.log('📅 Fetching attendance for date:', today);
       
@@ -90,13 +136,15 @@ function AdminDashboard() {
       
       if (response.data && response.data.attendance) {
         const attendanceList = response.data.attendance;
-        console.log('✅ Attendance data received:', attendanceList);
-        console.log('✅ Attendance length:', attendanceList.length);
-        console.log('✅ First record:', attendanceList[0]);
+        console.log('✅ Attendance data received:', attendanceList.length, 'records');
+        
+        if (attendanceList.length > 0) {
+          console.log('✅ First record:', attendanceList[0]);
+        }
         
         // Take only first 5 for dashboard display
         const dashboardAttendance = attendanceList.slice(0, 5);
-        console.log('✅ Setting dashboard attendance (first 5):', dashboardAttendance);
+        console.log('✅ Setting dashboard attendance (first 5):', dashboardAttendance.length, 'records');
         
         setAttendanceData(dashboardAttendance);
         console.log('✅ Attendance data set successfully');
@@ -148,6 +196,20 @@ function AdminDashboard() {
     }
   };
 
+  // ✅ NEW: Manual refresh handler
+  const handleManualRefresh = () => {
+    console.log('🔄 Manual refresh triggered');
+    setLoading(true);
+    Promise.all([
+      fetchDashboardData(),
+      fetchRecentProjects(),
+      fetchTodayAttendance()
+    ]).finally(() => {
+      setLoading(false);
+      toast.success('Dashboard refreshed!');
+    });
+  };
+
   const getStatusColor = (status) => {
     const statusMap = {
       'Planning': 'planning',
@@ -173,26 +235,23 @@ function AdminDashboard() {
     });
   };
 
-  // 🔍 DEBUG: Log render
+  // ✅ NEW: Format last refresh time
+  const formatLastRefresh = () => {
+    const now = new Date();
+    const diff = Math.floor((now - lastRefreshTime) / 1000);
+    
+    if (diff < 60) return 'Just now';
+    if (diff < 120) return '1 minute ago';
+    if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
+    return lastRefreshTime.toLocaleTimeString('en-US', { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
+  };
+
   console.log('🎨 RENDERING AdminDashboard');
   console.log('🎨 recentProjects.length:', recentProjects.length);
   console.log('🎨 attendanceData.length:', attendanceData.length);
-
-  const handleAddEmployee = () => {
-    navigate("/admin/employees/add");
-  };
-
-  const handleNewProject = () => {
-    navigate("/admin/projects/add");
-  };
-
-  const handleAssignTask = () => {
-    navigate("/admin/tasks");
-  };
-
-  const handleScheduleMeeting = () => {
-    navigate("/admin/meetings/schedule");
-  };
 
   if (loading) {
     return (
@@ -212,13 +271,28 @@ function AdminDashboard() {
         <div>
           <h1>Admin Dashboard</h1>
           <p>Welcome back! Here's what's happening today.</p>
+          {/* ✅ NEW: Last refresh indicator */}
+          <p style={{ fontSize: '12px', color: '#888', marginTop: '4px' }}>
+            {refreshing ? (
+              <>
+                <FiRefreshCw style={{ 
+                  animation: 'spin 1s linear infinite', 
+                  marginRight: '4px',
+                  display: 'inline-block'
+                }} /> 
+                Refreshing...
+              </>
+            ) : (
+              <>Last updated: {formatLastRefresh()}</>
+            )}
+          </p>
         </div>
         <div className="dashboard-actions">
-          <button className="btn btn-primary" onClick={() => {
-            fetchDashboardData();
-            fetchRecentProjects();
-            fetchTodayAttendance(); // ✅ Also refresh attendance
-          }}>
+          <button 
+            className="btn btn-primary" 
+            onClick={handleManualRefresh}
+            disabled={loading || refreshing}
+          >
             <FiClock /> Refresh
           </button>
         </div>
@@ -313,12 +387,26 @@ function AdminDashboard() {
           </div>
         </div>
 
-        {/* ✅ FIXED: Real-time Attendance */}
+        {/* ✅ IMPROVED: Real-time Attendance with Live Badge */}
         <div className="dashboard-card">
           <div className="card-header">
             <h3>Today's Attendance</h3>
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              <span className="badge badge-success">Live</span>
+              <span className="badge badge-success" style={{
+                animation: 'pulse 2s ease-in-out infinite',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}>
+                <span style={{
+                  width: '6px',
+                  height: '6px',
+                  borderRadius: '50%',
+                  backgroundColor: '#10b981',
+                  display: 'inline-block'
+                }}></span>
+                Live
+              </span>
               <button 
                 className="view-all-btn"
                 onClick={() => navigate('/admin/attendance')}
@@ -328,41 +416,36 @@ function AdminDashboard() {
             </div>
           </div>
           <div className="card-body">
-            {/* 🔍 DEBUG: Show what's happening */}
-            {console.log('🎨 Rendering attendance section')}
-            {console.log('🎨 attendanceData:', attendanceData)}
-            {console.log('🎨 attendanceData.length:', attendanceData.length)}
-            
             {attendanceData.length > 0 ? (
               <div className="attendance-list">
-                {console.log('🎨 Rendering attendance list with', attendanceData.length, 'records')}
-                {attendanceData.map((record, index) => {
-                  console.log(`🎨 Rendering attendance record ${index}:`, record);
-                  return (
-                    <div key={index} className="attendance-item">
-                      <div className="employee-info">
-                        <div className="employee-avatar">
-                          {record.employeeName?.charAt(0) || "E"}
-                        </div>
-                        <div>
-                          <p className="employee-name">{record.employeeName || 'Unknown'}</p>
-                          <p className="check-time">{formatTime(record.checkIn)}</p>
-                        </div>
+                {attendanceData.map((record, index) => (
+                  <div key={index} className="attendance-item">
+                    <div className="employee-info">
+                      <div className="employee-avatar">
+                        {record.employeeName?.charAt(0) || "E"}
                       </div>
-                      <span className={`status-badge ${record.status}`}>
-                        {record.status === "present"
-                          ? "Present"
-                          : record.status === "late"
-                            ? "Late"
-                            : "Absent"}
-                      </span>
+                      <div>
+                        <p className="employee-name">{record.employeeName || 'Unknown'}</p>
+                        <p className="check-time">
+                          {formatTime(record.checkIn)}
+                          {record.checkOut && (
+                            <> → {formatTime(record.checkOut)}</>
+                          )}
+                        </p>
+                      </div>
                     </div>
-                  );
-                })}
+                    <span className={`status-badge ${record.status}`}>
+                      {record.status === "present"
+                        ? "Present"
+                        : record.status === "late"
+                          ? "Late"
+                          : "Absent"}
+                    </span>
+                  </div>
+                ))}
               </div>
             ) : (
               <div className="empty-state">
-                {console.log('🎨 Rendering empty state for attendance')}
                 <FiUserCheck style={{ fontSize: '32px', color: '#d1d5db' }} />
                 <p>No attendance records yet</p>
                 <p style={{ fontSize: '12px', color: '#999', marginTop: '8px' }}>
@@ -422,13 +505,16 @@ function AdminDashboard() {
                 <FiBriefcase />
                 <span>New Project</span>
               </button>
-              <button className="quick-action-btn" onClick={handleAssignTask}>
+              <button 
+                className="quick-action-btn" 
+                onClick={() => navigate('/admin/tasks')}
+              >
                 <FiClock />
                 <span>Assign Task</span>
               </button>
               <button
                 className="quick-action-btn"
-                onClick={handleScheduleMeeting}
+                onClick={() => navigate('/admin/meetings/schedule')}
               >
                 <FiUserCheck />
                 <span>Schedule Meeting</span>
@@ -437,6 +523,27 @@ function AdminDashboard() {
           </div>
         </div>
       </div>
+
+      {/* ✅ NEW: Add CSS for pulse animation */}
+      <style jsx>{`
+        @keyframes pulse {
+          0%, 100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.6;
+          }
+        }
+
+        @keyframes spin {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
+      `}</style>
     </div>
   );
 }
