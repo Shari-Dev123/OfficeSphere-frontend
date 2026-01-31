@@ -126,16 +126,23 @@ function AttendanceMonitor() {
       // Handle different API response structures
       let attendanceList = [];
       
-      if (response.data && response.data.attendance) {
-        attendanceList = response.data.attendance;
-      } else if (response.data && response.data.data && response.data.data.attendance) {
-        attendanceList = response.data.data.attendance;
-      } else if (response.data && response.data.data && Array.isArray(response.data.data)) {
-        attendanceList = response.data.data;
-      } else if (response.data && Array.isArray(response.data)) {
-        attendanceList = response.data;
-      }
-      
+      // if (response.data && response.data.attendance) {
+      //   attendanceList = response.data.attendance;
+      // } else if (response.data && response.data.data && response.data.data.attendance) {
+      //   attendanceList = response.data.data.attendance;
+      // } else if (response.data && response.data.data && Array.isArray(response.data.data)) {
+      //   attendanceList = response.data.data;
+      // } else if (response.data && Array.isArray(response.data)) {
+      //   attendanceList = response.data;
+      // }
+      // Backend directly sends: { success: true, stats: {...}, attendance: [...] }
+if (response.data && response.data.attendance && Array.isArray(response.data.attendance)) {
+  attendanceList = response.data.attendance;
+}
+
+if (response.data && response.data.stats) {
+  statsData = response.data.stats;
+}
       setAttendanceData(attendanceList);
       
       // Calculate stats
