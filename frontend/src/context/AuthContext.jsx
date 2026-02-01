@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { toast } from 'react-toastify';
-import { authAPI } from '../utils/api'; // Import your mock API
+import api from '../utils/api';
 
 // Create Auth Context
 export const AuthContext = createContext();
@@ -46,54 +46,100 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   };
 
-  // Login function - Updated to match Login.js usage
+  // ✅ LOGIN FUNCTION - FIXED
   const login = async (email, password, role) => {
     try {
-      // Call the mock API
-      const response = await authAPI.login({ email, password, role });
-      const { user: userData, token } = response.data;
+      console.log('🔐 Login attempt:', { email, role });
+      
+      // Call backend API
+      const response = await api.post('/auth/login', {
+        email,
+        password,
+        role
+      });
 
-      // Store token and user data
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(userData));
-      
-      // Update state
-      setUser(userData);
-      setIsAuthenticated(true);
-      
-      toast.success(`Welcome back, ${userData.name}!`);
-      return { success: true, user: userData };
+      console.log('✅ Login response:', response.data);
+
+      // Check if login was successful
+      if (response.data && response.data.success) {
+        const { user: userData, token } = response.data;
+
+        // ⚠️ CRITICAL: Store data BEFORE updating state
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(userData));
+        
+        console.log('💾 Saved to localStorage:', {
+          token: token.substring(0, 20) + '...',
+          user: userData.email
+        });
+        
+        // Update state
+        setUser(userData);
+        setIsAuthenticated(true);
+        
+        toast.success(`Welcome back, ${userData.name}!`);
+        
+        // Return user data with role for navigation
+        return { 
+          success: true, 
+          user: {
+            ...userData,
+            role: userData.role // Ensure role is included
+          }
+        };
+      } else {
+        toast.error(response.data?.message || 'Login failed');
+        return { success: false };
+      }
     } catch (error) {
-      console.error('Login error:', error);
-      toast.error(error.message || 'Invalid credentials. Please try again.');
-      return { success: false, error: error.message };
+      console.error('❌ Login error:', error);
+      
+      // Handle error response
+      const errorMessage = error.response?.data?.message || 'Invalid credentials. Please try again.';
+      toast.error(errorMessage);
+      
+      return { success: false, error: errorMessage };
     }
   };
 
-  // Register function (optional)
+  // ✅ REGISTER FUNCTION - FIXED
   const register = async (userData) => {
     try {
-      const response = await authAPI.register(userData);
-      const { user: newUser, token } = response.data;
+      console.log('📝 Register attempt:', userData);
+      
+      // Call backend API
+      const response = await api.post('/auth/register', userData);
 
-      // Store token and user data
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(newUser));
-      
-      // Update state
-      setUser(newUser);
-      setIsAuthenticated(true);
-      
-      toast.success(`Welcome, ${newUser.name}!`);
-      return { success: true, user: newUser };
+      console.log('✅ Register response:', response.data);
+
+      if (response.data.success) {
+        const { user: newUser, token } = response.data;
+
+        // Store token and user data
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(newUser));
+        
+        // Update state
+        setUser(newUser);
+        setIsAuthenticated(true);
+        
+        toast.success(`Welcome, ${newUser.name}!`);
+        return { success: true, user: newUser };
+      } else {
+        toast.error(response.data.message || 'Registration failed');
+        return { success: false };
+      }
     } catch (error) {
-      console.error('Registration error:', error);
-      toast.error('Registration failed. Please try again.');
-      return { success: false, error: error.message };
+      console.error('❌ Registration error:', error);
+      
+      const errorMessage = error.response?.data?.message || 'Registration failed. Please try again.';
+      toast.error(errorMessage);
+      
+      return { success: false, error: errorMessage };
     }
   };
 
-  // Logout function
+  // ✅ LOGOUT FUNCTION
   const logout = () => {
     // Clear storage
     localStorage.removeItem('token');
