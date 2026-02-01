@@ -1,0 +1,11 @@
+
+
+/* OR if you want to customize for client: */
+
+.client-notifications {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* You can add client-specific styling here if needed */

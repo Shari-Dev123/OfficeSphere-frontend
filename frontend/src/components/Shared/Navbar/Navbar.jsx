@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaBell, FaUserCircle, FaSignOutAlt, FaCog, FaBars } from 'react-icons/fa';
 import { useAuth } from '../../../context/AuthContext';
-import { adminAPI } from '../../../utils/api';
+import { adminAPI, clientAPI } from '../../../utils/api';
 import './Navbar.css';
 
 const Navbar = ({ onToggleSidebar }) => {
@@ -17,23 +17,39 @@ const Navbar = ({ onToggleSidebar }) => {
   // ✅ Fetch notifications based on user role
   useEffect(() => {
     if (user?.role === 'admin') {
-      fetchAdminNotifications();
+      fetchNotifications();
       
-      // Auto-refresh notifications every 30 seconds for admin
+      // Auto-refresh notifications every 30 seconds
       const interval = setInterval(() => {
-        fetchAdminNotifications(true); // Silent refresh
+        fetchNotifications(true); // Silent refresh
+      }, 30000);
+
+      return () => clearInterval(interval);
+    } else if (user?.role === 'client') {
+      fetchNotifications();
+      
+      // Auto-refresh notifications every 30 seconds
+      const interval = setInterval(() => {
+        fetchNotifications(true); // Silent refresh
       }, 30000);
 
       return () => clearInterval(interval);
     }
   }, [user]);
 
-  // ✅ Fetch admin notifications from API
-  const fetchAdminNotifications = async (silent = false) => {
+  // ✅ Fetch notifications from API (admin or client)
+  const fetchNotifications = async (silent = false) => {
     try {
       if (!silent) setLoading(true);
       
-      const response = await adminAPI.getNotifications();
+      let response;
+      if (user?.role === 'admin') {
+        response = await adminAPI.getNotifications();
+      } else if (user?.role === 'client') {
+        response = await clientAPI.getNotifications();
+      } else {
+        return; // No notifications for other roles
+      }
       
       const notificationsData = response.data.data || response.data.notifications || response.data || [];
       const notificationsList = Array.isArray(notificationsData) ? notificationsData : [];
@@ -58,7 +74,11 @@ const Navbar = ({ onToggleSidebar }) => {
   // ✅ Mark notification as read
   const handleMarkAsRead = async (id) => {
     try {
-      await adminAPI.markNotificationAsRead(id);
+      if (user?.role === 'admin') {
+        await adminAPI.markNotificationAsRead(id);
+      } else if (user?.role === 'client') {
+        await clientAPI.markNotificationAsRead(id);
+      }
       
       // Update local state
       setNotifications(prev =>
@@ -80,7 +100,11 @@ const Navbar = ({ onToggleSidebar }) => {
   // ✅ Mark all as read
   const handleMarkAllAsRead = async () => {
     try {
-      await adminAPI.markAllNotificationsAsRead();
+      if (user?.role === 'admin') {
+        await adminAPI.markAllNotificationsAsRead();
+      } else if (user?.role === 'client') {
+        await clientAPI.markAllNotificationsAsRead();
+      }
       
       // Update local state
       setNotifications(prev =>
@@ -121,6 +145,8 @@ const Navbar = ({ onToggleSidebar }) => {
     setShowNotifications(false);
     if (user?.role === 'admin') {
       navigate('/admin/notifications');
+    } else if (user?.role === 'client') {
+      navigate('/client/notifications');
     }
   };
 
@@ -140,6 +166,9 @@ const Navbar = ({ onToggleSidebar }) => {
     setShowUserMenu(false);
   };
 
+  // ✅ Show notifications for admin and client only
+  const showNotificationBell = user?.role === 'admin' || user?.role === 'client';
+
   return (
     <nav className="navbar">
       <div className="navbar-left">
@@ -152,8 +181,8 @@ const Navbar = ({ onToggleSidebar }) => {
       </div>
 
       <div className="navbar-right">
-        {/* ✅ Notifications - Only show for admin */}
-        {user?.role === 'admin' && (
+        {/* ✅ Notifications - Show for admin and client */}
+        {showNotificationBell && (
           <div className="navbar-item">
             <button 
               className="navbar-icon-btn"

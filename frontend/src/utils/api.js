@@ -234,7 +234,12 @@ export const clientAPI = {
   scheduleMeeting: (data) => api.post('/meetings/client', data),
   cancelMeeting: (id) => api.delete(`/meetings/client/${id}`),
   updateMeetingStatus: (id, status) => api.patch(`/meetings/client/${id}/status`, { status }),
-
+  // Add these to clientAPI object
+getNotifications: () => api.get('/client/notifications'),
+markNotificationAsRead: (id) => api.patch(`/client/notifications/${id}/read`),
+markNotificationAsUnread: (id) => api.patch(`/client/notifications/${id}/unread`),
+markAllNotificationsAsRead: () => api.patch('/client/notifications/mark-all-read'),
+deleteNotification: (id) => api.delete(`/client/notifications/${id}`),
   // ============ Reports ============
   getProjectReports: (projectId, params) =>
     api.get(`/reports/client/projects/${projectId}`, { params }),

@@ -42,7 +42,7 @@ import ClientMeetings from "../Components/Client/Meetings/ClientMeetings";
 import ClientReports from "../Components/Client/Reports/ClientReports";
 import FeedbackForm from "../Components/Client/Feedback/FeedbackForm";
 import ClientProfile from "../Components/Client/Profile/ClientProfile"; // ← ADDED
-
+import ClientNotifications from "../Components/Client/Clientnotifications/Clientnotifications.jsx"
 // Loader
 import Loader from "../Components/Shared/Loader/Loader";
 
@@ -247,6 +247,7 @@ function AppRoutes() {
           </PrivateRoute>
         }
       >
+        <Route path="notifications" element={<ClientNotifications />} />
         <Route index element={<Navigate to="/client/dashboard" replace />} />
         <Route path="dashboard" element={<ClientDashboard />} />
         <Route path="projects" element={<ClientProjects />} />
