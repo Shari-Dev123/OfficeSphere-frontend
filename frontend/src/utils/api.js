@@ -104,7 +104,7 @@ export const adminAPI = {
   deleteNotification: (id) => api.delete(`/admin/notifications/${id}`),
   deleteNotifications: (ids) => api.post('/admin/notifications/delete-many', { ids }),
 
-  
+
 
   // ============ Employees ============
   getEmployees: (params) => api.get('/admin/employees', { params }),
@@ -186,9 +186,14 @@ export const employeeAPI = {
   requestLeave: (data) => api.post('/attendance/employee/leave', data),
 
   // ============ Tasks ============
-  getMyTasks: (params) => api.get('/employee/tasks', { params }),
+  // Update to the employeeAPI section - add these methods
+
+  // ============ Tasks ============
+  getMyTasks: (params) => api.get('/tasks/employee/my-tasks', { params }),
   getTask: (id) => api.get(`/employee/tasks/${id}`),
-  updateTaskStatus: (id, status) => api.patch(`/employee/tasks/${id}/status`, { status }),
+  updateTaskStatus: (id, status) => api.patch(`/tasks/employee/${id}/status`, { status }),
+  startTaskTimer: (id) => api.post(`/tasks/employee/${id}/timer/start`),
+  stopTaskTimer: (id) => api.post(`/tasks/employee/${id}/timer/stop`),
   addTaskComment: (id, comment) => api.post(`/employee/tasks/${id}/comments`, { comment }),
 
   // ============ Projects ============
@@ -235,11 +240,11 @@ export const clientAPI = {
   cancelMeeting: (id) => api.delete(`/meetings/client/${id}`),
   updateMeetingStatus: (id, status) => api.patch(`/meetings/client/${id}/status`, { status }),
   // Add these to clientAPI object
-getNotifications: () => api.get('/client/notifications'),
-markNotificationAsRead: (id) => api.patch(`/client/notifications/${id}/read`),
-markNotificationAsUnread: (id) => api.patch(`/client/notifications/${id}/unread`),
-markAllNotificationsAsRead: () => api.patch('/client/notifications/mark-all-read'),
-deleteNotification: (id) => api.delete(`/client/notifications/${id}`),
+  getNotifications: () => api.get('/client/notifications'),
+  markNotificationAsRead: (id) => api.patch(`/client/notifications/${id}/read`),
+  markNotificationAsUnread: (id) => api.patch(`/client/notifications/${id}/unread`),
+  markAllNotificationsAsRead: () => api.patch('/client/notifications/mark-all-read'),
+  deleteNotification: (id) => api.delete(`/client/notifications/${id}`),
   // ============ Reports ============
   getProjectReports: (projectId, params) =>
     api.get(`/reports/client/projects/${projectId}`, { params }),

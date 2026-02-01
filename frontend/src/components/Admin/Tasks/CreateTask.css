@@ -14,7 +14,97 @@
   flex-wrap: wrap;
   gap: 1rem;
 }
+/* Add these styles to CreateTask.css */
 
+/* File Upload Area */
+.file-upload-area {
+  margin-top: 0.5rem;
+}
+
+.file-upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  border: 2px dashed #cbd5e1;
+  border-radius: 8px;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.file-upload-label:hover {
+  border-color: #3b82f6;
+  background: #eff6ff;
+}
+
+.file-upload-label svg {
+  font-size: 2rem;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+}
+
+.file-upload-label span {
+  color: #475569;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.file-upload-label small {
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+/* Attachments List */
+.attachments-list {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.attachment-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: #f1f5f9;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.attachment-item svg:first-child {
+  color: #3b82f6;
+  font-size: 1.25rem;
+}
+
+.attachment-name {
+  flex: 1;
+  color: #334155;
+  font-size: 0.875rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.remove-attachment-btn {
+  padding: 0.5rem;
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.remove-attachment-btn:hover {
+  background: #fee2e2;
+}
+
+.remove-attachment-btn svg {
+  font-size: 1rem;
+}
 .page-header h1 {
   font-size: 1.875rem;
   font-weight: 700;

@@ -1,7 +1,8 @@
+// CreateTask.jsx - Admin Task Creation Component
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { adminAPI } from '../../../utils/api';
-import { FiSave, FiX, FiUser, FiCalendar, FiClock, FiAlertCircle } from 'react-icons/fi';
+import { adminAPI, uploadAPI } from '../../../utils/api';
+import { FiSave, FiX, FiUser, FiCalendar, FiClock, FiAlertCircle, FiUpload, FiFile, FiTrash2 } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import './CreateTask.css';
 
@@ -17,7 +18,8 @@ function CreateTask() {
     project: '',
     dueDate: '',
     estimatedHours: '',
-    tags: []
+    tags: [],
+    attachments: []
   });
 
   const [employees, setEmployees] = useState([]);
@@ -25,6 +27,7 @@ function CreateTask() {
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
   const [errors, setErrors] = useState({});
+  const [uploadingFiles, setUploadingFiles] = useState(false);
 
   useEffect(() => {
     fetchDropdownData();
@@ -69,6 +72,58 @@ function CreateTask() {
         [name]: ''
       }));
     }
+  };
+
+  const handleFileUpload = async (e) => {
+    const files = Array.from(e.target.files);
+    
+    if (files.length === 0) return;
+
+    // Validate file size (max 10MB per file)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    const invalidFiles = files.filter(file => file.size > maxSize);
+    
+    if (invalidFiles.length > 0) {
+      toast.error('Some files exceed 10MB limit');
+      return;
+    }
+
+    try {
+      setUploadingFiles(true);
+
+      // Upload each file
+      const uploadPromises = files.map(async (file) => {
+        const uploadRes = await uploadAPI.uploadFile(file, 'task-attachment');
+        return {
+          name: file.name,
+          url: uploadRes.data.url || uploadRes.data.file?.url,
+          uploadedAt: new Date()
+        };
+      });
+
+      const uploadedFiles = await Promise.all(uploadPromises);
+
+      setFormData(prev => ({
+        ...prev,
+        attachments: [...prev.attachments, ...uploadedFiles]
+      }));
+
+      toast.success(`${files.length} file(s) uploaded successfully`);
+    } catch (error) {
+      console.error('File upload error:', error);
+      toast.error('Failed to upload files');
+    } finally {
+      setUploadingFiles(false);
+      e.target.value = ''; // Reset file input
+    }
+  };
+
+  const removeAttachment = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      attachments: prev.attachments.filter((_, i) => i !== index)
+    }));
+    toast.info('Attachment removed');
   };
 
   const validateForm = () => {
@@ -259,6 +314,48 @@ function CreateTask() {
                 </select>
               </div>
             </div>
+
+            {/* File Attachments */}
+            <div className="form-group">
+              <label htmlFor="attachments">
+                <FiUpload /> Attachments (Optional)
+              </label>
+              <div className="file-upload-area">
+                <input
+                  type="file"
+                  id="attachments"
+                  multiple
+                  onChange={handleFileUpload}
+                  disabled={uploadingFiles}
+                  accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.xlsx,.xls"
+                  style={{ display: 'none' }}
+                />
+                <label htmlFor="attachments" className="file-upload-label">
+                  <FiUpload />
+                  <span>{uploadingFiles ? 'Uploading...' : 'Click to upload files'}</span>
+                  <small>PDF, DOC, TXT, Images, Excel (Max 10MB each)</small>
+                </label>
+              </div>
+
+              {/* Attachment List */}
+              {formData.attachments.length > 0 && (
+                <div className="attachments-list">
+                  {formData.attachments.map((file, index) => (
+                    <div key={index} className="attachment-item">
+                      <FiFile />
+                      <span className="attachment-name">{file.name}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeAttachment(index)}
+                        className="remove-attachment-btn"
+                      >
+                        <FiTrash2 />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Right Column */}
@@ -366,7 +463,7 @@ function CreateTask() {
           <button
             type="submit"
             className="btn btn-primary"
-            disabled={loading}
+            disabled={loading || uploadingFiles}
           >
             {loading ? (
               <>

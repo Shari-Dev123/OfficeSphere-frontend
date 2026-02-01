@@ -36,6 +36,28 @@ function AdminNotifications() {
 
     return () => clearInterval(interval);
   }, []);
+  useEffect(() => {
+    if (!socket || !connected) return;
+
+    const handleNewNotification = (notification) => {
+      console.log('📡 New notification received:', notification);
+      
+      // Add to state
+      setNotifications(prev => [notification, ...prev]);
+      
+      // Show toast
+      toast.info(`📬 ${notification.title}`, {
+        position: 'top-right',
+        autoClose: 3000,
+      });
+    };
+
+    socket.on('new-notification', handleNewNotification);
+
+    return () => {
+      socket.off('new-notification', handleNewNotification);
+    };
+  }, [socket, connected]);
 
   const fetchNotifications = async (silent = false) => {
     try {
