@@ -42,24 +42,31 @@ import AdminSidebar from '../Sidebar/AdminSidebar';
 import './AdminLayout.css';
 
 function AdminLayout() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  // ✅ Determine initial mobile state
+  const isMobileInitial = window.innerWidth <= 768;
+
+  // ✅ Initial sidebar state: desktop open, mobile closed
+  const [sidebarOpen, setSidebarOpen] = useState(!isMobileInitial);
+  const [isMobile, setIsMobile] = useState(isMobileInitial);
 
   const toggleSidebar = () => {
     setSidebarOpen(prev => !prev);
   };
 
-  // Detect screen resize
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth <= 768;
       setIsMobile(mobile);
 
-      // Desktop par sidebar auto open
       if (!mobile) {
-        setSidebarOpen(true);
+        setSidebarOpen(true); // desktop pe hamesha open
+      } else {
+        setSidebarOpen(false); // mobile pe pehli render closed
       }
     };
+
+    // ✅ Run once on mount to fix first render issue
+    handleResize();
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
@@ -70,7 +77,7 @@ function AdminLayout() {
       {/* Sidebar */}
       <AdminSidebar isOpen={sidebarOpen} />
 
-      {/* Overlay (ONLY mobile) */}
+      {/* Overlay for mobile */}
       {isMobile && sidebarOpen && (
         <div
           className="sidebar-overlay"
@@ -80,9 +87,8 @@ function AdminLayout() {
 
       {/* Main Content */}
       <div
-        className={`admin-main-content ${
-          sidebarOpen ? 'sidebar-open' : 'sidebar-closed'
-        }`}
+        className={`admin-main-content ${sidebarOpen ? 'sidebar-open' : 'sidebar-closed'
+          }`}
       >
         {/* Navbar */}
         <Navbar onToggleSidebar={toggleSidebar} />
@@ -97,3 +103,6 @@ function AdminLayout() {
 }
 
 export default AdminLayout;
+
+
+

@@ -28,10 +28,18 @@
   padding: 8px;
   border-radius: 6px;
   transition: all 0.2s;
-  display: flex;
+  display: none; /* By default hide for desktop */
   align-items: center;
   justify-content: center;
 }
+
+/* Show only on mobile */
+@media (max-width: 1024px) {
+  .navbar-toggle {
+    display: flex;
+  }
+}
+
 
 .navbar-toggle:hover {
   background: #f3f4f6;
