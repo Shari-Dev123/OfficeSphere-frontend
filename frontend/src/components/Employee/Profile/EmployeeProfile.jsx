@@ -627,22 +627,22 @@ function EmployeeProfile() {
               </div>
               <div className="performance-grid">
                 <div className="stat-card">
-                  <div className="employee-stat-icon">⭐</div>
+                  <div className="profile-stat-icon">⭐</div>
                   <div className="employee-stat-value">{profile.performance.rating.toFixed(1)}/5.0</div>
                   <div className="employee-stat-label">Performance Rating</div>
                 </div>
                 <div className="stat-card">
-                  <div className="employee-stat-icon">✅</div>
+                  <div className="profile-stat-icon">✅</div>
                   <div className="employee-stat-value">{profile.performance.totalTasksCompleted || 0}</div>
                   <div className="employee-stat-label">Tasks Completed</div>
                 </div>
                 <div className="stat-card">
-                  <div className="employee-stat-icon">⏱️</div>
+                  <div className="profile-stat-icon">⏱️</div>
                   <div className="employee-stat-value">{profile.performance.onTimeCompletion || 0}%</div>
                   <div className="employee-stat-label">On-Time Completion</div>
                 </div>
                 <div className="stat-card">
-                  <div className="employee-stat-icon">📊</div>
+                  <div className="profile-stat-icon">📊</div>
                   <div className="employee-stat-value">{profile.performance.averageTaskTime || 0}h</div>
                   <div className="employee-stat-label">Avg Task Time</div>
                 </div>

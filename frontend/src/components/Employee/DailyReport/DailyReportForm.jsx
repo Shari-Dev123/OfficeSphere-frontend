@@ -114,7 +114,7 @@ function DailyReportForm() {
           </h1>
           <p>Share your daily progress and plans</p>
         </div>
-        <div className="current-date">
+        <div className="dailyreport-current-date">
           <FiCalendar />
           <span>
             {new Date().toLocaleDateString("en-US", {

@@ -34,7 +34,7 @@
 }
 
 .task-attachments h4 svg {
-  color: #3b82f6;
+  color: #059669;
 }
 
 .task-attachments .attachments-list {
@@ -84,7 +84,7 @@
 }
 
 .tasks-header-left h1 svg {
-  color: #249E94 !important;
+  color: #059669;
 }
 
 .tasks-header-left p {
@@ -112,13 +112,13 @@
 }
 
 .filter-buttons button:hover {
-  border-color: #249E94;
-  color: #249E94;
+  border-color: #059669;
+  color: #059669;
 }
 
 .filter-buttons button.active {
-  background: #249E94;
-  border-color: #249E94;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-color: #059669;
   color: white;
 }
 

@@ -8,7 +8,8 @@
 
 /* ========== HEADER ========== */
 .employee-profile-header {
-  background: linear-gradient(135deg, #005461 0%, #005461 100%);
+  /* background: linear-gradient(135deg, #005461 0%, #005461 100%); */
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
   padding: 40px;
   border-radius: 16px;
   display: flex;
@@ -36,7 +37,7 @@
 .edit-btn,
 .change-password-btn {
   padding: 12px 24px;
-  background: linear-gradient(135deg, #249E94 0%, #249E94 100%);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -46,12 +47,11 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  transition: all 0.3s ease;
 }
 
 .edit-btn:hover,
 .change-password-btn:hover {
-  background: #249E94;
+  background: #059669;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
@@ -78,14 +78,14 @@
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #249E94 0%, #249E94 100%);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 48px;
   font-weight: 700;
-  box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 8px 16px rgba(6, 155, 43, 0.3);
 }
 
 /* .employee-profile-avatar img {
@@ -137,7 +137,7 @@
 }
 
 .section-title svg {
-  color: #249E94;
+  color: #059669;
   font-size: 22px;
 }
 
@@ -177,7 +177,7 @@
 }
 
 .employee-form-group label svg {
-  color: #249E94;
+  color: #059669;
   font-size: 16px;
 }
 
@@ -245,7 +245,7 @@
 }
 
 .stat-card {
-  background: linear-gradient(135deg, #249E94 0%, #249E94 100%);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   padding: 24px;
   border-radius: 12px;
   text-align: center;
@@ -258,10 +258,18 @@
   transform: translateY(-4px);
 }
 
-.stat-icon {
+.profile-stat-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 32px;
   margin-bottom: 12px;
+  margin: auto;
 }
+
 
 .employee-stat-value {
   font-size: 28px;
@@ -349,7 +357,7 @@
 }
 
 .employee-section-header h3 svg {
-  color: #249E94;
+  color: #059669;
 }
 
 .password-form {

@@ -23,8 +23,8 @@
 
 /* Time Display */
 .time-display {
-  /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
-  background: linear-gradient(135deg, #249E94 0%, #249E94 100%);
+  /* background: linear-gradient(135deg, #249E94 0%, #249E94 100%); */
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
   padding: 40px;
   border-radius: 16px;
   display: flex;
@@ -71,15 +71,15 @@
 }
 
 .status-card.checked-in {
-  border-left: 6px solid #249E94;
+  border-left: 6px solid #059669;
 }
 
 .status-card.checked-out {
-  border-left: 6px solid #249E94;
+  border-left: 6px solid #059669;
 }
 
 .status-card.not-checked-in {
-  border-left: 6px solid #249E94;
+  border-left: 6px solid #059669;
 }
 
 .status-header {
@@ -184,8 +184,8 @@
 }
 
 .method-card.active {
-  /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
-  background: linear-gradient(135deg, #249E94 0%, #249E94 100%);
+  /* background: linear-gradient(135deg, #249E94 0%, #249E94 100%); */
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
   border-color: #249E94;
 }
@@ -258,7 +258,8 @@
 }
 
 .btn-check-in {
-  background: linear-gradient(135deg, #249E94 0%, #249E94 100%);
+  /* background: linear-gradient(135deg, #249E94 0%, #249E94 100%); */
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
   box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
 }
@@ -372,8 +373,8 @@
 .quick-links button {
   padding: 12px 24px;
   background: white;
-  border: 2px solid #249E94;
-  color: #249E94;
+  border: 2px solid #059669;
+  color: #059669;
   border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
@@ -382,7 +383,7 @@
 }
 
 .quick-links button:hover {
-  background: #249E94;
+  background: #059669;
   color: white;
 }
 

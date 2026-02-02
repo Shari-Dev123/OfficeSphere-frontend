@@ -12,14 +12,12 @@
   margin-bottom: 32px;
   padding: 24px;
   /* background: linear-gradient(135deg, #005461 0%, #005461 100%); */
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
   /* background: linear-gradient(135deg, #20634a 0%, #5ac18e 100%); */
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  /* background: linear-gradient(135deg, #10b981 0%, #059669 100%); */
   color: #ffffff;
-
-
   border-radius: 16px;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-
 
 }
 
@@ -39,7 +37,16 @@
 }
 
 .employee-current-date {
-  background: linear-gradient(135deg, #249E94 0%, #249E94 100%);
+  /* background: linear-gradient(135deg, #249E94 0%, #249E94 100%); */
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  color: white;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .employee-current-date p {
@@ -59,7 +66,8 @@
 
 .employee-stat-card {
   /* background: white; */
-  background: linear-gradient(135deg, #249E94 0%, #249E94 100%);
+  /* background: linear-gradient(135deg, #249E94 0%, #249E94 100%); */
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   padding: 24px;
   border-radius: 12px;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
@@ -75,8 +83,8 @@
 }
 
 .employee-stat-icon {
-  width: 50px !important;
-  height: 50px !important;
+  width: 50px;
+  height: 50px;
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -127,8 +135,7 @@
 
 .dashboard-section h2 svg {
   font-size: 24px;
-  /* color: #667eea; */
-  color: #249E94
+  color: #059669;
 }
 
 /* Attendance Widget */
@@ -197,7 +204,8 @@
 
 .employee-btn-primary {
   /* background: #667eea; */
-  background: linear-gradient(135deg, #249E94 0%, #249E94 100%);
+  /* background: linear-gradient(135deg, #249E94 0%, #249E94 100%); */
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
   border: none;
   padding: 12px 24px;
@@ -205,11 +213,10 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.3s ease;
 }
 
 .employee-btn-primary:hover {
-  background: #249E94;
+  background: #059669;
 }
 
 /* Tasks List */
@@ -445,8 +452,8 @@
 }
 
 .action-card {
-  /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
-  background: linear-gradient(135deg, #249E94 0%, #249E94 100%);
+  /* background: linear-gradient(135deg, #249E94 0%, #249E94 100%); */
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
   border: none;
   padding: 24px 16px;
