@@ -336,10 +336,12 @@
   gap: 16px;
 }
 
-.activity-item {
+.admin-activity-item {
+  position: relative;
+  padding-bottom: 24px;
   display: flex;
-  gap: 12px;
-  padding: 12px;
+  align-items: flex-start;
+  gap: 16px;
   background: #f9fafb;
   border-radius: 8px;
 }

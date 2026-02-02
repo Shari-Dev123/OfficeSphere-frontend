@@ -88,7 +88,7 @@ function EmployeeList() {
   return (
     <div className="employee-list">
       {/* Header */}
-      <div className="page-header">
+      <div className="adminEmployee-page-header">
         <div>
           <h1>Employees</h1>
           <p>Manage your team members</p>
@@ -102,7 +102,7 @@ function EmployeeList() {
       </div>
 
       {/* Search Bar */}
-      <div className="search-bar">
+      <div className="adminEmployee-search-bar">
         <FiSearch className="search-icon" />
         <input
           type="text"
@@ -114,17 +114,17 @@ function EmployeeList() {
 
       {/* Employee Stats */}
       <div className="employee-stats">
-        <div className="stat-item">
+        <div className="adminEmployee-stat-item">
           <span className="stat-label">Total Employees</span>
           <span className="stat-value">{employees.length}</span>
         </div>
-        <div className="stat-item">
+        <div className="adminEmployee-stat-item">
           <span className="stat-label">Active</span>
           <span className="stat-value stat-success">
             {employees.filter((e) => e.status === "active").length}
           </span>
         </div>
-        <div className="stat-item">
+        <div className="adminEmployee-stat-item">
           <span className="stat-label">Inactive</span>
           <span className="stat-value stat-danger">
             {employees.filter((e) => e.status === "inactive").length}
@@ -138,12 +138,12 @@ function EmployeeList() {
           {filteredEmployees.map((employee) => (
             <div key={employee._id} className="employee-card">
               <div className="employee-card-header">
-                <div className="employee-avatar">
+                <div className="adminEmployee-employee-avatar">
                   {employee?.name?.charAt(0).toUpperCase()}
                 </div>
                 <div className="admin-employee-actions">
                   <button
-                    className="admin-action-btn admin-edit-btn"
+                    className="adminEmployee-admin-action-btn adminEmployee-edit-btn"
                     onClick={() => handleEdit(employee._id)}
                     title="Edit"
                   >
@@ -151,7 +151,7 @@ function EmployeeList() {
                     <span>Edit</span>
                   </button>
                   <button
-                    className="admin-action-btn admin-delete-btn"
+                    className="adminEmployee-admin-action-btn adminEmployee-admin-delete-btn"
                     onClick={() => handleDelete(employee._id, employee.name)}
                     title="Delete"
                   >
@@ -161,19 +161,19 @@ function EmployeeList() {
                 </div>
               </div>
 
-              <div className="employee-info">
+              <div className="adminEmployee-employee-info">
                 <h3>{employee.name}</h3>
                 <p className="employee-position">
                   {employee.position || "Employee"}
                 </p>
 
                 <div className="employee-contact">
-                  <div className="contact-item">
+                  <div className="adminEmployee-contact-item">
                     <FiMail />
                     <span>{employee.email}</span>
                   </div>
                   {employee.phone && (
-                    <div className="contact-item">
+                    <div className="adminEmployee-contact-item">
                       <FiPhone />
                       <span>{employee.phone}</span>
                     </div>
@@ -182,7 +182,7 @@ function EmployeeList() {
               </div>
 
               <div className="employee-footer">
-                <span className={`status-badge ${employee.status || "active"}`}>
+                <span className={`adminEmployee-status-badge ${employee.status || "active"}`}>
                   {employee.status || "Active"}
                 </span>
                 {employee.joinDate && (

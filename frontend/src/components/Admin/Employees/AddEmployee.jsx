@@ -91,7 +91,7 @@ function AddEmployee() {
 
   return (
     <div className="add-employee">
-      <div className="page-header">
+      <div className="adminEmployee-page-header">
         <div>
           <button className="back-btn" onClick={handleCancel}>
             <FiArrowLeft /> Back
@@ -101,13 +101,13 @@ function AddEmployee() {
         </div>
       </div>
 
-      <div className="form-container">
+      <div className="adminEmployee-form-container">
         <form onSubmit={handleSubmit}>
           {/* Basic Information */}
           <div className="form-section">
-            <h3 className="section-title">Basic Information</h3>
+            <h3 className="adminEmployee-section-title">Basic Information</h3>
             <div className="form-grid">
-              <div className="form-group">
+              <div className="adminEmployee-form-group">
                 <label>
                   <FiUser /> Full Name *
                 </label>
@@ -122,7 +122,7 @@ function AddEmployee() {
                 {errors.name && <span className="error-message">{errors.name}</span>}
               </div>
 
-              <div className="form-group">
+              <div className="adminEmployee-form-group">
                 <label>
                   <FiMail /> Email Address *
                 </label>
@@ -137,7 +137,7 @@ function AddEmployee() {
                 {errors.email && <span className="error-message">{errors.email}</span>}
               </div>
 
-              <div className="form-group">
+              <div className="adminEmployee-form-group">
                 <label>
                   <FiPhone /> Phone Number
                 </label>
@@ -150,7 +150,7 @@ function AddEmployee() {
                 />
               </div>
 
-              <div className="form-group">
+              <div className="adminEmployee-form-group">
                 <label>Password *</label>
                 <input
                   type="password"
@@ -167,9 +167,9 @@ function AddEmployee() {
 
           {/* Job Information */}
           <div className="form-section">
-            <h3 className="section-title">Job Information</h3>
+            <h3 className="adminEmployee-section-title">Job Information</h3>
             <div className="form-grid">
-              <div className="form-group">
+              <div className="adminEmployee-form-group">
                 <label>
                   <FiBriefcase /> Position *
                 </label>
@@ -184,7 +184,7 @@ function AddEmployee() {
                 {errors.position && <span className="error-message">{errors.position}</span>}
               </div>
 
-              <div className="form-group">
+              <div className="adminEmployee-form-group">
                 <label>Department</label>
                 <select
                   name="department"
@@ -198,12 +198,12 @@ function AddEmployee() {
                   <option value="Sales">Sales</option>
                   <option value="Hr">Human Resources</option>
                   <option value="Finance">Finance</option>
-                  <option value="Operations">Operations</option> 
+                  <option value="Operations">Operations</option>
                   <option value="Management">Management</option>
                 </select>
               </div>
 
-              <div className="form-group">
+              <div className="adminEmployee-form-group">
                 <label>
                   <FiDollarSign /> Salary
                 </label>
@@ -216,7 +216,7 @@ function AddEmployee() {
                 />
               </div>
 
-              <div className="form-group">
+              <div className="adminEmployee-form-group">
                 <label>Join Date</label>
                 <input
                   type="date"
@@ -230,9 +230,9 @@ function AddEmployee() {
 
           {/* Additional Information */}
           <div className="form-section">
-            <h3 className="section-title">Additional Information</h3>
+            <h3 className="adminEmployee-section-title">Additional Information</h3>
             <div className="form-grid">
-              <div className="form-group full-width">
+              <div className="adminEmployee-form-group full-width">
                 <label>
                   <FiMapPin /> Address
                 </label>
@@ -245,7 +245,7 @@ function AddEmployee() {
                 ></textarea>
               </div>
 
-              <div className="form-group">
+              <div className="adminEmployee-form-group">
                 <label>Status</label>
                 <select
                   name="status"
