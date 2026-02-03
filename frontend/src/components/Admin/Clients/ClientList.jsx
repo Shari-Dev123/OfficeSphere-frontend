@@ -144,7 +144,7 @@ function ClientList() {
   return (
     <div className="client-list">
       {/* Header */}
-      <div className="page-header">
+      <div className="AdminClient-page-header">
         <div>
           <h1>Clients</h1>
           <p>Manage your client accounts</p>
@@ -158,8 +158,8 @@ function ClientList() {
       </div>
 
       {/* Search Bar */}
-      <div className="search-bar">
-        <FiSearch className="search-icon" />
+      <div className="AdminClient-search-bar">
+        <FiSearch className="AdminClient-search-icon" />
         <input
           type="text"
           placeholder="Search clients by name, email, or company..."
@@ -170,19 +170,19 @@ function ClientList() {
 
       {/* Client Stats */}
       <div className="client-stats">
-        <div className="stat-item">
-          <span className="stat-label">Total Clients</span>
-          <span className="stat-value">{clients.length}</span>
+        <div className="AdminClient-stat-item">
+          <span className="AdminClient-stat-label">Total Clients</span>
+          <span className="AdminClient-stat-value">{clients.length}</span>
         </div>
-        <div className="stat-item">
-          <span className="stat-label">Active</span>
-          <span className="stat-value stat-success">
+        <div className="AdminClient-stat-item">
+          <span className="AdminClient-stat-label">Active</span>
+          <span className="AdminClient-stat-value stat-success">
             {clients.filter((c) => c.status === "active").length}
           </span>
         </div>
-        <div className="stat-item">
-          <span className="stat-label">Inactive</span>
-          <span className="stat-value stat-warning">
+        <div className="AdminClient-stat-item">
+          <span className="AdminClient-stat-label">Inactive</span>
+          <span className="AdminClient-stat-value stat-warning">
             {clients.filter((c) => c.status === "inactive").length}
           </span>
         </div>
@@ -221,7 +221,7 @@ function ClientList() {
                 </div>
               </div>
 
-              <div className="client-info">
+              <div className="adminClientList-info">
                 <h3>{client.name}</h3>
                 {client.company && (
                   <p className="client-company">
@@ -244,7 +244,7 @@ function ClientList() {
               </div>
 
               <div className="client-footer">
-                <span className={`status-badge ${client.status || "active"}`}>
+                <span className={`adminClientList-status-badge ${client.status || "active"}`}>
                   {client.status || "Active"}
                 </span>
                 {client.projectsCount !== undefined && (
