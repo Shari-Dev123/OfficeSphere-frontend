@@ -176,6 +176,14 @@ export const employeeAPI = {
   // ============ Dashboard ============
   getDashboard: () => api.get('/employee/dashboard'),
 
+  getNotifications: () => api.get('/employee/notifications'),
+  getUnreadCount: () => api.get('/employee/notifications/unread-count'),
+  markNotificationAsRead: (id) => api.patch(`/employee/notifications/${id}/read`),
+  markNotificationAsUnread: (id) => api.patch(`/employee/notifications/${id}/unread`),
+  markAllNotificationsAsRead: () => api.patch('/employee/notifications/mark-all-read'),
+  deleteNotification: (id) => api.delete(`/employee/notifications/${id}`),
+  deleteNotifications: (ids) => api.post('/employee/notifications/delete-many', { ids }),
+  
   // ============ Attendance ============
   checkIn: (data) => api.post('/attendance/employee/attendance/checkin', data),
   checkOut: (data) => api.post('/attendance/employee/attendance/checkout', data),

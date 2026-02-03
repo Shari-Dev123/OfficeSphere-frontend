@@ -1,13 +1,17 @@
+// components/Shared/Navbar/Navbar.jsx - WITH SOCKET.IO INTEGRATION
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaBell, FaUserCircle, FaSignOutAlt, FaCog, FaBars } from 'react-icons/fa';
-import { useAuth } from '../../../context/AuthContext';
-import { adminAPI, clientAPI } from '../../../utils/api';
+import { useAuth } from '../../../hooks/useAuth';
+import { useSocket } from '../../../context/SocketContext'; // ✅ ADDED
+import { adminAPI, employeeAPI, clientAPI } from '../../../utils/api';
+import { toast } from 'react-toastify'; // ✅ ADDED
 import './Navbar.css';
 
 const Navbar = ({ onToggleSidebar }) => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { socket, connected } = useSocket(); // ✅ ADDED
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([]);
@@ -16,16 +20,8 @@ const Navbar = ({ onToggleSidebar }) => {
 
   // ✅ Fetch notifications based on user role
   useEffect(() => {
-    if (user?.role === 'admin') {
-      fetchNotifications();
-      
-      // Auto-refresh notifications every 30 seconds
-      const interval = setInterval(() => {
-        fetchNotifications(true); // Silent refresh
-      }, 30000);
-
-      return () => clearInterval(interval);
-    } else if (user?.role === 'client') {
+    if (user?.role) {
+      console.log('🔔 Navbar mounted - User role:', user.role);
       fetchNotifications();
       
       // Auto-refresh notifications every 30 seconds
@@ -37,33 +33,100 @@ const Navbar = ({ onToggleSidebar }) => {
     }
   }, [user]);
 
-  // ✅ Fetch notifications from API (admin or client)
+  // ✅ NEW: Socket listener for real-time notifications
+  useEffect(() => {
+    if (!socket || !connected || !user?.role) {
+      console.log('🔔 Navbar: Socket not ready', { socket: !!socket, connected, role: user?.role });
+      return;
+    }
+
+    console.log('🔔 Navbar: Setting up socket listener for', user.role);
+
+    const handleNewNotification = (notification) => {
+      console.log('🔔 Navbar: New notification received:', notification);
+      
+      // Add to notifications list (keep only latest 5)
+      setNotifications(prev => [notification, ...prev].slice(0, 5));
+      
+      // Increment unread count
+      setUnreadCount(prev => prev + 1);
+      
+      // Show toast notification
+      toast.info(`📬 ${notification.title}`, {
+        position: 'top-right',
+        autoClose: 3000,
+      });
+    };
+
+    socket.on('new-notification', handleNewNotification);
+
+    return () => {
+      console.log('🔔 Navbar: Cleaning up socket listener');
+      socket.off('new-notification', handleNewNotification);
+    };
+  }, [socket, connected, user?.role]);
+
+  // ✅ Fetch notifications from API (admin, employee, or client)
   const fetchNotifications = async (silent = false) => {
     try {
       if (!silent) setLoading(true);
       
+      console.log(`🔍 Fetching notifications for role: ${user?.role}`);
+      
       let response;
+      
+      // ✅ Fetch based on role
       if (user?.role === 'admin') {
         response = await adminAPI.getNotifications();
+      } else if (user?.role === 'employee') {
+        console.log('📞 Calling employeeAPI.getNotifications()...');
+        response = await employeeAPI.getNotifications();
       } else if (user?.role === 'client') {
         response = await clientAPI.getNotifications();
       } else {
-        return; // No notifications for other roles
+        console.warn('⚠️ Unknown role:', user?.role);
+        return;
       }
       
-      const notificationsData = response.data.data || response.data.notifications || response.data || [];
+      console.log('📦 Raw API Response:', response);
+      console.log('📦 Response data:', response.data);
+      
+      // ✅ Handle different response formats
+      let notificationsData;
+      if (response.data.success && response.data.data) {
+        notificationsData = response.data.data.notifications || response.data.data;
+      } else if (response.data.notifications) {
+        notificationsData = response.data.notifications;
+      } else if (response.data.data) {
+        notificationsData = response.data.data;
+      } else if (Array.isArray(response.data)) {
+        notificationsData = response.data;
+      } else {
+        console.warn('⚠️ Unexpected response format:', response.data);
+        notificationsData = [];
+      }
+      
       const notificationsList = Array.isArray(notificationsData) ? notificationsData : [];
+      
+      console.log(`📬 Fetched ${notificationsList.length} notifications for ${user.role}`);
+      console.log('📋 Notifications list:', notificationsList);
       
       // Get only latest 5 for navbar dropdown
       const latestNotifications = notificationsList.slice(0, 5);
       setNotifications(latestNotifications);
       
       // Count unread
-      const unread = notificationsList.filter(n => !n.isRead).length;
+      const unread = notificationsList.filter(n => !n.isRead && !n.read).length;
       setUnreadCount(unread);
       
+      console.log(`✅ Set ${latestNotifications.length} notifications, ${unread} unread`);
+      
     } catch (error) {
-      console.error('Error fetching notifications:', error);
+      console.error('❌ Error fetching notifications:', error);
+      console.error('❌ Error response:', error.response?.data);
+      console.error('❌ Error status:', error.response?.status);
+      
+      // Don't show error to user, just set empty state
       setNotifications([]);
       setUnreadCount(0);
     } finally {
@@ -74,8 +137,12 @@ const Navbar = ({ onToggleSidebar }) => {
   // ✅ Mark notification as read
   const handleMarkAsRead = async (id) => {
     try {
+      console.log(`📝 Marking notification ${id} as read...`);
+      
       if (user?.role === 'admin') {
         await adminAPI.markNotificationAsRead(id);
+      } else if (user?.role === 'employee') {
+        await employeeAPI.markNotificationAsRead(id);
       } else if (user?.role === 'client') {
         await clientAPI.markNotificationAsRead(id);
       }
@@ -84,7 +151,7 @@ const Navbar = ({ onToggleSidebar }) => {
       setNotifications(prev =>
         prev.map(notification =>
           notification._id === id
-            ? { ...notification, isRead: true }
+            ? { ...notification, isRead: true, read: true }
             : notification
         )
       );
@@ -92,29 +159,37 @@ const Navbar = ({ onToggleSidebar }) => {
       // Update unread count
       setUnreadCount(prev => Math.max(0, prev - 1));
       
+      console.log('✅ Notification marked as read');
+      
     } catch (error) {
-      console.error('Error marking notification as read:', error);
+      console.error('❌ Error marking notification as read:', error);
     }
   };
 
   // ✅ Mark all as read
   const handleMarkAllAsRead = async () => {
     try {
+      console.log('📝 Marking all notifications as read...');
+      
       if (user?.role === 'admin') {
         await adminAPI.markAllNotificationsAsRead();
+      } else if (user?.role === 'employee') {
+        await employeeAPI.markAllNotificationsAsRead();
       } else if (user?.role === 'client') {
         await clientAPI.markAllNotificationsAsRead();
       }
       
       // Update local state
       setNotifications(prev =>
-        prev.map(notification => ({ ...notification, isRead: true }))
+        prev.map(notification => ({ ...notification, isRead: true, read: true }))
       );
       
       setUnreadCount(0);
       
+      console.log('✅ All notifications marked as read');
+      
     } catch (error) {
-      console.error('Error marking all as read:', error);
+      console.error('❌ Error marking all as read:', error);
     }
   };
 
@@ -145,6 +220,8 @@ const Navbar = ({ onToggleSidebar }) => {
     setShowNotifications(false);
     if (user?.role === 'admin') {
       navigate('/admin/notifications');
+    } else if (user?.role === 'employee') {
+      navigate('/employee/notifications');
     } else if (user?.role === 'client') {
       navigate('/client/notifications');
     }
@@ -166,8 +243,11 @@ const Navbar = ({ onToggleSidebar }) => {
     setShowUserMenu(false);
   };
 
-  // ✅ Show notifications for admin and client only
-  const showNotificationBell = user?.role === 'admin' || user?.role === 'client';
+  // ✅ Show notifications for admin, employee, and client
+  const showNotificationBell = ['admin', 'employee', 'client'].includes(user?.role);
+
+  console.log('🔔 Navbar render - showNotificationBell:', showNotificationBell, 'role:', user?.role);
+  console.log('🔔 Socket status:', { connected, hasSocket: !!socket });
 
   return (
     <nav className="navbar">
@@ -181,15 +261,17 @@ const Navbar = ({ onToggleSidebar }) => {
       </div>
 
       <div className="navbar-right">
-        {/* ✅ Notifications - Show for admin and client */}
+        {/* ✅ Notifications - Show for admin, employee, and client */}
         {showNotificationBell && (
           <div className="navbar-item">
             <button 
               className="navbar-icon-btn"
               onClick={() => {
+                console.log('🔔 Notification bell clicked');
                 setShowNotifications(!showNotifications);
                 setShowUserMenu(false);
               }}
+              title={`${unreadCount} unread notifications`}
             >
               <FaBell />
               {unreadCount > 0 && (
@@ -221,9 +303,9 @@ const Navbar = ({ onToggleSidebar }) => {
                     notifications.map(notification => (
                       <div 
                         key={notification._id} 
-                        className={`notification-item ${!notification.isRead ? 'unread' : ''}`}
+                        className={`notification-item ${(!notification.isRead && !notification.read) ? 'unread' : ''}`}
                         onClick={() => {
-                          if (!notification.isRead) {
+                          if (!notification.isRead && !notification.read) {
                             handleMarkAsRead(notification._id);
                           }
                         }}
@@ -235,7 +317,7 @@ const Navbar = ({ onToggleSidebar }) => {
                             {formatTimeAgo(notification.createdAt)}
                           </span>
                         </div>
-                        {!notification.isRead && (
+                        {(!notification.isRead && !notification.read) && (
                           <div className="notification-dot"></div>
                         )}
                       </div>

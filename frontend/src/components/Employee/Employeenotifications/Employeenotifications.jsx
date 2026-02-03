@@ -1,34 +1,31 @@
-// Components/Admin/AdminNotifications/AdminNotifications.jsx
+// Components/Employee/EmployeeNotifications/EmployeeNotifications.jsx
 import React, { useState, useEffect } from 'react';
-import { adminAPI } from '../../../utils/api';
-import { useSocket } from '../../../context/SocketContext'; // ✅ FIXED IMPORT
+import { employeeAPI } from '../../../utils/api';
+import { useSocket } from '../../../context/SocketContext';
 import { 
   FiBell, 
-  FiUser, 
-  FiBriefcase, 
   FiCheckCircle,
   FiClock,
   FiCalendar,
-  FiUserPlus,
   FiFileText,
   FiAlertCircle,
   FiTrash2,
   FiFilter,
   FiRefreshCw,
   FiCheck,
-  FiX
+  FiX,
+  FiBriefcase
 } from 'react-icons/fi';
 import { toast } from 'react-toastify';
-import './AdminNotifications.css';
+import './EmployeeNotifications.css';
 
-function AdminNotifications() {
+function EmployeeNotifications() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
   const [selectedNotifications, setSelectedNotifications] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
 
-  // ✅ Get socket from context
   const { socket, connected } = useSocket();
 
   useEffect(() => {
@@ -36,23 +33,21 @@ function AdminNotifications() {
     
     // Auto-refresh every 30 seconds
     const interval = setInterval(() => {
-      fetchNotifications(true); // Silent refresh
+      fetchNotifications(true);
     }, 30000);
 
     return () => clearInterval(interval);
   }, []);
 
-  // ✅ Socket listener for real-time notifications
+  // Socket listener for real-time notifications
   useEffect(() => {
     if (!socket || !connected) return;
 
     const handleNewNotification = (notification) => {
       console.log('📡 New notification received:', notification);
       
-      // Add to state
       setNotifications(prev => [notification, ...prev]);
       
-      // Show toast
       toast.info(`📬 ${notification.title}`, {
         position: 'top-right',
         autoClose: 3000,
@@ -70,18 +65,32 @@ function AdminNotifications() {
     try {
       if (!silent) setLoading(true);
       
-      const response = await adminAPI.getNotifications();
+      console.log('🔔 Fetching employee notifications...');
+      const response = await employeeAPI.getNotifications();
       
-      console.log('📬 Notifications response:', response.data);
+      console.log('📬 Employee notifications response:', response.data);
       
-      const notificationsData = response.data.data || response.data.notifications || response.data || [];
+      // Handle different response formats
+      let notificationsData;
+      if (response.data.success && response.data.data) {
+        notificationsData = response.data.data.notifications || response.data.data;
+      } else if (response.data.notifications) {
+        notificationsData = response.data.notifications;
+      } else if (response.data.data) {
+        notificationsData = response.data.data;
+      } else if (Array.isArray(response.data)) {
+        notificationsData = response.data;
+      } else {
+        notificationsData = [];
+      }
+      
       setNotifications(Array.isArray(notificationsData) ? notificationsData : []);
       
       if (!silent) {
         toast.success('Notifications loaded');
       }
     } catch (error) {
-      console.error('Error fetching notifications:', error);
+      console.error('❌ Error fetching notifications:', error);
       if (!silent) {
         toast.error('Failed to load notifications');
       }
@@ -93,28 +102,26 @@ function AdminNotifications() {
 
   const getNotificationIcon = (type) => {
     const icons = {
-      'employee': <FiUserPlus className="notification-icon employee" />,
-      'project': <FiBriefcase className="notification-icon project" />,
       'task': <FiCheckCircle className="notification-icon task" />,
       'meeting': <FiCalendar className="notification-icon meeting" />,
       'attendance': <FiClock className="notification-icon attendance" />,
-      'client': <FiUser className="notification-icon client" />,
+      'project': <FiBriefcase className="notification-icon project" />,
       'report': <FiFileText className="notification-icon report" />,
-      'alert': <FiAlertCircle className="notification-icon alert" />
+      'alert': <FiAlertCircle className="notification-icon alert" />,
+      'system': <FiBell className="notification-icon system" />
     };
     return icons[type] || <FiBell className="notification-icon default" />;
   };
 
   const getNotificationColor = (type) => {
     const colors = {
-      'employee': 'blue',
-      'project': 'purple',
       'task': 'green',
       'meeting': 'orange',
       'attendance': 'teal',
-      'client': 'indigo',
+      'project': 'purple',
       'report': 'gray',
-      'alert': 'red'
+      'alert': 'red',
+      'system': 'blue'
     };
     return colors[type] || 'blue';
   };
@@ -143,17 +150,17 @@ function AdminNotifications() {
 
   const handleMarkAsRead = async (id) => {
     try {
-      await adminAPI.markNotificationAsRead(id);
+      await employeeAPI.markNotificationAsRead(id);
       
       setNotifications(prev =>
         prev.map(notification =>
           notification._id === id
-            ? { ...notification, isRead: true }
+            ? { ...notification, isRead: true, read: true }
             : notification
         )
       );
       
-      toast.success('Notification marked as read');
+      toast.success('Marked as read');
     } catch (error) {
       console.error('Error marking notification as read:', error);
       toast.error('Failed to mark as read');
@@ -162,17 +169,17 @@ function AdminNotifications() {
 
   const handleMarkAsUnread = async (id) => {
     try {
-      await adminAPI.markNotificationAsUnread(id);
+      await employeeAPI.markNotificationAsUnread(id);
       
       setNotifications(prev =>
         prev.map(notification =>
           notification._id === id
-            ? { ...notification, isRead: false }
+            ? { ...notification, isRead: false, read: false }
             : notification
         )
       );
       
-      toast.success('Notification marked as unread');
+      toast.success('Marked as unread');
     } catch (error) {
       console.error('Error marking notification as unread:', error);
       toast.error('Failed to mark as unread');
@@ -181,10 +188,10 @@ function AdminNotifications() {
 
   const handleMarkAllAsRead = async () => {
     try {
-      await adminAPI.markAllNotificationsAsRead();
+      await employeeAPI.markAllNotificationsAsRead();
       
       setNotifications(prev =>
-        prev.map(notification => ({ ...notification, isRead: true }))
+        prev.map(notification => ({ ...notification, isRead: true, read: true }))
       );
       
       toast.success('All notifications marked as read');
@@ -195,12 +202,12 @@ function AdminNotifications() {
   };
 
   const handleDeleteNotification = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this notification?')) {
+    if (!window.confirm('Delete this notification?')) {
       return;
     }
 
     try {
-      await adminAPI.deleteNotification(id);
+      await employeeAPI.deleteNotification(id);
       
       setNotifications(prev =>
         prev.filter(notification => notification._id !== id)
@@ -224,7 +231,7 @@ function AdminNotifications() {
     }
 
     try {
-      await adminAPI.deleteNotifications(selectedNotifications);
+      await employeeAPI.deleteNotifications(selectedNotifications);
       
       setNotifications(prev =>
         prev.filter(notification => !selectedNotifications.includes(notification._id))
@@ -256,7 +263,7 @@ function AdminNotifications() {
 
   const getFilteredNotifications = () => {
     if (filter === 'all') return notifications;
-    if (filter === 'unread') return notifications.filter(n => !n.isRead);
+    if (filter === 'unread') return notifications.filter(n => !n.isRead && !n.read);
     return notifications.filter(n => n.type === filter);
   };
 
@@ -264,16 +271,16 @@ function AdminNotifications() {
 
   const stats = {
     total: notifications.length,
-    unread: notifications.filter(n => !n.isRead).length,
-    employee: notifications.filter(n => n.type === 'employee').length,
-    project: notifications.filter(n => n.type === 'project').length,
+    unread: notifications.filter(n => !n.isRead && !n.read).length,
     task: notifications.filter(n => n.type === 'task').length,
     meeting: notifications.filter(n => n.type === 'meeting').length,
+    project: notifications.filter(n => n.type === 'project').length,
+    attendance: notifications.filter(n => n.type === 'attendance').length,
   };
 
   if (loading) {
     return (
-      <div className="admin-notifications">
+      <div className="employee-notifications">
         <div className="loading-state">
           <div className="spinner"></div>
           <p>Loading notifications...</p>
@@ -283,12 +290,12 @@ function AdminNotifications() {
   }
 
   return (
-    <div className="admin-notifications">
+    <div className="employee-notifications">
       {/* Header */}
       <div className="page-header">
         <div>
-          <h1><FiBell /> Notifications</h1>
-          <p>Stay updated with all system activities</p>
+          <h1><FiBell /> My Notifications</h1>
+          <p>Stay updated with your tasks and activities</p>
         </div>
         <div className="header-actions">
           <button 
@@ -335,24 +342,6 @@ function AdminNotifications() {
           </div>
         </div>
         <div className="stat-item">
-          <div className="stat-icon employee">
-            <FiUserPlus />
-          </div>
-          <div className="stat-content">
-            <span className="stat-value">{stats.employee}</span>
-            <span className="stat-label">Employees</span>
-          </div>
-        </div>
-        <div className="stat-item">
-          <div className="stat-icon project">
-            <FiBriefcase />
-          </div>
-          <div className="stat-content">
-            <span className="stat-value">{stats.project}</span>
-            <span className="stat-label">Projects</span>
-          </div>
-        </div>
-        <div className="stat-item">
           <div className="stat-icon task">
             <FiCheckCircle />
           </div>
@@ -368,6 +357,24 @@ function AdminNotifications() {
           <div className="stat-content">
             <span className="stat-value">{stats.meeting}</span>
             <span className="stat-label">Meetings</span>
+          </div>
+        </div>
+        <div className="stat-item">
+          <div className="stat-icon project">
+            <FiBriefcase />
+          </div>
+          <div className="stat-content">
+            <span className="stat-value">{stats.project}</span>
+            <span className="stat-label">Projects</span>
+          </div>
+        </div>
+        <div className="stat-item">
+          <div className="stat-icon attendance">
+            <FiClock />
+          </div>
+          <div className="stat-content">
+            <span className="stat-value">{stats.attendance}</span>
+            <span className="stat-label">Attendance</span>
           </div>
         </div>
       </div>
@@ -388,18 +395,6 @@ function AdminNotifications() {
             Unread ({stats.unread})
           </button>
           <button
-            className={`filter-btn ${filter === 'employee' ? 'active' : ''}`}
-            onClick={() => setFilter('employee')}
-          >
-            <FiUserPlus /> Employees ({stats.employee})
-          </button>
-          <button
-            className={`filter-btn ${filter === 'project' ? 'active' : ''}`}
-            onClick={() => setFilter('project')}
-          >
-            <FiBriefcase /> Projects ({stats.project})
-          </button>
-          <button
             className={`filter-btn ${filter === 'task' ? 'active' : ''}`}
             onClick={() => setFilter('task')}
           >
@@ -410,6 +405,18 @@ function AdminNotifications() {
             onClick={() => setFilter('meeting')}
           >
             <FiCalendar /> Meetings ({stats.meeting})
+          </button>
+          <button
+            className={`filter-btn ${filter === 'project' ? 'active' : ''}`}
+            onClick={() => setFilter('project')}
+          >
+            <FiBriefcase /> Projects ({stats.project})
+          </button>
+          <button
+            className={`filter-btn ${filter === 'attendance' ? 'active' : ''}`}
+            onClick={() => setFilter('attendance')}
+          >
+            <FiClock /> Attendance ({stats.attendance})
           </button>
         </div>
       )}
@@ -449,7 +456,7 @@ function AdminNotifications() {
             {filteredNotifications.map((notification) => (
               <div
                 key={notification._id}
-                className={`notification-item ${!notification.isRead ? 'unread' : ''} ${getNotificationColor(notification.type)}`}
+                className={`notification-item ${(!notification.isRead && !notification.read) ? 'unread' : ''} ${getNotificationColor(notification.type)}`}
               >
                 <label className="notification-checkbox">
                   <input
@@ -475,11 +482,6 @@ function AdminNotifications() {
                   
                   {notification.metadata && (
                     <div className="notification-metadata">
-                      {notification.metadata.employeeName && (
-                        <span className="metadata-tag">
-                          <FiUser /> {notification.metadata.employeeName}
-                        </span>
-                      )}
                       {notification.metadata.projectName && (
                         <span className="metadata-tag">
                           <FiBriefcase /> {notification.metadata.projectName}
@@ -495,7 +497,7 @@ function AdminNotifications() {
                 </div>
 
                 <div className="notification-actions">
-                  {!notification.isRead ? (
+                  {(!notification.isRead && !notification.read) ? (
                     <button
                       className="action-btn mark-read"
                       onClick={() => handleMarkAsRead(notification._id)}
@@ -521,7 +523,7 @@ function AdminNotifications() {
                   </button>
                 </div>
 
-                {!notification.isRead && <div className="unread-indicator"></div>}
+                {(!notification.isRead && !notification.read) && <div className="unread-indicator"></div>}
               </div>
             ))}
           </div>
@@ -541,4 +543,4 @@ function AdminNotifications() {
   );
 }
 
-export default AdminNotifications;
+export default EmployeeNotifications;

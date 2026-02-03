@@ -1,3 +1,6 @@
+// components/Admin/Meetings/MeetingList.jsx - FIXED VERSION
+// ✅ KEY FIX: Use client.userId instead of client._id for participants
+
 import React, { useState, useEffect } from 'react';
 import { adminAPI } from '../../../utils/api';
 import { FiPlus, FiCalendar, FiClock, FiUsers, FiEdit2, FiTrash2, FiVideo, FiX, FiUser } from 'react-icons/fi';
@@ -13,7 +16,7 @@ function MeetingList() {
   const [employees, setEmployees] = useState([]);
   const [clients, setClients] = useState([]);
   const [projects, setProjects] = useState([]);
-  const [participantType, setParticipantType] = useState('employees'); // 'employees', 'clients', 'both'
+  const [participantType, setParticipantType] = useState('employees');
   
   const [formData, setFormData] = useState({
     title: '',
@@ -56,18 +59,41 @@ function MeetingList() {
   const fetchEmployees = async () => {
     try {
       const response = await adminAPI.getEmployees();
+      console.log('✅ Employees fetched:', response.data.employees?.length);
       setEmployees(response.data.employees || []);
     } catch (error) {
-      console.error('Error fetching employees:', error);
+      console.error('❌ Error fetching employees:', error);
     }
   };
 
   const fetchClients = async () => {
     try {
       const response = await adminAPI.getClients();
-      setClients(response.data.clients || []);
+      console.log('====================================');
+      console.log('📥 CLIENTS RESPONSE');
+      console.log('====================================');
+      console.log('Response:', response.data);
+      console.log('Clients array:', response.data.clients);
+      
+      // ✅ FIX: Check that clients have userId field
+      const clientsData = response.data.clients || [];
+      console.log('Sample client:', clientsData[0]);
+      
+      if (clientsData.length > 0) {
+        console.log('First client structure:', {
+          _id: clientsData[0]._id,
+          userId: clientsData[0].userId,  // ✅ This MUST exist!
+          name: clientsData[0].name,
+          email: clientsData[0].email
+        });
+      }
+      
+      setClients(clientsData);
+      console.log('✅ Clients state updated with', clientsData.length, 'clients');
+      console.log('====================================');
     } catch (error) {
-      console.error('Error fetching clients:', error);
+      console.error('❌ Error fetching clients:', error);
+      toast.error('Failed to load clients');
     }
   };
 
@@ -76,7 +102,7 @@ function MeetingList() {
       const response = await adminAPI.getProjects();
       setProjects(response.data.projects || []);
     } catch (error) {
-      console.error('Error fetching projects:', error);
+      console.error('❌ Error fetching projects:', error);
     }
   };
 
@@ -85,7 +111,7 @@ function MeetingList() {
     
     try {
       console.log('====================================');
-      console.log('📅 Scheduling meeting...');
+      console.log('📅 SCHEDULING MEETING');
       console.log('====================================');
       console.log('Form data:', formData);
       
@@ -95,14 +121,14 @@ function MeetingList() {
         return;
       }
 
-      // ✅ Validate at least one participant is selected
+      // ✅ Validate at least one participant
       const totalParticipants = formData.employeeParticipants.length + formData.clientParticipants.length;
       if (totalParticipants === 0) {
         toast.error('Please select at least one participant');
         return;
       }
 
-      // ✅ Calculate endTime if not provided
+      // ✅ Calculate endTime
       let endTime = formData.endTime;
       if (!endTime && formData.startTime && formData.duration) {
         const [hours, minutes] = formData.startTime.split(':');
@@ -112,36 +138,54 @@ function MeetingList() {
         endTime = `${String(startDate.getHours()).padStart(2, '0')}:${String(startDate.getMinutes()).padStart(2, '0')}`;
       }
 
-      // ✅ Create startTime and endTime as full DateTime
+      // ✅ Create DateTime objects
       const startDateTime = new Date(`${formData.date}T${formData.startTime}`);
       const endDateTime = new Date(`${formData.date}T${endTime}`);
       
-      console.log('📅 Start DateTime:', startDateTime);
-      console.log('📅 End DateTime:', endDateTime);
+      console.log('📅 Start DateTime:', startDateTime.toISOString());
+      console.log('📅 End DateTime:', endDateTime.toISOString());
       
-      // ✅ Validate date is in future
+      // ✅ Validate dates
       if (startDateTime < new Date()) {
         toast.error('Meeting date must be in the future');
         return;
       }
 
-      // ✅ Validate endTime is after startTime
       if (endDateTime <= startDateTime) {
         toast.error('End time must be after start time');
         return;
       }
 
-      // ✅ Combine all participants (employees + clients)
+      // ✅✅✅ CRITICAL FIX: Combine participants correctly
+      console.log('====================================');
+      console.log('👥 PARTICIPANT SELECTION');
+      console.log('====================================');
+      console.log('Selected employee IDs:', formData.employeeParticipants);
+      console.log('Selected client IDs:', formData.clientParticipants);
+      
+      // ✅ Log full participant data for debugging
+      const selectedClients = clients.filter(c => 
+        formData.clientParticipants.includes(c.userId)  // ✅ Using userId
+      );
+      
+      console.log('Selected clients full data:', selectedClients.map(c => ({
+        _id: c._id,
+        userId: c.userId,  // ✅ This is what we're sending
+        name: c.name,
+        email: c.email
+      })));
+
+      // ✅ Combine ALL participants (Employee IDs + Client User IDs)
       const allParticipants = [
-        ...formData.employeeParticipants,
-        ...formData.clientParticipants
+        ...formData.employeeParticipants,  // Already User IDs
+        ...formData.clientParticipants     // ✅ These are client.userId values
       ].filter(p => p); // Remove empty values
 
-      console.log('👥 Total participants:', allParticipants.length);
-      console.log('👨‍💼 Employee participants:', formData.employeeParticipants.length);
-      console.log('👤 Client participants:', formData.clientParticipants.length);
+      console.log('📤 Combined participants to send:', allParticipants);
+      console.log('Total participants:', allParticipants.length);
+      console.log('====================================');
 
-      // ✅ Build meeting data matching backend expectations
+      // ✅ Build meeting data
       const meetingData = {
         title: formData.title.trim(),
         description: formData.description.trim() || '',
@@ -152,21 +196,20 @@ function MeetingList() {
         location: formData.location,
         meetingLink: formData.meetingLink.trim() || '',
         agenda: formData.agenda.trim() || '',
-        participants: allParticipants // Combined list
+        participants: allParticipants  // ✅ All User IDs (employees + clients)
       };
 
-      // ✅ Add project if selected
       if (formData.project && formData.project.trim()) {
         meetingData.project = formData.project.trim();
       }
 
-      console.log('📤 Sending meeting data:', meetingData);
+      console.log('📤 Final meeting data to send:', JSON.stringify(meetingData, null, 2));
       console.log('====================================');
 
       const response = await adminAPI.scheduleMeeting(meetingData);
       
       console.log('====================================');
-      console.log('✅ Meeting scheduled successfully');
+      console.log('✅ MEETING SCHEDULED SUCCESSFULLY');
       console.log('Response:', response.data);
       console.log('====================================');
 
@@ -177,7 +220,7 @@ function MeetingList() {
       
     } catch (error) {
       console.error('====================================');
-      console.error('❌ Error scheduling meeting');
+      console.error('❌ SCHEDULE MEETING ERROR');
       console.error('====================================');
       console.error('Error:', error);
       console.error('Error response:', error.response?.data);
@@ -202,7 +245,7 @@ function MeetingList() {
       toast.success('Meeting deleted successfully');
       fetchMeetings();
     } catch (error) {
-      console.error('Error deleting meeting:', error);
+      console.error('❌ Error deleting meeting:', error);
       toast.error('Failed to delete meeting');
     }
   };
@@ -226,7 +269,9 @@ function MeetingList() {
     setParticipantType('employees');
   };
 
+  // ✅ Handle employee selection (already correct)
   const handleEmployeeToggle = (employeeId) => {
+    console.log('👤 Employee toggled:', employeeId);
     setFormData(prev => ({
       ...prev,
       employeeParticipants: prev.employeeParticipants.includes(employeeId)
@@ -235,13 +280,29 @@ function MeetingList() {
     }));
   };
 
-  const handleClientToggle = (clientId) => {
-    setFormData(prev => ({
-      ...prev,
-      clientParticipants: prev.clientParticipants.includes(clientId)
-        ? prev.clientParticipants.filter(id => id !== clientId)
-        : [...prev.clientParticipants, clientId]
-    }));
+  // ✅✅✅ CRITICAL FIX: Handle client selection using userId
+  const handleClientToggle = (clientUserId) => {
+    console.log('====================================');
+    console.log('👥 CLIENT TOGGLE');
+    console.log('====================================');
+    console.log('Client User ID:', clientUserId);
+    console.log('Current selected clients:', formData.clientParticipants);
+    
+    setFormData(prev => {
+      const isAlreadySelected = prev.clientParticipants.includes(clientUserId);
+      const newSelection = isAlreadySelected
+        ? prev.clientParticipants.filter(id => id !== clientUserId)
+        : [...prev.clientParticipants, clientUserId];
+      
+      console.log('Is already selected:', isAlreadySelected);
+      console.log('New selection:', newSelection);
+      console.log('====================================');
+      
+      return {
+        ...prev,
+        clientParticipants: newSelection
+      };
+    });
   };
 
   const getFilteredMeetings = () => {
@@ -289,7 +350,6 @@ function MeetingList() {
   };
 
   const filteredMeetings = getFilteredMeetings();
-
   const stats = {
     total: meetings.length,
     upcoming: meetings.filter(m => new Date(m.startTime) >= new Date()).length,
@@ -339,6 +399,7 @@ function MeetingList() {
             <span className="admin-stat-label">Total Meetings</span>
           </div>
         </div>
+
         <div className="admin-stat-item">
           <div className="admin-stat-icon today">
             <FiClock />
@@ -348,6 +409,7 @@ function MeetingList() {
             <span className="admin-stat-label">Today</span>
           </div>
         </div>
+
         <div className="admin-stat-item">
           <div className="admin-stat-icon upcoming">
             <FiCalendar />
@@ -357,6 +419,7 @@ function MeetingList() {
             <span className="admin-stat-label">Upcoming</span>
           </div>
         </div>
+
         <div className="admin-stat-item">
           <div className="admin-stat-icon past">
             <FiVideo />
@@ -427,6 +490,7 @@ function MeetingList() {
                       </div>
                     </div>
                   </div>
+
                   <div className="meeting-actions">
                     <span className={`status-badge ${status.class}`}>
                       {status.text}
@@ -454,11 +518,13 @@ function MeetingList() {
                       <FiVideo />
                       <span>{meeting.location || 'No location'}</span>
                     </div>
+
                     {meeting.type && (
                       <div className="detail-item">
                         <span className="meeting-type-badge">{meeting.type}</span>
                       </div>
                     )}
+
                     {meeting.participants && meeting.participants.length > 0 && (
                       <div className="detail-item">
                         <FiUsers />
@@ -691,7 +757,7 @@ function MeetingList() {
             />
           </div>
 
-          {/* Participants Selection with Tabs */}
+          {/* ✅✅✅ PARTICIPANTS SECTION - KEY FIX HERE */}
           <div className="form-group">
             <label>
               Participants * 
@@ -741,7 +807,7 @@ function MeetingList() {
                       />
                       <div className="participant-info">
                         <span className="participant-name">{employee.name}</span>
-                        <span className="participant-role">{employee.designation}</span>
+                        <span className="participant-role">{employee.designation || employee.position}</span>
                       </div>
                     </label>
                   ))
@@ -751,28 +817,39 @@ function MeetingList() {
               </div>
             )}
 
-            {/* Clients List */}
+            {/* ✅✅✅ CLIENTS LIST - CRITICAL FIX */}
             {(participantType === 'clients' || participantType === 'both') && (
               <div className="participants-selector">
                 <h4 className="selector-title">
                   <FiUser /> Clients
                 </h4>
                 {clients.length > 0 ? (
-                  clients.map(client => (
-                    <label key={client._id} className="participant-checkbox client-checkbox">
-                      <input
-                        type="checkbox"
-                        checked={formData.clientParticipants.includes(client._id)}
-                        onChange={() => handleClientToggle(client._id)}
-                      />
-                      <div className="participant-info">
-                        <span className="participant-name">{client.name}</span>
-                        <span className="participant-role">
-                          {client.company || 'Client'} • {client.email}
-                        </span>
-                      </div>
-                    </label>
-                  ))
+                  clients.map(client => {
+                    // ✅ Debug logging
+                    if (!client.userId) {
+                      console.warn('⚠️  Client missing userId:', client);
+                    }
+                    
+                    return (
+                      <label key={client._id} className="participant-checkbox client-checkbox">
+                        <input
+                          type="checkbox"
+                          checked={formData.clientParticipants.includes(client.userId)}  
+                          onChange={() => handleClientToggle(client.userId)}  
+                          disabled={!client.userId}  
+                        />
+                        <div className="participant-info">
+                          <span className="participant-name">
+                            {client.name}
+                            {!client.userId && <span className="error-badge">⚠️ No User ID</span>}
+                          </span>
+                          <span className="participant-role">
+                            {client.company || client.companyName || 'Client'} • {client.email}
+                          </span>
+                        </div>
+                      </label>
+                    );
+                  })
                 ) : (
                   <p className="no-participants">No clients available</p>
                 )}
