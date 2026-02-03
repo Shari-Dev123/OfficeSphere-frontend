@@ -24,6 +24,8 @@ import MeetingList from "../Components/Admin/Meetings/MeetingList";
 import ReportGenerator from "../Components/Admin/Reports/ReportGenerator";
 import AdminSettings from "../Components/Admin/Settings/AdminSettings"; // ← ADDED
 import AdminNotifications from '../Components/Admin/AdminNotifications/AdminNotifications.jsx'
+import EmployeeNotifications from '../Components/Employee/Employeenotifications/Employeenotifications.jsx';
+
 // Employee Components
 import EmployeeLayout from "../Components/Shared/Layout/EmployeeLayout";
 import EmployeeDashboard from "../Components/Employee/Dashboard/EmployeeDashboard";
@@ -229,6 +231,7 @@ function AppRoutes() {
         }
       >
         <Route index element={<Navigate to="/employee/dashboard" replace />} />
+        <Route path="notifications" element={<EmployeeNotifications />} />
         <Route path="dashboard" element={<EmployeeDashboard />} />
         <Route path="tasks" element={<MyTasks />} />
         <Route path="attendance" element={<AutoAttendance />} />
