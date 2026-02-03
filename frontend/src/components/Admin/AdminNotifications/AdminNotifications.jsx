@@ -28,7 +28,6 @@ function AdminNotifications() {
   const [showFilters, setShowFilters] = useState(false);
 
   // ✅ Get socket from context
-  const { socket, connected } = useSocket();
 
   useEffect(() => {
     fetchNotifications();
