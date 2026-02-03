@@ -113,7 +113,11 @@
 
 .report-type-card.active {
   border-color: #667eea;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.05) 0%,
+    rgba(118, 75, 162, 0.05) 100%
+  );
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
 }
 
@@ -388,7 +392,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ==================== REPORT RESULTS ==================== */
@@ -642,6 +648,89 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   white-space: nowrap;
+}
+
+.no-chart-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #666;
+  font-size: 14px;
+  text-align: center;
+  padding: 20px;
+}
+/* Progress bar styles */
+.progress-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.progress-bar {
+  flex-grow: 1;
+  height: 6px;
+  background: #e9ecef;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #00c49f;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  min-width: 40px;
+  font-size: 12px;
+  color: #666;
+}
+
+/* Type badges */
+.type-badge {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.type-badge.project {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.type-badge.employee {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+/* Productivity badges */
+.productivity-badge {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.productivity-badge.good {
+  background: #d4edda;
+  color: #155724;
+}
+
+.productivity-badge.average {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.productivity-badge.poor {
+  background: #f8d7da;
+  color: #721c24;
+}
+.no-chart-data p {
+  margin: 5px 0;
 }
 
 .data-table td {
@@ -941,3 +1030,53 @@
     font-size: 14px;
   }
 }
+
+.employee-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.employee-name {
+  font-weight: 600;
+}
+
+.employee-id {
+  font-size: 12px;
+  color: #666;
+}
+
+.task-progress {
+  background: #e8f4ff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.attendance-badge,
+.productivity-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.attendance-badge.good,
+.productivity-badge.good {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.attendance-badge.average,
+.productivity-badge.average {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.attendance-badge.poor,
+.productivity-badge.poor {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+

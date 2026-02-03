@@ -15,7 +15,6 @@ export default defineConfig({
       '@context': path.resolve(__dirname, './src/context'),
       '@hooks': path.resolve(__dirname, './src/hooks'),
       '@assets': path.resolve(__dirname, './src/assets'),
-      // ✅ Fix: Force single React instance
       'react': path.resolve(__dirname, './node_modules/react'),
       'react-dom': path.resolve(__dirname, './node_modules/react-dom'),
     },
@@ -24,14 +23,13 @@ export default defineConfig({
   server: {
     port: 3000,
     open: true,
-    host: true,
+    host: "localhost",
     proxy: {
       '/api': {
         target: 'http://localhost:5000',
         changeOrigin: true,
         secure: false,
       },
-      // ✅ Add socket.io proxy
       '/socket.io': {
         target: 'http://localhost:5000',
         changeOrigin: true,
