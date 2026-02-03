@@ -1,27 +1,58 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { adminAPI } from '../../../utils/api';
-import { FiBriefcase, FiDollarSign, FiCalendar, FiAlignLeft, FiUsers } from 'react-icons/fi';
+import { FiBriefcase, FiDollarSign, FiCalendar, FiAlignLeft, FiUsers, FiFlag } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import './AddProject.css';
 
 function AddProject() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [clients, setClients] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    client: '',
+    client: '', // Will be ObjectId from dropdown
+    projectManager: '', // Optional
     startDate: new Date().toISOString().split('T')[0],
-    deadline: '',
-    budget: '',
-    status: 'active',
-    priority: 'medium',
-    teamSize: '',
-    category: ''
+    endDate: '', // Changed from 'deadline'
+    budget: '', // Required
+    status: 'Planning', // Match model enum
+    priority: 'Medium', // Match model enum (capitalized)
+    tags: []
   });
 
   const [errors, setErrors] = useState({});
+
+  // ✅ Load clients and employees on mount
+  useEffect(() => {
+    loadClients();
+    loadEmployees();
+  }, []);
+
+  const loadClients = async () => {
+    try {
+      const response = await adminAPI.getClients();
+      const clientsData = response.data.data || response.data.clients || response.data || [];
+      setClients(Array.isArray(clientsData) ? clientsData : []);
+    } catch (error) {
+      console.error('Error loading clients:', error);
+      toast.error('Failed to load clients');
+    }
+  };
+
+  const loadEmployees = async () => {
+    try {
+      const response = await adminAPI.getEmployees();
+      const employeesData = response.data.data || response.data.employees || response.data || [];
+      setEmployees(Array.isArray(employeesData) ? employeesData : []);
+    } catch (error) {
+      console.error('Error loading employees:', error);
+      toast.error('Failed to load employees');
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -45,17 +76,25 @@ function AddProject() {
       newErrors.name = 'Project name is required';
     }
 
-    if (!formData.client.trim()) {
-      newErrors.client = 'Client is required';
+    if (!formData.description.trim()) {
+      newErrors.description = 'Project description is required';
     }
 
-    if (!formData.deadline) {
-      newErrors.deadline = 'Deadline is required';
+    if (!formData.client) {
+      newErrors.client = 'Client selection is required';
     }
 
-    if (formData.deadline && formData.startDate) {
-      if (new Date(formData.deadline) < new Date(formData.startDate)) {
-        newErrors.deadline = 'Deadline must be after start date';
+    if (!formData.endDate) {
+      newErrors.endDate = 'End date is required';
+    }
+
+    if (!formData.budget || parseFloat(formData.budget) <= 0) {
+      newErrors.budget = 'Budget must be greater than 0';
+    }
+
+    if (formData.endDate && formData.startDate) {
+      if (new Date(formData.endDate) < new Date(formData.startDate)) {
+        newErrors.endDate = 'End date must be after start date';
       }
     }
 
@@ -73,7 +112,24 @@ function AddProject() {
 
     try {
       setLoading(true);
-      await adminAPI.addProject(formData);
+      
+      // ✅ Prepare data to match Project model schema
+      const projectData = {
+        name: formData.name.trim(),
+        description: formData.description.trim(),
+        client: formData.client, // ObjectId from dropdown
+        projectManager: formData.projectManager || undefined, // Optional
+        startDate: formData.startDate,
+        endDate: formData.endDate, // Match model field name
+        budget: parseFloat(formData.budget),
+        status: formData.status,
+        priority: formData.priority,
+        tags: formData.tags
+      };
+
+      console.log('📤 Sending project data:', projectData);
+
+      await adminAPI.addProject(projectData);
       toast.success('Project created successfully!');
       navigate('/admin/projects');
     } catch (error) {
@@ -103,12 +159,12 @@ function AddProject() {
         <form onSubmit={handleSubmit}>
           {/* Project Details */}
           <div className="form-section">
-            <h3 className="section-title">Project Details</h3>
+            <h3 className="section-title">
+              <FiBriefcase /> Project Details
+            </h3>
             <div className="form-grid">
               <div className="form-group full-width">
-                <label>
-                  <FiBriefcase /> Project Name *
-                </label>
+                <label>Project Name *</label>
                 <input
                   type="text"
                   name="name"
@@ -122,7 +178,7 @@ function AddProject() {
 
               <div className="form-group full-width">
                 <label>
-                  <FiAlignLeft /> Description
+                  <FiAlignLeft /> Description *
                 </label>
                 <textarea
                   name="description"
@@ -130,38 +186,48 @@ function AddProject() {
                   onChange={handleChange}
                   placeholder="Enter project description"
                   rows="4"
+                  className={errors.description ? 'error' : ''}
                 ></textarea>
+                {errors.description && <span className="error-message">{errors.description}</span>}
               </div>
 
+              {/* ✅ FIXED: Client Dropdown */}
               <div className="form-group">
                 <label>
                   <FiUsers /> Client *
                 </label>
-                <input
-                  type="text"
+                <select
                   name="client"
                   value={formData.client}
                   onChange={handleChange}
-                  placeholder="Enter client name"
                   className={errors.client ? 'error' : ''}
-                />
+                >
+                  <option value="">Select a client</option>
+                  {clients.map((client) => (
+                    <option key={client._id} value={client._id}>
+                      {client.name || client.companyName || 'Unknown Client'}
+                    </option>
+                  ))}
+                </select>
                 {errors.client && <span className="error-message">{errors.client}</span>}
               </div>
 
+              {/* ✅ NEW: Project Manager (Optional) */}
               <div className="form-group">
-                <label>Category</label>
+                <label>
+                  <FiUsers /> Project Manager (Optional)
+                </label>
                 <select
-                  name="category"
-                  value={formData.category}
+                  name="projectManager"
+                  value={formData.projectManager}
                   onChange={handleChange}
                 >
-                  <option value="">Select Category</option>
-                  <option value="web-development">Web Development</option>
-                  <option value="mobile-app">Mobile App</option>
-                  <option value="design">Design</option>
-                  <option value="marketing">Marketing</option>
-                  <option value="consulting">Consulting</option>
-                  <option value="other">Other</option>
+                  <option value="">Assign later</option>
+                  {employees.map((emp) => (
+                    <option key={emp._id} value={emp._id}>
+                      {emp.userId?.name || emp.name || 'Unknown Employee'}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -169,12 +235,12 @@ function AddProject() {
 
           {/* Timeline & Budget */}
           <div className="form-section">
-            <h3 className="section-title">Timeline & Budget</h3>
+            <h3 className="section-title">
+              <FiCalendar /> Timeline & Budget
+            </h3>
             <div className="form-grid">
               <div className="form-group">
-                <label>
-                  <FiCalendar /> Start Date
-                </label>
+                <label>Start Date *</label>
                 <input
                   type="date"
                   name="startDate"
@@ -183,52 +249,46 @@ function AddProject() {
                 />
               </div>
 
+              {/* ✅ FIXED: Changed to endDate */}
               <div className="form-group">
-                <label>
-                  <FiCalendar /> Deadline *
-                </label>
+                <label>End Date *</label>
                 <input
                   type="date"
-                  name="deadline"
-                  value={formData.deadline}
+                  name="endDate"
+                  value={formData.endDate}
                   onChange={handleChange}
-                  className={errors.deadline ? 'error' : ''}
+                  className={errors.endDate ? 'error' : ''}
                 />
-                {errors.deadline && <span className="error-message">{errors.deadline}</span>}
+                {errors.endDate && <span className="error-message">{errors.endDate}</span>}
               </div>
 
-              <div className="form-group">
+              {/* ✅ FIXED: Budget now required */}
+              <div className="form-group full-width">
                 <label>
-                  <FiDollarSign /> Budget
+                  <FiDollarSign /> Budget *
                 </label>
                 <input
                   type="number"
                   name="budget"
                   value={formData.budget}
                   onChange={handleChange}
-                  placeholder="Enter budget amount"
+                  placeholder="Enter budget amount (e.g., 50000)"
+                  min="0"
+                  step="0.01"
+                  className={errors.budget ? 'error' : ''}
                 />
-              </div>
-
-              <div className="form-group">
-                <label>
-                  <FiUsers /> Team Size
-                </label>
-                <input
-                  type="number"
-                  name="teamSize"
-                  value={formData.teamSize}
-                  onChange={handleChange}
-                  placeholder="Number of team members"
-                />
+                {errors.budget && <span className="error-message">{errors.budget}</span>}
               </div>
             </div>
           </div>
 
           {/* Status & Priority */}
           <div className="form-section">
-            <h3 className="section-title">Status & Priority</h3>
+            <h3 className="section-title">
+              <FiFlag /> Status & Priority
+            </h3>
             <div className="form-grid">
+              {/* ✅ FIXED: Status values match model enum */}
               <div className="form-group">
                 <label>Status</label>
                 <select
@@ -236,13 +296,15 @@ function AddProject() {
                   value={formData.status}
                   onChange={handleChange}
                 >
-                  <option value="active">Active</option>
-                  <option value="on-hold">On Hold</option>
-                  <option value="completed">Completed</option>
-                  <option value="cancelled">Cancelled</option>
+                  <option value="Planning">Planning</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="On Hold">On Hold</option>
+                  <option value="Completed">Completed</option>
+                  <option value="Cancelled">Cancelled</option>
                 </select>
               </div>
 
+              {/* ✅ FIXED: Priority values match model enum (capitalized) */}
               <div className="form-group">
                 <label>Priority</label>
                 <select
@@ -250,10 +312,11 @@ function AddProject() {
                   value={formData.priority}
                   onChange={handleChange}
                 >
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
-                  <option value="urgent">Urgent</option>
+                  <option value="Low">Low</option>
+                  <option value="Medium">Medium</option>
+                  <option value="High">High</option>
+                  <option value="Urgent">Urgent</option>
+                  <option value="Critical">Critical</option>
                 </select>
               </div>
             </div>
@@ -274,7 +337,16 @@ function AddProject() {
               className="btn btn-primary"
               disabled={loading}
             >
-              {loading ? 'Creating...' : 'Create Project'}
+              {loading ? (
+                <>
+                  <div className="spinner-small"></div>
+                  Creating...
+                </>
+              ) : (
+                <>
+                  <FiBriefcase /> Create Project
+                </>
+              )}
             </button>
           </div>
         </form>

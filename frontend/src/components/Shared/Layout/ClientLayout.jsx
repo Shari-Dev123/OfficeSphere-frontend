@@ -41,14 +41,14 @@ import ClientSidebar from '../Sidebar/ClientSidebar';
 import './ClientLayout.css';
 
 function ClientLayout() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   const toggleSidebar = () => {
     setSidebarOpen(prev => !prev);
   };
 
-  // Handle resize
+  // Detect screen resize
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth <= 768;
@@ -61,8 +61,17 @@ function ClientLayout() {
     };
 
     window.addEventListener('resize', handleResize);
+
+    // Cleanup
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Ensure first render pe mobile me sidebar closed
+  useEffect(() => {
+    if (isMobile) {
+      setSidebarOpen(false);
+    }
+  }, [isMobile]);
 
   return (
     <div className="client-layout">
@@ -79,9 +88,8 @@ function ClientLayout() {
 
       {/* Main Content */}
       <div
-        className={`client-main-content ${
-          sidebarOpen ? 'sidebar-open' : 'sidebar-closed'
-        }`}
+        className={`client-main-content ${sidebarOpen ? 'sidebar-open' : 'sidebar-closed'
+          }`}
       >
         {/* Navbar */}
         <Navbar onToggleSidebar={toggleSidebar} />

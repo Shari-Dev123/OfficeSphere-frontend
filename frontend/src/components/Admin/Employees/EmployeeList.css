@@ -12,11 +12,15 @@
   margin-bottom: 24px;
 }
 
-.page-header h1 {
+.adminEmployee-page-header h1 {
   font-size: 28px;
   font-weight: 700;
   color: #1a1a2e;
   margin: 0 0 8px 0;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .page-header p {
@@ -26,7 +30,8 @@
 }
 
 /* Search Bar */
-.search-bar {
+.adminEmployee-search-bar {
+  margin-top: 20px;
   position: relative;
   margin-bottom: 24px;
 }
@@ -40,19 +45,19 @@
   font-size: 20px;
 }
 
-.search-bar input {
-  width: 100%;
-  padding: 12px 16px 12px 48px;
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
+.adminEmployee-search-bar input {
+  padding: 10px 12px 10px 40px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
   font-size: 14px;
-  transition: all 0.3s;
+  transition: all 0.2s;
+  width: 100%;
   background: white;
 }
 
-.search-bar input:focus {
+.adminEmployee-search-bar input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
@@ -64,14 +69,17 @@
   margin-bottom: 24px;
 }
 
-.stat-item {
-  background: white;
-  padding: 20px;
+.adminEmployee-stat-item {
+  padding: 16px;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e5e7eb;
   display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   flex-direction: column;
-  gap: 8px;
 }
 
 .stat-label {
@@ -122,18 +130,19 @@
   margin-bottom: 16px;
 }
 
-.employee-avatar {
-  width: 64px;
-  height: 64px;
+.adminEmployee-employee-avatar {
+  overflow: hidden;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 24px;
-  font-weight: 700;
-  overflow: hidden;
+  font-weight: 600;
+  font-size: 16px;
+  flex-shrink: 0;
 }
 
 .employee-avatar img {
@@ -147,7 +156,7 @@
   gap: 8px;
 }
 
-.admin-action-btn {
+.adminEmployee-admin-action-btn {
   width: 100px;
   height: 36px;
   border-radius: 8px;
@@ -160,36 +169,51 @@
   font-size: 16px;
 }
 
-.admin-edit-btn {
-  background: #e0e7ff;    /* Light indigo background */
-  color: #4f46e5;         /* Indigo text */
-  padding: 0 16px;        /* Horizontal padding */
-  height: 40px;           /* Fixed height */
-  gap: 8px;               /* Space between icon and text */
+.adminEmployee-edit-btn {
+  background: #e0e7ff;
+  /* Light indigo background */
+  color: #4f46e5;
+  /* Indigo text */
+  padding: 0 16px;
+  /* Horizontal padding */
+  height: 40px;
+  /* Fixed height */
+  gap: 8px;
+  /* Space between icon and text */
 }
 
-.admin-edit-btn:hover {
-  background: #4f46e5;    /* Solid indigo on hover */
-  color: white;           /* White text on hover */
-  transform: scale(1.05); /* Slight scale up */
+.adminEmployee-edit-btn:hover {
+  background: #c7d2fe;
+  /* White text on hover */
+  transform: scale(1.05);
+  /* Slight scale up */
 }
 
-.admin-delete-btn {
-  background: #fee2e2;    /* Light red background */
-  color: #dc2626;         /* Red text */
-  padding: 0 16px;        /* Horizontal padding */
-  height: 40px;           /* Fixed height */
-  gap: 8px;               /* Space between icon and text */
+.adminEmployee-admin-delete-btn {
+  background: #fee2e2;
+  /* Light red background */
+  color: #dc2626;
+  /* Red text */
+  padding: 0 16px;
+  /* Horizontal padding */
+  height: 40px;
+  /* Fixed height */
+  gap: 8px;
+  /* Space between icon and text */
 }
 
-.admin-delete-btn:hover {
-  background: #dc2626;    /* Solid red on hover */
-  color: white;           /* White text on hover */
-  transform: scale(1.05); /* Slight scale up */
+.adminEmployee-admin-delete-btn:hover {
+  background: #fecaca;
+  /* White text on hover */
+  transform: scale(1.05);
+  /* Slight scale up */
 }
 
 /* Employee Info */
-.employee-info h3 {
+.adminEmployee-employee-info h3 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   font-size: 20px;
   font-weight: 700;
   color: #1a1a2e;
@@ -209,7 +233,7 @@
   gap: 8px;
 }
 
-.contact-item {
+.adminEmployee-contact-item {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -217,7 +241,7 @@
   color: #6b7280;
 }
 
-.contact-item svg {
+.adminEmployee-contact-item svg {
   font-size: 14px;
   color: #9ca3af;
 }
@@ -232,15 +256,16 @@
   border-top: 1px solid #e5e7eb;
 }
 
-.status-badge {
-  padding: 4px 12px;
-  border-radius: 12px;
+.adminEmployee-status-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 700;
   font-size: 12px;
-  font-weight: 600;
   text-transform: capitalize;
 }
 
-.status-badge.active {
+.adminEmployee-status-badge.active {
   background: #d1fae5;
   color: #065f46;
 }
@@ -308,8 +333,13 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-state p {

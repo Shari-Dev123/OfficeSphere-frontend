@@ -465,7 +465,7 @@ function AdminDashboard() {
             {recentActivity.length > 0 ? (
               <div className="activity-list">
                 {recentActivity.slice(0, 5).map((activity, index) => (
-                  <div key={index} className="activity-item">
+                  <div key={index} className="admin-activity-item">
                     <div className="activity-icon">
                       <FiClock />
                     </div>

@@ -348,12 +348,12 @@ function ProjectList() {
                   </div>
                 </div>
 
-                <div className="project-actions">
+                <div className="admin-project-project-actions">
                   {/* ✅ NEW: Accept/Reject Buttons (only for Planning status) */}
                   {project.status === 'Planning' && (
                     <>
                       <button
-                        className="action-btn accept-btn"
+                        className="admin-project-action-btn admin-project-accept-btn"
                         onClick={() => handleAcceptProject(project._id, project.name)}
                         title="Accept Project"
                         disabled={updatingStatus === project._id}
@@ -361,7 +361,7 @@ function ProjectList() {
                         <FiCheck />
                       </button>
                       <button
-                        className="action-btn reject-btn"
+                        className="admin-project-action-btn admin-project-reject-btn"
                         onClick={() => handleRejectProject(project._id, project.name)}
                         title="Reject Project"
                         disabled={updatingStatus === project._id}
@@ -372,14 +372,14 @@ function ProjectList() {
                   )}
 
                   <button
-                    className="action-btn edit-btn"
+                    className="admin-project-action-btn admin-project-edit-btn"
                     onClick={() => handleEdit(project._id)}
                     title="Edit"
                   >
                     <FiEdit2 />
                   </button>
                   <button
-                    className="action-btn delete-btn"
+                    className="admin-project-action-btn admin-project-delete-btn"
                     onClick={() => handleDelete(project._id, project.name)}
                     title="Delete"
                   >

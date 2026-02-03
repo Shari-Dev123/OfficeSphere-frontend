@@ -241,12 +241,12 @@
 }
 
 /* ==================== Project Actions ==================== */
-.project-actions {
+.admin-project-project-actions {
   display: flex;
   gap: 6px;
 }
 
-.action-btn {
+.admin-project-action-btn {
   width: 32px;
   height: 32px;
   display: flex;
@@ -260,57 +260,57 @@
   font-size: 16px;
 }
 
-.action-btn:hover {
+.admin-project-action-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.action-btn:active {
+.admin-project-action-btn:active {
   transform: translateY(0);
 }
 
-.action-btn:disabled {
+.admin-project-action-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   transform: none;
 }
 
 /* ✅ NEW: Accept Button */
-.accept-btn {
+.admin-project-accept-btn {
   color: #10b981;
   border-color: #10b981;
 }
 
-.accept-btn:hover {
+.admin-project-accept-btn:hover {
   background: #10b981;
   color: white;
 }
 
 /* ✅ NEW: Reject Button */
-.reject-btn {
+.admin-project-reject-btn {
   color: #ef4444;
   border-color: #ef4444;
 }
 
-.reject-btn:hover {
+.admin-project-reject-btn:hover {
   background: #ef4444;
   color: white;
 }
 
-.edit-btn {
+.admin-project-edit-btn {
   color: #3b82f6;
 }
 
-.edit-btn:hover {
+.admin-project-edit-btn:hover {
   background: #3b82f6;
   color: white;
 }
 
-.delete-btn {
+.admin-project-delete-btn {
   color: #ef4444;
 }
 
-.delete-btn:hover {
+.admin-project-delete-btn:hover {
   background: #ef4444;
   color: white;
 }

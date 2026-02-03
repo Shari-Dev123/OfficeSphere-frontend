@@ -42,17 +42,28 @@ import EmployeeSidebar from '../Sidebar/EmployeeSidebar';
 import './EmployeeLayout.css';
 
 function EmployeeLayout() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  // Set initial sidebar state based on window width
+  const isMobileView = window.innerWidth <= 768;
+  const [sidebarOpen, setSidebarOpen] = useState(!isMobileView); 
+  const [isMobile, setIsMobile] = useState(isMobileView);
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   // Update isMobile on window resize
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    const handleResize = () => {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+
+      // Automatically close sidebar if switching to mobile
+      if (mobile && sidebarOpen) setSidebarOpen(false);
+      // Automatically open sidebar if switching to desktop
+      if (!mobile && !sidebarOpen) setSidebarOpen(true);
+    };
+
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [sidebarOpen]);
 
   return (
     <div className="employee-layout">
@@ -69,11 +80,9 @@ function EmployeeLayout() {
 
       {/* Main Content Area */}
       <div
-        className={`employee-main-content ${
-          sidebarOpen ? 'sidebar-open' : 'sidebar-closed'
-        }`}
+        className={`employee-main-content ${sidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}
       >
-        {/* Top Navbar */}
+        {/* Navbar */}
         <Navbar onToggleSidebar={toggleSidebar} />
 
         {/* Page Content */}
@@ -86,3 +95,4 @@ function EmployeeLayout() {
 }
 
 export default EmployeeLayout;
+
