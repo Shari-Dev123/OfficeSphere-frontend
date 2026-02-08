@@ -163,6 +163,7 @@ export const adminAPI = {
   deleteMeeting: (id) => api.delete(`/meetings/admin/${id}`),
   addMeetingMinutes: (id, data) =>
     api.post(`/meetings/admin/${id}/minutes`, data),
+  // getMyMeetings: () => api.get('/employee/meetings'),
 
   // ============ Reports ============
   generateReport: (data) => api.post("/reports/admin/generate", data),

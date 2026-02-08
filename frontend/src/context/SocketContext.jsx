@@ -13,6 +13,7 @@ export const useSocket = () => {
   return context;
 };
 
+
 export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const [connected, setConnected] = useState(false);
