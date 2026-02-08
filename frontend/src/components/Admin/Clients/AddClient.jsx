@@ -28,7 +28,7 @@ function AddClient() {
       ...prev,
       [name]: value
     }));
-    
+
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -93,20 +93,20 @@ function AddClient() {
 
   return (
     <div className="add-client">
-      <div className="page-header">
+      <div className="AdminAddClient-page-header">
         <div>
           <h1>Add New Client</h1>
           <p>Create a new client account</p>
         </div>
       </div>
 
-      <div className="form-container">
+      <div className="AdminAddClient-form-container">
         <form onSubmit={handleSubmit}>
           {/* Basic Information */}
           <div className="form-section">
-            <h3 className="section-title">Basic Information</h3>
+            <h3 className="AdminAddClient-section-title">Basic Information</h3>
             <div className="form-grid">
-              <div className="form-group">
+              <div className="AdminAddClient-form-group">
                 <label>
                   <FiUser /> Full Name *
                 </label>
@@ -121,7 +121,7 @@ function AddClient() {
                 {errors.name && <span className="error-message">{errors.name}</span>}
               </div>
 
-              <div className="form-group">
+              <div className="AdminAddClient-form-group">
                 <label>
                   <FiMail /> Email Address *
                 </label>
@@ -136,7 +136,7 @@ function AddClient() {
                 {errors.email && <span className="error-message">{errors.email}</span>}
               </div>
 
-              <div className="form-group">
+              <div className="AdminAddClient-form-group">
                 <label>
                   <FiPhone /> Phone Number
                 </label>
@@ -149,7 +149,7 @@ function AddClient() {
                 />
               </div>
 
-              <div className="form-group">
+              <div className="AdminAddClient-form-group">
                 <label>Password *</label>
                 <input
                   type="password"
@@ -166,9 +166,9 @@ function AddClient() {
 
           {/* Company Information */}
           <div className="form-section">
-            <h3 className="section-title">Company Information</h3>
+            <h3 className="AdminAddClient-section-title">Company Information</h3>
             <div className="form-grid">
-              <div className="form-group">
+              <div className="AdminAddClient-form-group">
                 <label>
                   <FiBriefcase /> Company Name *
                 </label>
@@ -183,7 +183,7 @@ function AddClient() {
                 {errors.company && <span className="error-message">{errors.company}</span>}
               </div>
 
-              <div className="form-group">
+              <div className="AdminAddClient-form-group">
                 <label>Industry</label>
                 <select
                   name="industry"
@@ -201,7 +201,7 @@ function AddClient() {
                 </select>
               </div>
 
-              <div className="form-group">
+              <div className="AdminAddClient-form-group">
                 <label>Website</label>
                 <input
                   type="url"
@@ -212,7 +212,7 @@ function AddClient() {
                 />
               </div>
 
-              <div className="form-group">
+              <div className="AdminAddClient-form-group">
                 <label>Status</label>
                 <select
                   name="status"
@@ -228,9 +228,9 @@ function AddClient() {
 
           {/* Additional Information */}
           <div className="form-section">
-            <h3 className="section-title">Additional Information</h3>
+            <h3 className="AdminAddClient-section-title">Additional Information</h3>
             <div className="form-grid">
-              <div className="form-group full-width">
+              <div className="AdminAddClient-form-group full-width">
                 <label>
                   <FiMapPin /> Address
                 </label>
@@ -246,10 +246,10 @@ function AddClient() {
           </div>
 
           {/* Form Actions */}
-          <div className="form-actions">
+          <div className="AdminAddClient-form-actions">
             <button
               type="button"
-              className="btn btn-secondary"
+              className="AdminAddClient-btn AdminAddClient-btn-secondary"
               onClick={handleCancel}
               disabled={loading}
             >
@@ -257,7 +257,7 @@ function AddClient() {
             </button>
             <button
               type="submit"
-              className="btn btn-primary"
+              className="AdminAddClient-btn AdminAddClient-btn-primary"
               disabled={loading}
             >
               {loading ? 'Adding...' : 'Add Client'}

@@ -71,7 +71,7 @@ function AdminDashboard() {
       });
 
       setRecentActivity(dashboardData.recentActivity || []);
-      
+
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
       toast.error("Failed to load dashboard data");
@@ -84,10 +84,10 @@ function AdminDashboard() {
   const refreshDashboardData = async () => {
     try {
       setRefreshing(true);
-      
+
       // Fetch attendance (most important for live updates)
       await fetchTodayAttendance();
-      
+
       // Fetch stats
       const response = await adminAPI.getDashboardStats();
       let dashboardData = {};
@@ -107,7 +107,7 @@ function AdminDashboard() {
 
       setLastRefreshTime(new Date());
       console.log('✅ Dashboard refreshed successfully');
-      
+
     } catch (error) {
       console.error("Error refreshing dashboard:", error);
       // Don't show toast on auto-refresh errors to avoid annoying users
@@ -122,30 +122,30 @@ function AdminDashboard() {
       console.log('====================================');
       console.log('🔍 Fetching today\'s attendance for dashboard...');
       console.log('====================================');
-      
+
       const today = new Date().toISOString().split('T')[0];
       console.log('📅 Fetching attendance for date:', today);
-      
+
       const response = await adminAPI.getDailyAttendance({ date: today });
-      
+
       console.log('📊 ATTENDANCE API RESPONSE:');
       console.log('Full response:', response);
       console.log('response.data:', response.data);
       console.log('response.data.attendance:', response.data.attendance);
       console.log('response.data.stats:', response.data.stats);
-      
+
       if (response.data && response.data.attendance) {
         const attendanceList = response.data.attendance;
         console.log('✅ Attendance data received:', attendanceList.length, 'records');
-        
+
         if (attendanceList.length > 0) {
           console.log('✅ First record:', attendanceList[0]);
         }
-        
+
         // Take only first 5 for dashboard display
         const dashboardAttendance = attendanceList.slice(0, 5);
         console.log('✅ Setting dashboard attendance (first 5):', dashboardAttendance.length, 'records');
-        
+
         setAttendanceData(dashboardAttendance);
         console.log('✅ Attendance data set successfully');
       } else {
@@ -167,9 +167,9 @@ function AdminDashboard() {
   const fetchRecentProjects = async () => {
     try {
       console.log('🔍 Starting fetchRecentProjects...');
-      
+
       const response = await adminAPI.getProjects();
-      
+
       console.log('====================================');
       console.log('📊 PROJECTS FETCH DEBUG');
       console.log('====================================');
@@ -177,19 +177,19 @@ function AdminDashboard() {
       console.log('response.data:', response.data);
       console.log('response.data.projects:', response.data.projects);
       console.log('====================================');
-      
+
       const projects = response.data.projects || response.data.data || [];
-      
+
       console.log('✅ Projects array:', projects);
       console.log('✅ Projects length:', projects.length);
-      
+
       const recent = projects.slice(0, 5);
       console.log('✅ Setting recentProjects to:', recent);
-      
+
       setRecentProjects(recent);
-      
+
       console.log('✅ setRecentProjects called');
-      
+
     } catch (error) {
       console.error('❌ Error fetching projects:', error);
       console.error('❌ Error details:', error.response?.data);
@@ -229,9 +229,9 @@ function AdminDashboard() {
 
   const formatTime = (time) => {
     if (!time) return 'Not checked in';
-    return new Date(time).toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
+    return new Date(time).toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit'
     });
   };
 
@@ -239,13 +239,13 @@ function AdminDashboard() {
   const formatLastRefresh = () => {
     const now = new Date();
     const diff = Math.floor((now - lastRefreshTime) / 1000);
-    
+
     if (diff < 60) return 'Just now';
     if (diff < 120) return '1 minute ago';
     if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
-    return lastRefreshTime.toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
+    return lastRefreshTime.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit'
     });
   };
 
@@ -275,11 +275,11 @@ function AdminDashboard() {
           <p style={{ fontSize: '12px', color: '#888', marginTop: '4px' }}>
             {refreshing ? (
               <>
-                <FiRefreshCw style={{ 
-                  animation: 'spin 1s linear infinite', 
+                <FiRefreshCw style={{
+                  animation: 'spin 1s linear infinite',
                   marginRight: '4px',
                   display: 'inline-block'
-                }} /> 
+                }} />
                 Refreshing...
               </>
             ) : (
@@ -288,8 +288,8 @@ function AdminDashboard() {
           </p>
         </div>
         <div className="dashboard-actions">
-          <button 
-            className="btn btn-primary" 
+          <button
+            className="btn btn-primary"
             onClick={handleManualRefresh}
             disabled={loading || refreshing}
           >
@@ -336,7 +336,7 @@ function AdminDashboard() {
         <div className="dashboard-card projects-overview-card">
           <div className="card-header">
             <h3><FiBriefcase /> Recent Projects ({recentProjects.length})</h3>
-            <button 
+            <button
               className="view-all-btn"
               onClick={() => navigate('/admin/projects')}
             >
@@ -347,8 +347,8 @@ function AdminDashboard() {
             {recentProjects.length > 0 ? (
               <div className="projects-list">
                 {recentProjects.map((project) => (
-                  <div 
-                    key={project._id} 
+                  <div
+                    key={project._id}
                     className="project-item"
                     onClick={() => navigate(`/admin/projects/${project._id}`)}
                     style={{ cursor: 'pointer' }}
@@ -375,7 +375,7 @@ function AdminDashboard() {
               <div className="empty-state">
                 <FiBriefcase style={{ fontSize: '48px', color: '#d1d5db' }} />
                 <p>No projects yet</p>
-                <button 
+                <button
                   className="btn btn-primary"
                   onClick={() => navigate('/admin/projects/add')}
                   style={{ marginTop: '12px' }}
@@ -407,7 +407,7 @@ function AdminDashboard() {
                 }}></span>
                 Live
               </span>
-              <button 
+              <button
                 className="view-all-btn"
                 onClick={() => navigate('/admin/attendance')}
               >
@@ -491,22 +491,22 @@ function AdminDashboard() {
           </div>
           <div className="card-body">
             <div className="quick-actions-grid">
-              <button 
+              <button
                 className="quick-action-btn"
                 onClick={() => navigate('/admin/employees/add')}
               >
                 <FiUsers />
                 <span>Add Employee</span>
               </button>
-              <button 
+              <button
                 className="quick-action-btn"
                 onClick={() => navigate('/admin/projects/add')}
               >
                 <FiBriefcase />
                 <span>New Project</span>
               </button>
-              <button 
-                className="quick-action-btn" 
+              <button
+                className="quick-action-btn"
                 onClick={() => navigate('/admin/tasks')}
               >
                 <FiClock />

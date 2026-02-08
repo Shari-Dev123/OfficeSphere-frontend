@@ -91,7 +91,7 @@ function AddEmployee() {
 
   return (
     <div className="add-employee">
-      <div className="adminEmployee-page-header">
+      <div className="addEmployee-page-header">
         <div>
           <button className="back-btn" onClick={handleCancel}>
             <FiArrowLeft /> Back
@@ -263,7 +263,7 @@ function AddEmployee() {
           <div className="form-actions">
             <button
               type="button"
-              className="btn btn-secondary"
+              className="AddEmployee-btn AddEmployee-btn-secondary"
               onClick={handleCancel}
               disabled={loading}
             >
@@ -271,7 +271,7 @@ function AddEmployee() {
             </button>
             <button
               type="submit"
-              className="btn btn-primary"
+              className="AddEmployee-btn btn-primary"
               disabled={loading}
             >
               {loading ? 'Adding Employee...' : 'Add Employee'}
