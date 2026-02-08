@@ -1,9 +1,9 @@
 // Components/Client/Meetings/ClientMeetings.jsx
-// ✅ FINAL FIXED VERSION - Correct meeting type enum value
+// ✅ COMPLETE FIX - Matches backend meetingController exactly
 
 import React, { useState, useEffect } from 'react';
 import { clientAPI } from '../../../utils/api';
-import { FiPlus, FiCalendar, FiClock, FiVideo, FiX, FiMapPin } from 'react-icons/fi';
+import { FiPlus, FiCalendar, FiClock, FiVideo, FiX, FiMapPin, FiUsers } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import Modal from '../../Shared/Modal/Modal';
 import './ClientMeetings.css';
@@ -20,7 +20,7 @@ function ClientMeetings() {
     date: '',
     time: '',
     duration: '60',
-    meetingType: 'Online',  // For UI display only
+    location: 'Online',
     meetingLink: '',
     agenda: ''
   });
@@ -32,13 +32,35 @@ function ClientMeetings() {
   const fetchMeetings = async () => {
     try {
       setLoading(true);
-      console.log('🔍 Fetching client meetings...');
+      console.log('====================================');
+      console.log('📥 FETCHING CLIENT MEETINGS');
+      console.log('====================================');
+      
       const response = await clientAPI.getMyMeetings();
-      console.log('✅ Meetings response:', response.data);
-      setMeetings(response.data.meetings || []);
+      
+      console.log('API Response:', response);
+      console.log('Response data:', response.data);
+      
+      // ✅ Backend returns: { success, count, meetings }
+      const meetingsData = response.data.meetings || [];
+      
+      console.log(`✅ Loaded ${meetingsData.length} meetings`);
+      if (meetingsData.length > 0) {
+        console.log('Sample meeting:', meetingsData[0]);
+      }
+      console.log('====================================');
+      
+      setMeetings(meetingsData);
     } catch (error) {
-      console.error('❌ Error fetching meetings:', error);
-      toast.error('Failed to load meetings');
+      console.error('====================================');
+      console.error('❌ ERROR FETCHING MEETINGS');
+      console.error('====================================');
+      console.error('Error:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('====================================');
+      
+      toast.error(error.response?.data?.message || 'Failed to load meetings');
+      setMeetings([]);
     } finally {
       setLoading(false);
     }
@@ -49,93 +71,83 @@ function ClientMeetings() {
     
     try {
       console.log('====================================');
-      console.log('📅 Scheduling meeting...');
+      console.log('📅 CLIENT SCHEDULE MEETING');
       console.log('====================================');
-      console.log('Form data:', formData);
-
+      
       // ✅ Validate required fields
-      if (!formData.title || !formData.title.trim()) {
+      if (!formData.title?.trim()) {
         toast.error('Please enter meeting title');
         return;
       }
-
+      
       if (!formData.date) {
         toast.error('Please select meeting date');
         return;
       }
-
+      
       if (!formData.time) {
         toast.error('Please select meeting time');
         return;
       }
 
-      // ✅ Create proper DateTime objects
-      const [year, month, day] = formData.date.split('-');
-      const [hours, minutes] = formData.time.split(':');
+      // ✅ Create ISO datetime strings (backend expects these)
+      const dateTimeStr = `${formData.date}T${formData.time}:00`;
+      const startDateTime = new Date(dateTimeStr);
       
-      const startDateTime = new Date(
-        parseInt(year),
-        parseInt(month) - 1,
-        parseInt(day),
-        parseInt(hours),
-        parseInt(minutes),
-        0,
-        0
-      );
-
-      console.log('📅 Meeting date/time:', startDateTime);
-
+      console.log('📅 Start DateTime:', startDateTime);
+      
       // ✅ Validate date is in future
       if (startDateTime < new Date()) {
         toast.error('Meeting date must be in the future');
         return;
       }
 
-      // ✅ Calculate end time
+      // ✅ Calculate end time based on duration
       const durationMinutes = parseInt(formData.duration);
       const endDateTime = new Date(startDateTime.getTime() + (durationMinutes * 60 * 1000));
+      
+      console.log('📅 Start (ISO):', startDateTime.toISOString());
+      console.log('📅 End (ISO):', endDateTime.toISOString());
+      console.log('⏱️  Duration:', durationMinutes, 'minutes');
 
-      console.log('📅 Start:', startDateTime.toISOString());
-      console.log('📅 End:', endDateTime.toISOString());
-      console.log('⏱️ Duration:', durationMinutes, 'minutes');
-
-      // ✅✅✅ CRITICAL FIX: Use valid enum value for type
+      // ✅✅✅ CRITICAL: Match backend clientScheduleMeeting expectations exactly
       const meetingData = {
         title: formData.title.trim(),
         description: formData.description?.trim() || '',
-        type: 'Client',  // ✅ Valid enum value from schema
+        type: 'Client',  // ✅ Valid enum value from Meeting schema
         startTime: startDateTime.toISOString(),
         endTime: endDateTime.toISOString(),
         duration: durationMinutes,
-        location: formData.meetingType === 'Online' ? 'Online' : 'Client Office',
+        location: formData.location,
         meetingLink: formData.meetingLink?.trim() || '',
-        participants: [],  // Empty array is fine - backend adds client automatically
-        agenda: formData.agenda?.trim() || ''
+        agenda: formData.agenda?.trim() || '',
+        participants: []  // ✅ Backend adds client automatically
       };
 
-      console.log('📤 Sending meeting data:', meetingData);
+      console.log('📤 Sending meeting data:');
+      console.log(JSON.stringify(meetingData, null, 2));
       console.log('====================================');
 
       const response = await clientAPI.scheduleMeeting(meetingData);
       
       console.log('====================================');
-      console.log('✅ Meeting scheduled successfully');
+      console.log('✅ MEETING SCHEDULED SUCCESSFULLY');
       console.log('Response:', response.data);
       console.log('====================================');
-
+      
       toast.success('Meeting scheduled successfully!');
       setShowScheduleModal(false);
       resetForm();
-      fetchMeetings();
+      await fetchMeetings();
       
     } catch (error) {
-      console.log('====================================');
-      console.log('❌ Error scheduling meeting');
-      console.log('====================================');
+      console.error('====================================');
+      console.error('❌ SCHEDULE MEETING ERROR');
+      console.error('====================================');
       console.error('Error:', error);
-      console.error('Error response:', error.response?.data);
-      console.error('Error status:', error.response?.status);
-      console.log('====================================');
+      console.error('Response data:', error.response?.data);
+      console.error('Status:', error.response?.status);
+      console.error('====================================');
       
       const errorMessage = error.response?.data?.message 
         || error.response?.data?.error
@@ -151,13 +163,26 @@ function ClientMeetings() {
     }
 
     try {
-      console.log('🗑️ Cancelling meeting:', id);
+      console.log('====================================');
+      console.log('🗑️  CANCELLING MEETING:', id);
+      console.log('====================================');
+      
       await clientAPI.cancelMeeting(id);
+      
+      console.log('✅ Meeting cancelled successfully');
+      console.log('====================================');
+      
       toast.success('Meeting cancelled successfully');
-      fetchMeetings();
+      await fetchMeetings();
     } catch (error) {
-      console.error('❌ Error cancelling meeting:', error);
-      toast.error('Failed to cancel meeting');
+      console.error('====================================');
+      console.error('❌ CANCEL MEETING ERROR');
+      console.error('====================================');
+      console.error('Error:', error);
+      console.error('Response:', error.response?.data);
+      console.error('====================================');
+      
+      toast.error(error.response?.data?.message || 'Failed to cancel meeting');
     }
   };
 
@@ -168,13 +193,15 @@ function ClientMeetings() {
       date: '',
       time: '',
       duration: '60',
-      meetingType: 'Online',
+      location: 'Online',
       meetingLink: '',
       agenda: ''
     });
   };
 
   const getFilteredMeetings = () => {
+    if (!Array.isArray(meetings)) return [];
+    
     const now = new Date();
     
     if (filter === 'upcoming') {
@@ -205,20 +232,27 @@ function ClientMeetings() {
   };
 
   const getMeetingStatus = (startTime, endTime) => {
-    const meetingDate = new Date(startTime);
+    const meetingStart = new Date(startTime);
     const meetingEnd = new Date(endTime);
     const now = new Date();
-    const diff = meetingDate - now;
+    
+    if (now > meetingEnd) {
+      return { text: 'Completed', class: 'completed' };
+    }
+    if (now >= meetingStart && now <= meetingEnd) {
+      return { text: 'In Progress', class: 'in-progress' };
+    }
+    
+    const diff = meetingStart - now;
     const hoursDiff = diff / (1000 * 60 * 60);
-
-    if (now > meetingEnd) return { text: 'Completed', class: 'completed' };
-    if (now >= meetingDate && now <= meetingEnd) return { text: 'In Progress', class: 'in-progress' };
+    
     if (hoursDiff < 1) return { text: 'Starting Soon', class: 'starting-soon' };
     if (hoursDiff < 24) return { text: 'Today', class: 'today' };
     return { text: 'Upcoming', class: 'upcoming' };
   };
 
   const filteredMeetings = getFilteredMeetings();
+  
   const stats = {
     total: meetings.length,
     upcoming: meetings.filter(m => new Date(m.startTime) >= new Date()).length,
@@ -273,7 +307,6 @@ function ClientMeetings() {
             <span className="stat-label">Total</span>
           </div>
         </div>
-
         <div className="stat-card">
           <div className="stat-icon today">
             <FiClock />
@@ -283,7 +316,6 @@ function ClientMeetings() {
             <span className="stat-label">Today</span>
           </div>
         </div>
-
         <div className="stat-card">
           <div className="stat-icon upcoming">
             <FiCalendar />
@@ -293,7 +325,6 @@ function ClientMeetings() {
             <span className="stat-label">Upcoming</span>
           </div>
         </div>
-
         <div className="stat-card">
           <div className="stat-icon past">
             <FiVideo />
@@ -323,7 +354,7 @@ function ClientMeetings() {
           className={`filter-tab ${filter === 'all' ? 'active' : ''}`}
           onClick={() => setFilter('all')}
         >
-          All Meetings ({stats.total})
+          All ({stats.total})
         </button>
       </div>
 
@@ -332,7 +363,7 @@ function ClientMeetings() {
         <div className="meetings-grid">
           {filteredMeetings.map((meeting) => {
             const status = getMeetingStatus(meeting.startTime, meeting.endTime);
-            const canCancel = new Date(meeting.startTime) > new Date();
+            const canCancel = new Date(meeting.startTime) > new Date() && status.text !== 'Completed';
             
             return (
               <div key={meeting._id} className="meeting-card">
@@ -343,43 +374,55 @@ function ClientMeetings() {
                       {status.text}
                     </span>
                   </div>
+                  {meeting.type && (
+                    <span className="meeting-type-badge">{meeting.type}</span>
+                  )}
                 </div>
-
+                
                 <div className="meeting-body">
                   {meeting.description && (
                     <p className="meeting-description">{meeting.description}</p>
                   )}
-
+                  
                   <div className="meeting-details">
                     <div className="detail-item">
                       <FiCalendar />
                       <span>{formatDate(meeting.startTime)}</span>
                     </div>
-
                     <div className="detail-item">
                       <FiClock />
                       <span>
-                        {formatTime(meeting.startTime)}
-                        {meeting.endTime && ` - ${formatTime(meeting.endTime)}`}
+                        {formatTime(meeting.startTime)} - {formatTime(meeting.endTime)}
                       </span>
                     </div>
-
                     <div className="detail-item">
                       <FiMapPin />
-                      <span>{meeting.location}</span>
+                      <span>{meeting.location || 'Not specified'}</span>
                     </div>
+                    {meeting.participants && meeting.participants.length > 0 && (
+                      <div className="detail-item">
+                        <FiUsers />
+                        <span>{meeting.participants.length} participant(s)</span>
+                      </div>
+                    )}
                   </div>
-
+                  
                   {meeting.agenda && (
                     <div className="meeting-agenda">
                       <strong>Agenda:</strong>
                       <p>{meeting.agenda}</p>
                     </div>
                   )}
-                </div>
 
+                  {meeting.organizer && (
+                    <div className="meeting-organizer">
+                      <small>Organized by: <strong>{meeting.organizer.name || meeting.organizer.email}</strong></small>
+                    </div>
+                  )}
+                </div>
+                
                 <div className="meeting-footer">
-                  {meeting.meetingLink && (
+                  {meeting.meetingLink && status.text !== 'Completed' && (
                     <a 
                       href={meeting.meetingLink} 
                       target="_blank" 
@@ -390,7 +433,7 @@ function ClientMeetings() {
                     </a>
                   )}
                   
-                  {canCancel && status.text !== 'Completed' && (
+                  {canCancel && (
                     <button
                       className="btn btn-sm btn-danger"
                       onClick={() => handleCancelMeeting(meeting._id, meeting.title)}
@@ -407,7 +450,13 @@ function ClientMeetings() {
         <div className="empty-state">
           <FiCalendar className="empty-icon" />
           <h3>No {filter !== 'all' ? filter : ''} Meetings</h3>
-          <p>Schedule a meeting to get started</p>
+          <p>
+            {filter === 'upcoming' 
+              ? 'You have no upcoming meetings scheduled'
+              : filter === 'past'
+              ? 'You have no past meetings'
+              : 'Schedule a meeting to get started'}
+          </p>
           <button 
             className="btn btn-primary"
             onClick={() => setShowScheduleModal(true)}
@@ -425,6 +474,7 @@ function ClientMeetings() {
           resetForm();
         }}
         title="Schedule New Meeting"
+        size="medium"
       >
         <form onSubmit={handleScheduleMeeting} className="schedule-form">
           <div className="form-group">
@@ -435,6 +485,7 @@ function ClientMeetings() {
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               placeholder="Enter meeting title"
               required
+              maxLength={100}
             />
           </div>
 
@@ -443,8 +494,9 @@ function ClientMeetings() {
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Meeting description"
+              placeholder="Meeting description (optional)"
               rows="3"
+              maxLength={500}
             />
           </div>
 
@@ -459,7 +511,6 @@ function ClientMeetings() {
                 required
               />
             </div>
-
             <div className="form-group">
               <label>Time *</label>
               <input
@@ -477,25 +528,30 @@ function ClientMeetings() {
               value={formData.duration}
               onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
             >
+              <option value="15">15 minutes</option>
               <option value="30">30 minutes</option>
               <option value="60">1 hour</option>
               <option value="90">1.5 hours</option>
               <option value="120">2 hours</option>
+              <option value="180">3 hours</option>
             </select>
           </div>
 
           <div className="form-group">
-            <label>Meeting Type *</label>
+            <label>Location *</label>
             <select
-              value={formData.meetingType}
-              onChange={(e) => setFormData({ ...formData, meetingType: e.target.value })}
+              value={formData.location}
+              onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+              required
             >
               <option value="Online">Online</option>
-              <option value="In Person">In Person</option>
+              <option value="Office">Office</option>
+              <option value="Client Office">Client Office</option>
+              <option value="Other">Other</option>
             </select>
           </div>
 
-          {formData.meetingType === 'Online' && (
+          {formData.location === 'Online' && (
             <div className="form-group">
               <label>Meeting Link (Optional)</label>
               <input
@@ -504,7 +560,7 @@ function ClientMeetings() {
                 onChange={(e) => setFormData({ ...formData, meetingLink: e.target.value })}
                 placeholder="https://zoom.us/j/... or https://meet.google.com/..."
               />
-              <small className="form-hint">Leave empty if admin will provide the link</small>
+              <small className="form-hint">Provide your own link or leave empty for admin to add later</small>
             </div>
           )}
 
@@ -515,6 +571,7 @@ function ClientMeetings() {
               onChange={(e) => setFormData({ ...formData, agenda: e.target.value })}
               placeholder="Meeting agenda and topics to discuss"
               rows="3"
+              maxLength={500}
             />
           </div>
 
