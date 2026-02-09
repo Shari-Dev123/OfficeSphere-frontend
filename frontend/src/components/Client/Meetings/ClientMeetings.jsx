@@ -1,5 +1,5 @@
 // Components/Client/Meetings/ClientMeetings.jsx
-// ✅ COMPLETE FIX - Matches backend meetingController exactly
+// ✅ FIXED VERSION - Shows meetings where client is organizer OR participant
 
 import React, { useState, useEffect } from 'react';
 import { clientAPI } from '../../../utils/api';
@@ -121,7 +121,7 @@ function ClientMeetings() {
         location: formData.location,
         meetingLink: formData.meetingLink?.trim() || '',
         agenda: formData.agenda?.trim() || '',
-        participants: []  // ✅ Backend adds client automatically
+        participants: []  // ✅ Backend adds client + admins automatically
       };
 
       console.log('📤 Sending meeting data:');
@@ -135,7 +135,7 @@ function ClientMeetings() {
       console.log('Response:', response.data);
       console.log('====================================');
       
-      toast.success('Meeting scheduled successfully!');
+      toast.success('Meeting scheduled successfully! Admins have been notified.');
       setShowScheduleModal(false);
       resetForm();
       await fetchMeetings();
@@ -433,7 +433,7 @@ function ClientMeetings() {
                     </a>
                   )}
                   
-                  {canCancel && (
+                  {canCancel && meeting.organizer && (
                     <button
                       className="btn btn-sm btn-danger"
                       onClick={() => handleCancelMeeting(meeting._id, meeting.title)}
@@ -573,6 +573,10 @@ function ClientMeetings() {
               rows="3"
               maxLength={500}
             />
+          </div>
+
+          <div className="info-note">
+            <strong>Note:</strong> All admins will be automatically notified and added as participants to this meeting.
           </div>
 
           <div className="modal-actions">

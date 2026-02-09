@@ -1,13 +1,11 @@
-// ✅✅✅ COMPLETE FIX for AutoAttendance.jsx
-// This fixes both issues:
-// 1. Check-out stops timer properly
-// 2. Timer doesn't restart on new check-in after checkout
+// ✅✅✅ FIXED VERSION - Location Name Integration
+// Location is REQUIRED for check-in with readable address
 
 import React, { useState, useEffect, useRef } from 'react';
 import { employeeAPI } from '../../../utils/api';
 import { toast } from 'react-toastify';
-import { FiClock, FiMapPin, FiWifi, FiCheckCircle, FiXCircle } from 'react-icons/fi';
-import { MdQrCodeScanner } from 'react-icons/md';
+import { FiClock, FiMapPin, FiWifi, FiCheckCircle, FiXCircle, FiAlertTriangle } from 'react-icons/fi';
+import { getAddressFromCoordinates, getShortLocationName } from '../../../utils/locationUtils';
 import './AutoAttendance.css';
 
 function AutoAttendance() {
@@ -17,13 +15,18 @@ function AutoAttendance() {
   const [workingSeconds, setWorkingSeconds] = useState(0);
   const [isInitialized, setIsInitialized] = useState(false);
   const [location, setLocation] = useState(null);
+  const [locationError, setLocationError] = useState(null);
   const [checkInMethod, setCheckInMethod] = useState('auto');
+  
+  // ✅ NEW: Location name states
+  const [locationName, setLocationName] = useState(null);
+  const [loadingLocationName, setLoadingLocationName] = useState(false);
 
   const timerIntervalRef = useRef(null);
   const clockIntervalRef = useRef(null);
   const syncIntervalRef = useRef(null);
 
-  // ✅✅✅ CRITICAL FIX: Derive states from attendanceStatus directly
+  // ✅ Derive states from attendanceStatus directly
   const isCheckedIn = Boolean(
     attendanceStatus?.checkInTime && 
     !attendanceStatus?.checkOutTime &&
@@ -75,14 +78,13 @@ function AutoAttendance() {
     return `${hrs}h ${mins}m`;
   };
 
-  // ✅✅✅ FIXED: Timer management
   const startTimer = (checkInTime) => {
     if (!checkInTime) {
       console.warn('⚠️ No check-in time provided');
       return;
     }
 
-    stopTimer(); // Clear any existing timer first
+    stopTimer();
 
     const checkIn = new Date(checkInTime);
     console.log('⏱️ Starting timer from:', checkIn.toISOString());
@@ -106,7 +108,6 @@ function AutoAttendance() {
     }
   };
 
-  // ✅✅✅ FIXED: Server sync
   const syncWithServer = async () => {
     try {
       const res = await employeeAPI.getAttendanceStatus();
@@ -114,7 +115,6 @@ function AutoAttendance() {
 
       console.log('📡 Server sync:', serverData);
 
-      // Check if checked out
       if (serverData?.data?.checkOut || serverData?.data?.checkOutTime) {
         console.log('✅ Server shows checkout');
         
@@ -130,7 +130,6 @@ function AutoAttendance() {
         return;
       }
 
-      // If active session
       if (serverData?.data?.checkInTime && !serverData?.data?.checkOut && !serverData?.data?.checkOutTime) {
         console.log('✅ Active session on server');
         setAttendanceStatus(serverData.data);
@@ -145,7 +144,6 @@ function AutoAttendance() {
     }
   };
 
-  // ✅✅✅ FIXED: Initial fetch
   const fetchAttendanceStatus = async () => {
     try {
       const res = await employeeAPI.getAttendanceStatus();
@@ -153,7 +151,6 @@ function AutoAttendance() {
 
       console.log('📡 Initial fetch:', serverData);
 
-      // CRITICAL: Check for checkout FIRST
       if (serverData?.data?.checkOut || serverData?.data?.checkOutTime) {
         console.log('✅ Already checked out today');
         setAttendanceStatus(serverData.data);
@@ -168,7 +165,6 @@ function AutoAttendance() {
         return;
       }
 
-      // If checked in but not out
       if (serverData?.data?.checkInTime) {
         console.log('✅ Active check-in found');
         setAttendanceStatus(serverData.data);
@@ -185,7 +181,6 @@ function AutoAttendance() {
         return;
       }
 
-      // No attendance
       console.log('⭕ No attendance today');
       setAttendanceStatus(null);
       clearAttendanceFromStorage();
@@ -196,22 +191,98 @@ function AutoAttendance() {
     }
   };
 
+  // ✅ UPDATED: Get location with address
   const getLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setLocation({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            accuracy: position.coords.accuracy
-          });
-        },
-        (error) => {
-          console.error('❌ Location error:', error);
-          toast.warning('Location access denied');
-        }
-      );
+    if (!navigator.geolocation) {
+      const errorMsg = 'Geolocation is not supported by your browser. Cannot mark attendance.';
+      setLocationError(errorMsg);
+      toast.error(errorMsg, { autoClose: 7000 });
+      return;
     }
+
+    const loadingToast = toast.info('📍 Getting your location...', { autoClose: false });
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const coords = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          accuracy: position.coords.accuracy
+        };
+
+        setLocation(coords);
+        setLocationError(null);
+        
+        // ✅ Get location name
+        setLoadingLocationName(true);
+        try {
+          const addressData = await getAddressFromCoordinates(
+            coords.latitude, 
+            coords.longitude
+          );
+          
+          const shortName = await getShortLocationName(
+            coords.latitude,
+            coords.longitude
+          );
+
+          setLocationName({
+            short: shortName,
+            full: addressData.formattedAddress,
+            details: addressData
+          });
+
+          toast.dismiss(loadingToast);
+          toast.success(`✅ Location: ${shortName}`);
+          
+          console.log('✅ Location obtained:', {
+            coordinates: coords,
+            address: addressData
+          });
+        } catch (error) {
+          console.error('❌ Error getting address:', error);
+          setLocationName({
+            short: 'Location detected',
+            full: `${coords.latitude.toFixed(6)}, ${coords.longitude.toFixed(6)}`,
+            details: null
+          });
+          toast.dismiss(loadingToast);
+          toast.success('✅ Location detected');
+        } finally {
+          setLoadingLocationName(false);
+        }
+      },
+      (error) => {
+        console.error('❌ Location error:', error);
+        toast.dismiss(loadingToast);
+        
+        let errorMessage = 'Location access denied';
+        
+        switch(error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = '🚫 Location permission denied. Please enable location access in your browser settings to mark attendance.';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = '📍 Location information unavailable. Please check your GPS settings and try again.';
+            break;
+          case error.TIMEOUT:
+            errorMessage = '⏱️ Location request timed out. Please try again.';
+            break;
+          default:
+            errorMessage = '❌ Unable to get location. Please try again.';
+        }
+        
+        setLocationError(errorMessage);
+        setLocation(null);
+        setLocationName(null);
+        toast.error(errorMessage, { autoClose: 7000 });
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      }
+    );
   };
 
   const handleAutoCheckout = async () => {
@@ -268,7 +339,7 @@ function AutoAttendance() {
 
     setIsInitialized(true);
     fetchAttendanceStatus();
-    getLocation();
+    getLocation(); // Get location on mount
 
     clockIntervalRef.current = setInterval(() => {
       setCurrentTime(new Date());
@@ -285,7 +356,6 @@ function AutoAttendance() {
     };
   }, []);
 
-  // Listen for logout
   useEffect(() => {
     const handleLogoutEvent = () => {
       console.log('🚪 Logout event');
@@ -307,7 +377,6 @@ function AutoAttendance() {
     };
   }, [isCheckedIn, location]);
 
-  // ✅✅✅ CRITICAL FIX: Attendance status handler
   useEffect(() => {
     if (!isInitialized) return;
 
@@ -317,7 +386,6 @@ function AutoAttendance() {
       status: attendanceStatus?.status
     });
 
-    // ✅ CHECKED OUT - Stop everything
     if (attendanceStatus?.checkOut || attendanceStatus?.checkOutTime) {
       console.log('🛑 CHECKED OUT - Stopping timer');
 
@@ -334,7 +402,6 @@ function AutoAttendance() {
       return;
     }
 
-    // ✅ CHECKED IN (active)
     if (attendanceStatus?.checkInTime && !attendanceStatus?.checkOut && !attendanceStatus?.checkOutTime) {
       console.log('✅ CHECKED IN - Starting timer');
 
@@ -351,7 +418,6 @@ function AutoAttendance() {
       return;
     }
 
-    // ✅ NOT CHECKED IN
     console.log('⭕ NOT CHECKED IN');
     stopTimer();
     setWorkingSeconds(0);
@@ -359,7 +425,6 @@ function AutoAttendance() {
 
   }, [attendanceStatus, isInitialized]);
 
-  // Handle visibility change
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (!document.hidden) {
@@ -371,7 +436,7 @@ function AutoAttendance() {
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, []);
 
-  // ✅✅✅ FIXED: Check-in handler
+  // ✅ UPDATED: Check-in with location name
   const handleCheckIn = async () => {
     try {
       setLoading(true);
@@ -383,6 +448,25 @@ function AutoAttendance() {
         return;
       }
 
+      if (!location) {
+        toast.error('📍 Location is required to mark attendance. Please enable location access.', {
+          autoClose: 5000
+        });
+        setLoading(false);
+        getLocation();
+        return;
+      }
+
+      if (location.accuracy > 100) {
+        const proceed = window.confirm(
+          `⚠️ Location accuracy is low (±${Math.round(location.accuracy)}m). Continue anyway?`
+        );
+        if (!proceed) {
+          setLoading(false);
+          return;
+        }
+      }
+
       // Reset everything
       stopTimer();
       setWorkingSeconds(0);
@@ -391,26 +475,31 @@ function AutoAttendance() {
       const currentUser = getCurrentUser();
       const now = new Date();
       
+      // ✅ Include location name in check-in data
       const checkInData = {
-        location: location ? {
+        location: {
           latitude: location.latitude,
           longitude: location.longitude,
-          accuracy: location.accuracy
-        } : null,
-        notes: `Check-in via ${checkInMethod}`,
+          accuracy: location.accuracy,
+          // ✅ Add location name
+          locationName: locationName?.short || 'Unknown Location',
+          fullAddress: locationName?.full || '',
+          addressDetails: locationName?.details || null
+        },
+        notes: `Check-in via ${checkInMethod} from ${locationName?.short || 'Unknown Location'}`,
         timestamp: now.toISOString(),
         employeeName: currentUser.name,
         email: currentUser.email,
         method: checkInMethod
       };
 
-      console.log('📤 Sending check-in...');
+      console.log('📤 Sending check-in with location:', checkInData.location);
+
       const response = await employeeAPI.checkIn(checkInData);
       console.log('✅ Check-in response:', response.data);
 
       setAttendanceStatus(response.data.data);
-      toast.success('✅ Checked in successfully!');
-
+      toast.success(`✅ Checked in from ${locationName?.short || 'your location'}!`);
     } catch (error) {
       console.error('❌ Check-in error:', error);
       toast.error(error.response?.data?.message || 'Failed to check in');
@@ -423,7 +512,6 @@ function AutoAttendance() {
     }
   };
 
-  // ✅✅✅ FIXED: Check-out handler
   const handleCheckOut = async () => {
     try {
       setLoading(true);
@@ -467,10 +555,8 @@ function AutoAttendance() {
       const response = await employeeAPI.checkOut(checkOutData);
       console.log('✅ Check-out response:', response.data);
 
-      // ✅ CRITICAL: Stop timer IMMEDIATELY
       stopTimer();
       
-      // ✅ Update state with checkout data
       const updatedStatus = {
         ...attendanceStatus,
         checkOut: response.data.checkOut || response.data.data?.checkOut || response.data.data?.checkOutTime,
@@ -524,6 +610,45 @@ function AutoAttendance() {
         <p>{formatDate(currentTime)}</p>
       </div>
 
+      {/* ✅ LOCATION WARNING */}
+      {!location && !isCheckedIn && !isCheckedOut && (
+        <div className="location-warning" style={{
+          background: '#fef3c7',
+          border: '2px solid #f59e0b',
+          borderRadius: '8px',
+          padding: '16px',
+          marginBottom: '20px',
+          display: 'flex',
+          alignItems: 'start',
+          gap: '12px'
+        }}>
+          <FiAlertTriangle style={{ color: '#f59e0b', fontSize: '24px', flexShrink: 0, marginTop: '2px' }} />
+          <div>
+            <h3 style={{ margin: '0 0 8px 0', color: '#92400e' }}>Location Required</h3>
+            <p style={{ margin: '0 0 12px 0', color: '#78350f' }}>
+              {locationError || 'Location access is mandatory to mark attendance. Please enable location permissions.'}
+            </p>
+            <button
+              onClick={getLocation}
+              disabled={loadingLocationName}
+              style={{
+                background: '#f59e0b',
+                color: 'white',
+                border: 'none',
+                padding: '8px 16px',
+                borderRadius: '6px',
+                cursor: loadingLocationName ? 'wait' : 'pointer',
+                fontWeight: '500',
+                opacity: loadingLocationName ? 0.7 : 1
+              }}
+            >
+              <FiMapPin style={{ marginRight: '6px' }} />
+              {loadingLocationName ? 'Getting Location...' : 'Enable Location'}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Timer Display */}
       <div className="time-display">
         <FiClock className="clock-icon" />
@@ -565,7 +690,7 @@ function AutoAttendance() {
               <FiXCircle className="status-icon warning" />
               <div>
                 <h3>Not Checked In</h3>
-                <p>Check in to start tracking your time</p>
+                <p>Enable location and check in to start tracking your time</p>
               </div>
             </>
           )}
@@ -604,27 +729,35 @@ function AutoAttendance() {
               <FiMapPin />
               <span>Manual</span>
             </button>
-            <button
-              className={`method-card ${checkInMethod === 'qr' ? 'active' : ''}`}
-              onClick={() => setCheckInMethod('qr')}
-            >
-              <MdQrCodeScanner />
-              <span>QR Code</span>
-            </button>
           </div>
         </div>
       )}
 
-      {/* Location Info */}
-      {location && (
-        <div className="location-info">
-          <FiMapPin />
-          <div>
-            <p><strong>Location Detected</strong></p>
-            <p className="location-coords">
-              Lat: {location.latitude.toFixed(6)}, Long: {location.longitude.toFixed(6)}
-            </p>
-            <p className="accuracy">Accuracy: ±{Math.round(location.accuracy)}m</p>
+      {/* ✅ UPDATED: Location Info with Name */}
+      {location && locationName && (
+        <div className="location-info" style={{
+          background: '#d1fae5',
+          border: '1px solid #10b981',
+          borderRadius: '8px',
+          padding: '12px 16px',
+          marginTop: '16px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'start', gap: '12px' }}>
+            <FiMapPin style={{ color: '#10b981', fontSize: '20px', marginTop: '2px' }} />
+            <div style={{ flex: 1 }}>
+              <p style={{ margin: '0 0 4px 0', fontWeight: '600', color: '#065f46', fontSize: '15px' }}>
+                📍 {locationName.short}
+              </p>
+              <p style={{ margin: '0 0 6px 0', fontSize: '13px', color: '#047857' }}>
+                {locationName.full}
+              </p>
+              <p className="location-coords" style={{ margin: '0', fontSize: '12px', color: '#059669' }}>
+                Coordinates: {location.latitude.toFixed(6)}, {location.longitude.toFixed(6)}
+              </p>
+              <p className="accuracy" style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#059669' }}>
+                Accuracy: ±{Math.round(location.accuracy)}m
+              </p>
+            </div>
           </div>
         </div>
       )}
@@ -635,14 +768,23 @@ function AutoAttendance() {
           <button
             className="btn-check-in"
             onClick={handleCheckIn}
-            disabled={loading}
+            disabled={loading || !location || loadingLocationName}
+            style={{
+              opacity: (!location || loadingLocationName) ? 0.5 : 1,
+              cursor: (!location || loadingLocationName) ? 'not-allowed' : 'pointer'
+            }}
           >
             {loading ? (
               <div className="spinner-small"></div>
             ) : (
               <>
                 <FiCheckCircle />
-                Check In & Start Timer
+                {!location 
+                  ? '📍 Enable Location to Check In' 
+                  : loadingLocationName
+                    ? 'Getting Location Name...'
+                    : `Check In from ${locationName?.short || 'Current Location'}`
+                }
               </>
             )}
           </button>
