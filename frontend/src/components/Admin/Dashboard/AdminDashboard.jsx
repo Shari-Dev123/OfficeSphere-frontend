@@ -1,8 +1,11 @@
+// ✅✅✅ FIXED VERSION - Proper Location Name Display
+// Shows employee check-in location with readable address
+
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { adminAPI } from "../../../utils/api";
 import StatCard from "./StatCard";
-import { FiUsers, FiUserCheck, FiBriefcase, FiClock, FiArrowRight, FiRefreshCw } from "react-icons/fi";
+import { FiUsers, FiUserCheck, FiBriefcase, FiClock, FiArrowRight, FiRefreshCw, FiMapPin } from "react-icons/fi";
 import { toast } from "react-toastify";
 import "./AdminDashboard.css";
 
@@ -22,23 +25,19 @@ function AdminDashboard() {
   const [recentProjects, setRecentProjects] = useState([]);
   const [lastRefreshTime, setLastRefreshTime] = useState(new Date());
 
-  // Use ref for polling interval
   const pollingIntervalRef = useRef(null);
 
   useEffect(() => {
-    // Initial data fetch
     fetchDashboardData();
     fetchRecentProjects();
     fetchTodayAttendance();
 
-    // ✅ NEW: Set up auto-refresh polling every 30 seconds
     console.log('🔄 Setting up auto-refresh polling (30s interval)');
     pollingIntervalRef.current = setInterval(() => {
       console.log('🔄 Auto-refreshing dashboard data...');
       refreshDashboardData();
-    }, 30000); // 30 seconds
+    }, 30000);
 
-    // Cleanup on unmount
     return () => {
       if (pollingIntervalRef.current) {
         console.log('🧹 Cleaning up polling interval');
@@ -81,15 +80,12 @@ function AdminDashboard() {
     }
   };
 
-  // ✅ NEW: Refresh function for auto-polling (doesn't show loading spinner)
   const refreshDashboardData = async () => {
     try {
       setRefreshing(true);
 
-      // Fetch attendance (most important for live updates)
       await fetchTodayAttendance();
 
-      // Fetch stats
       const response = await adminAPI.getDashboardStats();
       let dashboardData = {};
 
@@ -111,13 +107,12 @@ function AdminDashboard() {
 
     } catch (error) {
       console.error("Error refreshing dashboard:", error);
-      // Don't show toast on auto-refresh errors to avoid annoying users
     } finally {
       setRefreshing(false);
     }
   };
 
-  // ✅ IMPROVED: Separate function to fetch today's attendance
+  // ✅✅✅ UPDATED: Fetch attendance with location details
   const fetchTodayAttendance = async () => {
     try {
       console.log('====================================');
@@ -133,14 +128,18 @@ function AdminDashboard() {
       console.log('Full response:', response);
       console.log('response.data:', response.data);
       console.log('response.data.attendance:', response.data.attendance);
-      console.log('response.data.stats:', response.data.stats);
 
       if (response.data && response.data.attendance) {
         const attendanceList = response.data.attendance;
         console.log('✅ Attendance data received:', attendanceList.length, 'records');
 
         if (attendanceList.length > 0) {
-          console.log('✅ First record:', attendanceList[0]);
+          console.log('✅ First record with location:', {
+            name: attendanceList[0].employeeName,
+            checkIn: attendanceList[0].checkInTime,
+            location: attendanceList[0].checkInLocation,
+            locationDetails: attendanceList[0].checkInLocationDetails
+          });
         }
 
         // Take only first 5 for dashboard display
@@ -197,7 +196,6 @@ function AdminDashboard() {
     }
   };
 
-  // ✅ NEW: Manual refresh handler
   const handleManualRefresh = () => {
     console.log('🔄 Manual refresh triggered');
     setLoading(true);
@@ -236,7 +234,19 @@ function AdminDashboard() {
     });
   };
 
-  // ✅ NEW: Format last refresh time
+  // ✅✅✅ NEW: Format location name
+  const formatLocation = (record) => {
+    // Try to get location from different possible fields
+    const locationName = record.checkInLocation || 
+                        record.checkInLocationDetails?.shortName ||
+                        record.location ||
+                        'Unknown Location';
+    
+    console.log('📍 Formatting location for', record.employeeName, ':', locationName);
+    
+    return locationName;
+  };
+
   const formatLastRefresh = () => {
     const now = new Date();
     const diff = Math.floor((now - lastRefreshTime) / 1000);
@@ -272,7 +282,6 @@ function AdminDashboard() {
         <div>
           <h1>Admin Dashboard</h1>
           <p>Welcome back! Here's what's happening today.</p>
-          {/* ✅ NEW: Last refresh indicator */}
           <p style={{ fontSize: '12px', color: '#888', marginTop: '4px' }}>
             {refreshing ? (
               <>
@@ -388,7 +397,7 @@ function AdminDashboard() {
           </div>
         </div>
 
-        {/* ✅ IMPROVED: Real-time Attendance with Live Badge */}
+        {/* ✅✅✅ UPDATED: Real-time Attendance with Location Display */}
         <div className="dashboard-card">
           <div className="card-header">
             <h3>Today's Attendance</h3>
@@ -425,14 +434,33 @@ function AdminDashboard() {
                       <div className="employee-avatar">
                         {record.employeeName?.charAt(0) || "E"}
                       </div>
-                      <div>
+                      <div style={{ flex: 1 }}>
                         <p className="employee-name">{record.employeeName || 'Unknown'}</p>
-                        <p className="check-time">
-                          {formatTime(record.checkIn)}
-                          {record.checkOut && (
-                            <> → {formatTime(record.checkOut)}</>
+                        
+                        {/* ✅✅✅ UPDATED: Show time and location */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                          <p className="check-time">
+                            {formatTime(record.checkIn || record.checkInTime)}
+                            {record.checkOut && (
+                              <> → {formatTime(record.checkOut)}</>
+                            )}
+                          </p>
+                          
+                          {/* ✅✅✅ NEW: Location display */}
+                          {(record.checkIn || record.checkInTime) && (
+                            <p style={{
+                              fontSize: '11px',
+                              color: '#6b7280',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              marginTop: '2px'
+                            }}>
+                              <FiMapPin style={{ fontSize: '10px' }} />
+                              {formatLocation(record)}
+                            </p>
                           )}
-                        </p>
+                        </div>
                       </div>
                     </div>
                     <span className={`status-badge ${record.status}`}>
@@ -525,7 +553,6 @@ function AdminDashboard() {
         </div>
       </div>
 
-      {/* ✅ NEW: Add CSS for pulse animation */}
       <style jsx>{`
         @keyframes pulse {
           0%, 100% {
