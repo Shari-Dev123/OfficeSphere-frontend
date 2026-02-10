@@ -466,7 +466,7 @@ function ClientProjects() {
                 </div>
 
                 <div className="form-group">
-                  <label>Budget</label>
+                  <label>Estimated Budget (USD)</label>
                   <input
                     type="number"
                     value={newProject.budget}

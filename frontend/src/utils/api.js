@@ -174,7 +174,8 @@ export const adminAPI = {
   getAttendanceReportData: (params) =>
     api.get("/reports/admin/attendance", { params }),
   getEmployeeReport: (params) => api.get("/reports/admin/employee", { params }),
-  getDailyReports: (params) => api.get("/reports/admin/daily", { params }),
+  // In adminAPI object
+  getDailyReports: (params) => api.get('/reports/admin/daily', { params }), 
   exportReport: (reportType, params) =>
     api.get(`/reports/admin/${reportType}/export`, {
       params,
@@ -200,7 +201,7 @@ export const employeeAPI = {
   markAllNotificationsAsRead: () => api.patch('/employee/notifications/mark-all-read'),
   deleteNotification: (id) => api.delete(`/employee/notifications/${id}`),
   deleteNotifications: (ids) => api.post('/employee/notifications/delete-many', { ids }),
-  
+
   // ============ Attendance ============
   checkIn: (data) => api.post("/attendance/employee/attendance/checkin", data),
   checkOut: (data) =>

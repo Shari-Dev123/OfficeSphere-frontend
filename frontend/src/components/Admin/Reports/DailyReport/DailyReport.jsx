@@ -182,6 +182,7 @@ function DailyReport({ reportData, dateRange, employees }) {
   const handleEmail = () => {
     toast.info('Email feature coming soon!');
   };
+  
 
   return (
     <div className="daily-report-results">
