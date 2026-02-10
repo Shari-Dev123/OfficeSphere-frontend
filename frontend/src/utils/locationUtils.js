@@ -1,24 +1,29 @@
 // utils/locationUtils.js
-// Google Maps Geocoding utilities
+// ✅ FIXED - Google Maps Geocoding with OpenStreetMap Fallback
 
 const GOOGLE_MAPS_API_KEY = 'AIzaSyAOVYRIgupAurZup5y1PRh8Ismb1A3lLao';
 
 /**
  * Convert coordinates to readable address using Google Geocoding API
+ * Falls back to OpenStreetMap if Google fails
  * @param {number} latitude - Latitude coordinate
  * @param {number} longitude - Longitude coordinate
  * @returns {Promise<Object>} Address details
  */
 export const getAddressFromCoordinates = async (latitude, longitude) => {
   try {
-    const response = await fetch(
+    console.log('🌍 Geocoding coordinates:', { latitude, longitude });
+
+    // TRY GOOGLE GEOCODING FIRST
+    const googleResponse = await fetch(
       `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${GOOGLE_MAPS_API_KEY}`
     );
 
-    const data = await response.json();
+    const googleData = await googleResponse.json();
+    console.log('📍 Google Geocoding Status:', googleData.status);
 
-    if (data.status === 'OK' && data.results && data.results.length > 0) {
-      const result = data.results[0];
+    if (googleData.status === 'OK' && googleData.results && googleData.results.length > 0) {
+      const result = googleData.results[0];
       
       // Extract detailed address components
       const addressComponents = result.address_components;
@@ -53,8 +58,15 @@ export const getAddressFromCoordinates = async (latitude, longitude) => {
         }
       });
 
+      console.log('✅ Google Geocoding Success:', {
+        city,
+        state,
+        country
+      });
+
       return {
         success: true,
+        source: 'google',
         formattedAddress: result.formatted_address,
         street: street.trim(),
         area: area,
@@ -64,20 +76,95 @@ export const getAddressFromCoordinates = async (latitude, longitude) => {
         postalCode: postalCode,
         placeId: result.place_id
       };
-    } else {
+    } 
+    
+    // GOOGLE FAILED - TRY OPENSTREETMAP FALLBACK
+    console.warn('⚠️ Google Geocoding failed, trying OpenStreetMap...');
+    return await getAddressFromOpenStreetMap(latitude, longitude);
+
+  } catch (error) {
+    console.error('❌ Google Geocoding error:', error);
+    
+    // FALLBACK TO OPENSTREETMAP
+    try {
+      console.log('🔄 Falling back to OpenStreetMap...');
+      return await getAddressFromOpenStreetMap(latitude, longitude);
+    } catch (osmError) {
+      console.error('❌ OpenStreetMap also failed:', osmError);
+      
+      // LAST RESORT - RETURN COORDINATES
       return {
         success: false,
-        error: 'No address found',
-        formattedAddress: 'Location unavailable'
+        source: 'none',
+        error: 'All geocoding services failed',
+        formattedAddress: `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
+        city: 'Unknown',
+        state: 'Unknown',
+        country: 'Unknown'
       };
     }
+  }
+};
+
+/**
+ * Fallback geocoding using OpenStreetMap Nominatim
+ * @param {number} latitude 
+ * @param {number} longitude 
+ * @returns {Promise<Object>} Address details
+ */
+const getAddressFromOpenStreetMap = async (latitude, longitude) => {
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`,
+      {
+        headers: {
+          'User-Agent': 'AttendanceApp/1.0' // Required by Nominatim
+        }
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error('OpenStreetMap request failed');
+    }
+
+    const data = await response.json();
+    console.log('📍 OpenStreetMap Response:', data);
+
+    if (data && data.display_name) {
+      const address = data.address || {};
+
+      // Extract components
+      const street = address.road || '';
+      const area = address.suburb || address.neighbourhood || address.quarter || '';
+      const city = address.city || address.town || address.village || '';
+      const state = address.state || address.province || '';
+      const country = address.country || '';
+      const postalCode = address.postcode || '';
+
+      console.log('✅ OpenStreetMap Success:', {
+        city,
+        state,
+        country
+      });
+
+      return {
+        success: true,
+        source: 'openstreetmap',
+        formattedAddress: data.display_name,
+        street: street,
+        area: area,
+        city: city,
+        state: state,
+        country: country,
+        postalCode: postalCode,
+        placeId: data.place_id
+      };
+    } else {
+      throw new Error('No address found in OpenStreetMap response');
+    }
   } catch (error) {
-    console.error('❌ Geocoding error:', error);
-    return {
-      success: false,
-      error: error.message,
-      formattedAddress: 'Error getting location'
-    };
+    console.error('❌ OpenStreetMap error:', error);
+    throw error;
   }
 };
 
@@ -94,14 +181,65 @@ export const getShortLocationName = async (latitude, longitude) => {
     return 'Location unavailable';
   }
 
-  // Return format: "Area, City" or "City, State"
+  // Return format based on available data
   if (address.area && address.city) {
     return `${address.area}, ${address.city}`;
   } else if (address.city && address.state) {
     return `${address.city}, ${address.state}`;
   } else if (address.city) {
     return address.city;
+  } else if (address.state && address.country) {
+    return `${address.state}, ${address.country}`;
+  } else if (address.formattedAddress) {
+    // Extract first 2 parts from formatted address
+    const parts = address.formattedAddress.split(',').slice(0, 2);
+    return parts.join(',').trim();
   } else {
-    return address.formattedAddress.split(',').slice(0, 2).join(',');
+    return `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
   }
+};
+
+/**
+ * Validate if coordinates are within reasonable bounds
+ * @param {number} latitude 
+ * @param {number} longitude 
+ * @returns {boolean} True if valid
+ */
+export const validateCoordinates = (latitude, longitude) => {
+  return (
+    latitude >= -90 && 
+    latitude <= 90 && 
+    longitude >= -180 && 
+    longitude <= 180
+  );
+};
+
+/**
+ * Calculate distance between two coordinates (in meters)
+ * @param {number} lat1 
+ * @param {number} lon1 
+ * @param {number} lat2 
+ * @param {number} lon2 
+ * @returns {number} Distance in meters
+ */
+export const calculateDistance = (lat1, lon1, lat2, lon2) => {
+  const R = 6371e3; // Earth's radius in meters
+  const φ1 = lat1 * Math.PI / 180;
+  const φ2 = lat2 * Math.PI / 180;
+  const Δφ = (lat2 - lat1) * Math.PI / 180;
+  const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+  const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+            Math.cos(φ1) * Math.cos(φ2) *
+            Math.sin(Δλ/2) * Math.sin(Δλ/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+  return R * c; // Distance in meters
+};
+
+export default {
+  getAddressFromCoordinates,
+  getShortLocationName,
+  validateCoordinates,
+  calculateDistance
 };
