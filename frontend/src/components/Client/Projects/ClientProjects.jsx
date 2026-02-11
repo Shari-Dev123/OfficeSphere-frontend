@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { clientAPI } from '../../../utils/api';
-import { FiSearch, FiFilter, FiGrid, FiList, FiTrendingUp, FiClock, FiCheckCircle, FiPlus, FiSend, FiX } from 'react-icons/fi';
+import { FiSearch, FiFilter, FiGrid, FiList, FiTrendingUp, FiClock, FiCheckCircle, FiPlus, FiSend, FiX, FiPaperclip, FiTrash2 } from 'react-icons/fi';
 import { BiTask } from 'react-icons/bi';
 import Card from '../../Shared/Card/Card';
 import Loader from '../../Shared/Loader/Loader';
@@ -28,18 +28,21 @@ function ClientProjects() {
     name: '',
     description: '',
     startDate: '',
-    deadline: '',
+    endDate: '',
     budget: '',
     requirements: '',
     priority: 'Medium',
-    category: ''
+    tags: []
   });
+
+  // ✅ FILE UPLOAD STATE
+  const [selectedFiles, setSelectedFiles] = useState([]);
 
   // Send to admin form data
   const [sendData, setSendData] = useState({
     message: '',
     urgency: 'Normal',
-    requestType: 'Review' // Review, Approval, Discussion, etc.
+    requestType: 'Review'
   });
 
   useEffect(() => {
@@ -51,23 +54,21 @@ function ClientProjects() {
   }, [searchTerm, filterStatus, projects]);
 
   const fetchProjects = async () => {
-  try {
-    setLoading(true);
-    const response = await clientAPI.getMyProjects();
-    
-    // ✅ FIXED: Backend sends projects in 'data' field
-    const projectsArray = response.data.data || [];
-    
-    console.log('✅ Loaded projects:', projectsArray.length);
-    setProjects(projectsArray);
-    setFilteredProjects(projectsArray);
-  } catch (error) {
-    console.error('Error fetching projects:', error);
-    toast.error('Failed to load projects');
-  } finally {
-    setLoading(false);
-  }
-};
+    try {
+      setLoading(true);
+      const response = await clientAPI.getMyProjects();
+      const projectsArray = response.data.data || [];
+      
+      console.log('✅ Loaded projects:', projectsArray.length);
+      setProjects(projectsArray);
+      setFilteredProjects(projectsArray);
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+      toast.error('Failed to load projects');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filterProjects = () => {
     let filtered = [...projects];
@@ -86,7 +87,22 @@ function ClientProjects() {
     setFilteredProjects(filtered);
   };
 
-  // Handle Create Project
+  // ✅ HANDLE FILE SELECTION
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length + selectedFiles.length > 10) {
+      toast.error('Maximum 10 files allowed');
+      return;
+    }
+    setSelectedFiles([...selectedFiles, ...files]);
+  };
+
+  // ✅ REMOVE SELECTED FILE
+  const removeFile = (index) => {
+    setSelectedFiles(selectedFiles.filter((_, i) => i !== index));
+  };
+
+  // ✅ HANDLE CREATE PROJECT WITH FILES
   const handleCreateProject = async (e) => {
     e.preventDefault();
     
@@ -94,25 +110,36 @@ function ClientProjects() {
       setSubmitting(true);
 
       // Validation
-      if (!newProject.name || !newProject.description || !newProject.startDate || !newProject.deadline) {
+      if (!newProject.name || !newProject.description || !newProject.startDate || !newProject.endDate) {
         toast.error('Please fill all required fields');
         return;
       }
 
-      const projectData = {
-        ...newProject,
-        status: 'Planning', // Default status
-        progress: 0,
-        tasksCompleted: 0,
-        totalTasks: 0,
-        milestonesCompleted: 0,
-        totalMilestones: 0
-      };
-
-      console.log('Creating project:', projectData);
-      const response = await clientAPI.createProject(projectData);
+      // ✅ CREATE FORMDATA FOR FILE UPLOAD
+      const formData = new FormData();
       
-      toast.success('Project created successfully!');
+      // Add project data
+      formData.append('name', newProject.name);
+      formData.append('description', newProject.description);
+      formData.append('startDate', newProject.startDate);
+      formData.append('endDate', newProject.endDate);
+      formData.append('budget', newProject.budget || 0);
+      formData.append('priority', newProject.priority);
+      formData.append('requirements', newProject.requirements || '');
+      
+      if (newProject.tags && newProject.tags.length > 0) {
+        formData.append('tags', JSON.stringify(newProject.tags));
+      }
+
+      // ✅ Add files to FormData
+      selectedFiles.forEach(file => {
+        formData.append('files', file);
+      });
+
+      console.log('Creating project with', selectedFiles.length, 'files');
+      const response = await clientAPI.createProject(formData);
+      
+      toast.success('Project created successfully! Waiting for admin approval.');
       
       // Refresh projects list
       await fetchProjects();
@@ -123,12 +150,13 @@ function ClientProjects() {
         name: '',
         description: '',
         startDate: '',
-        deadline: '',
+        endDate: '',
         budget: '',
         requirements: '',
         priority: 'Medium',
-        category: ''
+        tags: []
       });
+      setSelectedFiles([]); // ✅ Reset files
 
     } catch (error) {
       console.error('Error creating project:', error);
@@ -151,18 +179,13 @@ function ClientProjects() {
       }
 
       const requestData = {
-        projectId: selectedProject._id,
-        projectName: selectedProject.name,
         message: sendData.message,
         urgency: sendData.urgency,
-        requestType: sendData.requestType,
-        clientInfo: {
-          // Add any client info you want to send
-        }
+        requestType: sendData.requestType
       };
 
       console.log('Sending to admin:', requestData);
-      const response = await clientAPI.sendProjectToAdmin(requestData);
+      await clientAPI.sendProjectToAdmin(selectedProject._id, requestData);
       
       toast.success('Project sent to admin successfully!');
       
@@ -293,7 +316,7 @@ function ClientProjects() {
       {filteredProjects.length > 0 ? (
         <div className={`projects-container ${viewMode}`}>
           {filteredProjects.map((project) => {
-            const daysLeft = calculateDaysLeft(project.deadline);
+            const daysLeft = calculateDaysLeft(project.endDate);
             return (
               <Card key={project._id} className="project-card">
                 <div className="project-header">
@@ -312,47 +335,20 @@ function ClientProjects() {
                   <p className="project-description">{project.description}</p>
                 </div>
 
+                {/* ✅ SHOW PROGRESS BAR */}
                 <div className="project-progress">
                   <div className="progress-header">
                     <span>Progress</span>
-                    <span className="progress-percentage">{project.progress}%</span>
+                    <span className="progress-percentage">{project.progress || 0}%</span>
                   </div>
                   <div className="progress-bar">
                     <div 
                       className="progress-fill"
                       style={{ 
-                        width: `${project.progress}%`,
-                        backgroundColor: getProgressColor(project.progress)
+                        width: `${project.progress || 0}%`,
+                        backgroundColor: getProgressColor(project.progress || 0)
                       }}
                     ></div>
-                  </div>
-                </div>
-
-                <div className="client-project-stats">
-                  <div className="client-stat-item">
-                    <BiTask className="client-stat-icon" />
-                    <div className="client-stat-details">
-                      <span className="client-stat-value">{project.tasksCompleted}/{project.totalTasks}</span>
-                      <span className="client-stat-label">Tasks</span>
-                    </div>
-                  </div>
-
-                  <div className="client-stat-item">
-                    <FiCheckCircle className="client-stat-icon" />
-                    <div className="client-stat-details">
-                      <span className="client-stat-value">{project.milestonesCompleted}/{project.totalMilestones}</span>
-                      <span className="client-stat-label">Milestones</span>
-                    </div>
-                  </div>
-
-                  <div className="client-stat-item">
-                    <FiClock className="client-stat-icon" />
-                    <div className="client-stat-details">
-                      <span className={`client-stat-value ${daysLeft <= 7 ? 'urgent' : ''}`}>
-                        {daysLeft > 0 ? `${daysLeft} days` : 'Overdue'}
-                      </span>
-                      <span className="client-stat-label">Remaining</span>
-                    </div>
                   </div>
                 </div>
 
@@ -362,7 +358,7 @@ function ClientProjects() {
                     <span className="date-value">{formatDate(project.startDate)}</span>
                     <span className="date-separator">•</span>
                     <span className="date-label">End:</span>
-                    <span className="date-value">{formatDate(project.deadline)}</span>
+                    <span className="date-value">{formatDate(project.endDate)}</span>
                   </div>
                   
                   <div className="project-actions">
@@ -410,7 +406,7 @@ function ClientProjects() {
       {/* Create Project Modal */}
       {showCreateModal && (
         <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2>Create New Project</h2>
               <button 
@@ -456,11 +452,11 @@ function ClientProjects() {
                 </div>
 
                 <div className="form-group">
-                  <label>Deadline *</label>
+                  <label>End Date *</label>
                   <input
                     type="date"
-                    value={newProject.deadline}
-                    onChange={(e) => setNewProject({...newProject, deadline: e.target.value})}
+                    value={newProject.endDate}
+                    onChange={(e) => setNewProject({...newProject, endDate: e.target.value})}
                     required
                   />
                 </div>
@@ -484,18 +480,8 @@ function ClientProjects() {
                     <option value="Low">Low</option>
                     <option value="Medium">Medium</option>
                     <option value="High">High</option>
-                    <option value="Critical">Urgent</option>
+                    <option value="Urgent">Urgent</option>
                   </select>
-                </div>
-
-                <div className="form-group full-width">
-                  <label>Category</label>
-                  <input
-                    type="text"
-                    value={newProject.category}
-                    onChange={(e) => setNewProject({...newProject, category: e.target.value})}
-                    placeholder="e.g., Web Development, Mobile App, etc."
-                  />
                 </div>
 
                 <div className="form-group full-width">
@@ -506,6 +492,52 @@ function ClientProjects() {
                     placeholder="List project requirements (optional)"
                     rows="3"
                   />
+                </div>
+
+                {/* ✅ FILE UPLOAD SECTION */}
+                <div className="form-group full-width">
+                  <label>
+                    <FiPaperclip /> Attach Files (Optional - Max 10 files)
+                  </label>
+                  <div className="file-upload-area">
+                    <input
+                      type="file"
+                      multiple
+                      onChange={handleFileChange}
+                      id="file-input"
+                      style={{ display: 'none' }}
+                      accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.zip,.rar"
+                    />
+                    <label htmlFor="file-input" className="file-upload-btn">
+                      <FiPaperclip />
+                      Choose Files
+                    </label>
+                    <span className="file-count">
+                      {selectedFiles.length} file(s) selected
+                    </span>
+                  </div>
+
+                  {/* ✅ SELECTED FILES LIST */}
+                  {selectedFiles.length > 0 && (
+                    <div className="selected-files-list">
+                      {selectedFiles.map((file, index) => (
+                        <div key={index} className="file-item">
+                          <FiPaperclip className="file-icon" />
+                          <span className="file-name">{file.name}</span>
+                          <span className="file-size">
+                            ({(file.size / 1024).toFixed(2)} KB)
+                          </span>
+                          <button
+                            type="button"
+                            className="remove-file-btn"
+                            onClick={() => removeFile(index)}
+                          >
+                            <FiTrash2 />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -540,7 +572,7 @@ function ClientProjects() {
         </div>
       )}
 
-      {/* Send to Admin Modal */}
+      {/* Send to Admin Modal - UNCHANGED */}
       {showSendModal && selectedProject && (
         <div className="modal-overlay" onClick={() => setShowSendModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
