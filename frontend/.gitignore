@@ -22,3 +22,13 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# ✅ IMPORTANT: Environment variables (contains API keys)
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+
+# ✅ Keep the example file (safe to commit)
+!.env.example
