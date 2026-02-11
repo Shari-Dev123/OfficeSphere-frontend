@@ -1,7 +1,14 @@
 // utils/locationUtils.js
-// ✅ FIXED - Google Maps Geocoding with OpenStreetMap Fallback
+// ✅ SECURE VERSION - API keys from environment variables
 
-const GOOGLE_MAPS_API_KEY = 'AIzaSyAOVYRIgupAurZup5y1PRh8Ismb1A3lLao';
+// ✅ SECURE: Get API key from environment variable
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+
+// Validate API key is present
+if (!GOOGLE_MAPS_API_KEY) {
+  console.warn('⚠️ WARNING: VITE_GOOGLE_MAPS_API_KEY not found in environment variables');
+  console.warn('📝 Add it to your .env file: VITE_GOOGLE_MAPS_API_KEY=your-api-key-here');
+}
 
 /**
  * Convert coordinates to readable address using Google Geocoding API
@@ -14,76 +21,88 @@ export const getAddressFromCoordinates = async (latitude, longitude) => {
   try {
     console.log('🌍 Geocoding coordinates:', { latitude, longitude });
 
-    // TRY GOOGLE GEOCODING FIRST
-    const googleResponse = await fetch(
-      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${GOOGLE_MAPS_API_KEY}`
-    );
+    // TRY GOOGLE GEOCODING FIRST (if API key is available)
+    if (GOOGLE_MAPS_API_KEY && GOOGLE_MAPS_API_KEY !== 'undefined') {
+      try {
+        const googleResponse = await fetch(
+          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${GOOGLE_MAPS_API_KEY}`
+        );
 
-    const googleData = await googleResponse.json();
-    console.log('📍 Google Geocoding Status:', googleData.status);
+        const googleData = await googleResponse.json();
+        console.log('📍 Google Geocoding Status:', googleData.status);
 
-    if (googleData.status === 'OK' && googleData.results && googleData.results.length > 0) {
-      const result = googleData.results[0];
-      
-      // Extract detailed address components
-      const addressComponents = result.address_components;
-      
-      let street = '';
-      let area = '';
-      let city = '';
-      let state = '';
-      let country = '';
-      let postalCode = '';
+        if (googleData.status === 'OK' && googleData.results && googleData.results.length > 0) {
+          const result = googleData.results[0];
+          
+          // Extract detailed address components
+          const addressComponents = result.address_components;
+          
+          let street = '';
+          let area = '';
+          let city = '';
+          let state = '';
+          let country = '';
+          let postalCode = '';
 
-      addressComponents.forEach(component => {
-        const types = component.types;
-        
-        if (types.includes('street_number') || types.includes('route')) {
-          street += component.long_name + ' ';
-        }
-        if (types.includes('sublocality') || types.includes('neighborhood')) {
-          area = component.long_name;
-        }
-        if (types.includes('locality')) {
-          city = component.long_name;
-        }
-        if (types.includes('administrative_area_level_1')) {
-          state = component.long_name;
-        }
-        if (types.includes('country')) {
-          country = component.long_name;
-        }
-        if (types.includes('postal_code')) {
-          postalCode = component.long_name;
-        }
-      });
+          addressComponents.forEach(component => {
+            const types = component.types;
+            
+            if (types.includes('street_number') || types.includes('route')) {
+              street += component.long_name + ' ';
+            }
+            if (types.includes('sublocality') || types.includes('neighborhood')) {
+              area = component.long_name;
+            }
+            if (types.includes('locality')) {
+              city = component.long_name;
+            }
+            if (types.includes('administrative_area_level_1')) {
+              state = component.long_name;
+            }
+            if (types.includes('country')) {
+              country = component.long_name;
+            }
+            if (types.includes('postal_code')) {
+              postalCode = component.long_name;
+            }
+          });
 
-      console.log('✅ Google Geocoding Success:', {
-        city,
-        state,
-        country
-      });
+          console.log('✅ Google Geocoding Success:', {
+            city,
+            state,
+            country
+          });
 
-      return {
-        success: true,
-        source: 'google',
-        formattedAddress: result.formatted_address,
-        street: street.trim(),
-        area: area,
-        city: city,
-        state: state,
-        country: country,
-        postalCode: postalCode,
-        placeId: result.place_id
-      };
-    } 
+          return {
+            success: true,
+            source: 'google',
+            formattedAddress: result.formatted_address,
+            street: street.trim(),
+            area: area,
+            city: city,
+            state: state,
+            country: country,
+            postalCode: postalCode,
+            placeId: result.place_id
+          };
+        } else {
+          console.warn('⚠️ Google Geocoding returned:', googleData.status);
+          throw new Error(`Google Geocoding failed: ${googleData.status}`);
+        }
+      } catch (googleError) {
+        console.error('❌ Google Geocoding error:', googleError.message);
+        // Fall through to OpenStreetMap
+      }
+    } else {
+      console.log('⚠️ No Google Maps API key - using OpenStreetMap only');
+    }
     
-    // GOOGLE FAILED - TRY OPENSTREETMAP FALLBACK
-    console.warn('⚠️ Google Geocoding failed, trying OpenStreetMap...');
+    // FALLBACK TO OPENSTREETMAP
+    console.log('🔄 Using OpenStreetMap...');
     return await getAddressFromOpenStreetMap(latitude, longitude);
 
   } catch (error) {
-    console.error('❌ Google Geocoding error:', error);
+    console.error('❌ Geocoding error:', error);
     
     // FALLBACK TO OPENSTREETMAP
     try {
