@@ -267,7 +267,7 @@ function AdminDashboard() {
   return (
     <div className="admin-dashboard">
       {/* Header */}
-      <div className="dashboard-header">
+      <div className="Admin-dashboard-header">
         <div>
           <h1>Admin Dashboard</h1>
           <p>Welcome back! Here's what's happening today.</p>
@@ -289,7 +289,7 @@ function AdminDashboard() {
         </div>
         <div className="dashboard-actions">
           <button
-            className="btn btn-primary"
+            className="Admin-btn Admin-btn-primary"
             onClick={handleManualRefresh}
             disabled={loading || refreshing}
           >
@@ -334,10 +334,10 @@ function AdminDashboard() {
       <div className="dashboard-content">
         {/* Recent Projects Card */}
         <div className="dashboard-card projects-overview-card">
-          <div className="card-header">
+          <div className="Admin-card-header">
             <h3><FiBriefcase /> Recent Projects ({recentProjects.length})</h3>
             <button
-              className="view-all-btn"
+              className="AdminDashboard-view-all-btn"
               onClick={() => navigate('/admin/projects')}
             >
               View All <FiArrowRight />
@@ -349,7 +349,7 @@ function AdminDashboard() {
                 {recentProjects.map((project) => (
                   <div
                     key={project._id}
-                    className="project-item"
+                    className="AdminDashboard-project-item"
                     onClick={() => navigate(`/admin/projects/${project._id}`)}
                     style={{ cursor: 'pointer' }}
                   >
@@ -376,7 +376,7 @@ function AdminDashboard() {
                 <FiBriefcase style={{ fontSize: '48px', color: '#d1d5db' }} />
                 <p>No projects yet</p>
                 <button
-                  className="btn btn-primary"
+                  className="Admin-btn Admin-btn-primary"
                   onClick={() => navigate('/admin/projects/add')}
                   style={{ marginTop: '12px' }}
                 >
@@ -389,7 +389,7 @@ function AdminDashboard() {
 
         {/* ✅ IMPROVED: Real-time Attendance with Live Badge */}
         <div className="dashboard-card">
-          <div className="card-header">
+          <div className="Admin-card-header">
             <h3>Today's Attendance</h3>
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
               <span className="badge badge-success" style={{
@@ -408,7 +408,7 @@ function AdminDashboard() {
                 Live
               </span>
               <button
-                className="view-all-btn"
+                className="AdminDashboard-view-all-btn"
                 onClick={() => navigate('/admin/attendance')}
               >
                 View All <FiArrowRight />
@@ -420,12 +420,12 @@ function AdminDashboard() {
               <div className="attendance-list">
                 {attendanceData.map((record, index) => (
                   <div key={index} className="attendance-item">
-                    <div className="employee-info">
-                      <div className="employee-avatar">
+                    <div className="AdminDashboard-employee-info">
+                      <div className="AdminDashboard-employee-avatar">
                         {record.employeeName?.charAt(0) || "E"}
                       </div>
                       <div>
-                        <p className="employee-name">{record.employeeName || 'Unknown'}</p>
+                        <p className="AdminDashboard-employee-name">{record.employeeName || 'Unknown'}</p>
                         <p className="check-time">
                           {formatTime(record.checkIn)}
                           {record.checkOut && (
@@ -434,7 +434,7 @@ function AdminDashboard() {
                         </p>
                       </div>
                     </div>
-                    <span className={`status-badge ${record.status}`}>
+                    <span className={`AdminDashboard-status-badge ${record.status}`}>
                       {record.status === "present"
                         ? "Present"
                         : record.status === "late"
@@ -458,7 +458,7 @@ function AdminDashboard() {
 
         {/* Recent Activity */}
         <div className="dashboard-card">
-          <div className="card-header">
+          <div className="Admin-card-header">
             <h3>Recent Activity</h3>
           </div>
           <div className="card-body">
@@ -470,8 +470,8 @@ function AdminDashboard() {
                       <FiClock />
                     </div>
                     <div className="activity-content">
-                      <p className="activity-text">{activity.description}</p>
-                      <p className="activity-time">{activity.time}</p>
+                      <p className="AdminDashboard-activity-text">{activity.description}</p>
+                      <p className="AdminDashboard-activity-time">{activity.time}</p>
                     </div>
                   </div>
                 ))}
@@ -486,7 +486,7 @@ function AdminDashboard() {
 
         {/* Quick Actions */}
         <div className="dashboard-card quick-actions-card">
-          <div className="card-header">
+          <div className="Admin-card-header">
             <h3>Quick Actions</h3>
           </div>
           <div className="card-body">

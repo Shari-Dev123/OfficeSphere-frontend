@@ -10,11 +10,16 @@
 }
 
 /* Header */
-.dashboard-header {
+.Admin-dashboard-header {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e5e7eb;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 32px;
 }
 
 /* Projects Card */
@@ -28,17 +33,20 @@
   gap: 12px;
 }
 
-.project-item {
+.AdminDashboard-project-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px;
-  background: #f9fafb;
+  gap: 8px;
+  padding: 12px 20px;
+  background: #f3f4f6;
   border-radius: 8px;
+  color: #4b5563;
+  font-size: 13px;
   transition: all 0.2s;
 }
 
-.project-item:hover {
+.AdminDashboard-project-item:hover {
   background: #f3f4f6;
   transform: translateX(4px);
 }
@@ -192,14 +200,14 @@
   color: #2563eb;
 }
 
-.dashboard-header h1 {
+.Admin-dashboard-header h1 {
   font-size: 28px;
   font-weight: 700;
   color: #1a1a2e;
   margin: 0 0 8px 0;
 }
 
-.dashboard-header p {
+.Admin-dashboard-header p {
   color: #6b7280;
   font-size: 14px;
   margin: 0;
@@ -241,17 +249,57 @@
   align-items: center;
 }
 
-.dashboard-card .card-header h3 {
+
+
+.dashboard-card  {
   font-size: 18px;
   font-weight: 600;
   color: #1a1a2e;
   margin: 0;
 }
 
+.Admin-card-header{
+  padding: 20px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.Admin-card-header h3{
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.Admin-card-header h3 svg {
+  font-size: 20px;
+}
+
 .dashboard-card .card-body {
   padding: 20px;
   max-height: 400px;
   overflow-y: auto;
+}
+
+.AdminDashboard-view-all-btn {
+  margin-top: 8px;
+  background: transparent;
+  color: #667eea;
+  border: none;
+  padding: 8px 0;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+}
+
+.AdminDashboard-view-all-btn:hover {
+  text-decoration: underline;
 }
 
 /* Attendance List */
@@ -275,26 +323,27 @@
   background: #f3f4f6;
 }
 
-.employee-info {
+.AdminDashboard-employee-info {
   display: flex;
+  flex-direction: row;
   align-items: center;
   gap: 12px;
 }
 
-.employee-avatar {
-  width: 40px;
-  height: 40px;
+.AdminDashboard-employee-avatar {
+  width: 50px;
+  height: 50px;
+  color: white;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
   font-weight: 600;
-  font-size: 16px;
+  font-size: 18px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-.employee-name {
+.AdminDashboard-employee-name {
   font-weight: 600;
   color: #1a1a2e;
   margin: 0 0 4px 0;
@@ -307,24 +356,25 @@
   margin: 0;
 }
 
-.status-badge {
+.AdminDashboard-status-badge {
   padding: 4px 12px;
   border-radius: 12px;
   font-size: 12px;
   font-weight: 600;
+  white-space: nowrap;
 }
 
-.status-badge.present {
+.AdminDashboard-status-badge.present {
   background: #d1fae5;
   color: #065f46;
 }
 
-.status-badge.late {
+.AdminDashboard-status-badge.late {
   background: #fef3c7;
   color: #92400e;
 }
 
-.status-badge.absent {
+.AdminDashboard-status-badge.absent {
   background: #fee2e2;
   color: #991b1b;
 }
@@ -362,15 +412,15 @@
   flex: 1;
 }
 
-.activity-text {
+.AdminDashboard-activity-text {
   font-size: 14px;
-  color: #1a1a2e;
+  color: #2d3748;
   margin: 0 0 4px 0;
 }
 
-.activity-time {
+.AdminDashboard-activity-time {
   font-size: 12px;
-  color: #6b7280;
+  color: #718096;
   margin: 0;
 }
 
@@ -472,25 +522,29 @@
 }
 
 /* Buttons */
-.btn {
+.Admin-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 10px 20px;
-  border: none;
+  line-height: 1.5;
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
   border-radius: 8px;
   font-weight: 600;
   font-size: 14px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
   gap: 8px;
   transition: all 0.3s;
 }
 
-.btn-primary {
+.Admin-btn-primary {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
 }
 
-.btn-primary:hover {
+.Admin-btn-primary:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
@@ -507,7 +561,7 @@
     padding: 16px;
   }
 
-  .dashboard-header {
+  .Admin-dashboard-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
