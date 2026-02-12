@@ -163,6 +163,7 @@ export const adminAPI = {
   deleteMeeting: (id) => api.delete(`/meetings/admin/${id}`),
   addMeetingMinutes: (id, data) =>
     api.post(`/meetings/admin/${id}/minutes`, data),
+  // getMyMeetings: () => api.get('/employee/meetings'),
 
   // ============ Reports ============
   generateReport: (data) => api.post("/reports/admin/generate", data),
@@ -173,7 +174,8 @@ export const adminAPI = {
   getAttendanceReportData: (params) =>
     api.get("/reports/admin/attendance", { params }),
   getEmployeeReport: (params) => api.get("/reports/admin/employee", { params }),
-  getDailyReports: (params) => api.get("/reports/admin/daily", { params }),
+  // In adminAPI object
+  getDailyReports: (params) => api.get('/reports/admin/daily', { params }), 
   exportReport: (reportType, params) =>
     api.get(`/reports/admin/${reportType}/export`, {
       params,
@@ -199,7 +201,7 @@ export const employeeAPI = {
   markAllNotificationsAsRead: () => api.patch('/employee/notifications/mark-all-read'),
   deleteNotification: (id) => api.delete(`/employee/notifications/${id}`),
   deleteNotifications: (ids) => api.post('/employee/notifications/delete-many', { ids }),
-  
+
   // ============ Attendance ============
   checkIn: (data) => api.post("/attendance/employee/attendance/checkin", data),
   checkOut: (data) =>
@@ -319,4 +321,161 @@ export const uploadAPI = {
       },
     });
   },
+};
+// ============================================
+// API UTILITY - ADD THESE TO utils/api.js
+// ============================================
+
+import axios from 'axios';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+// Create axios instance
+const api = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
+
+// Add token to requests
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// ============================================
+// ✅ CLIENT API FUNCTIONS
+// ============================================
+
+export const clientAPI = {
+  // Get client's projects
+  getMyProjects: () => api.get('/client/projects'),
+
+  // Get single project
+  getProject: (id) => api.get(`/client/projects/${id}`),
+
+  // ✅ Create project WITH FILES
+  createProject: (formData) => {
+    // Check if formData contains files
+    if (formData instanceof FormData) {
+      return api.post('/client/projects', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+    }
+    return api.post('/client/projects', formData);
+  },
+
+  // ✅ Upload files to project
+  uploadFiles: (projectId, files) => {
+    const formData = new FormData();
+    files.forEach(file => {
+      formData.append('files', file);
+    });
+    return api.post(`/client/projects/${projectId}/upload`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+  },
+
+  // ✅ Submit feedback
+  submitFeedback: (projectId, feedbackData) => 
+    api.post(`/client/projects/${projectId}/feedback`, feedbackData),
+
+  // ✅ Get project progress
+  getProjectProgress: (projectId) => 
+    api.get(`/client/projects/${projectId}/progress`),
+
+  // ✅ Send to admin
+  sendProjectToAdmin: (projectId, requestData) => 
+    api.post(`/client/projects/${projectId}/send-to-admin`, requestData),
+
+  // Get feedback history
+  getFeedbackHistory: (projectId) => 
+    api.get(`/client/projects/${projectId}/feedback`)
+};
+
+// ============================================
+// ✅ ADMIN API FUNCTIONS (ADD TO EXISTING)
+// ============================================
+
+export const adminAPI = {
+  // Existing functions...
+  getProjects: (params) => api.get('/admin/projects', { params }),
+  getProject: (id) => api.get(`/admin/projects/${id}`),
+  
+  // ✅ Create project WITH FILES
+  addProject: (formData) => {
+    if (formData instanceof FormData) {
+      return api.post('/admin/projects', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+    }
+    return api.post('/admin/projects', formData);
+  },
+
+  // ✅ Update project WITH FILES
+  updateProject: (id, formData) => {
+    if (formData instanceof FormData) {
+      return api.put(`/admin/projects/${id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+    }
+    return api.put(`/admin/projects/${id}`, formData);
+  },
+
+  deleteProject: (id) => api.delete(`/admin/projects/${id}`),
+
+  // ✅ Upload files to project
+  uploadProjectFiles: (projectId, files) => {
+    const formData = new FormData();
+    files.forEach(file => {
+      formData.append('files', file);
+    });
+    return api.post(`/admin/projects/${projectId}/upload`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+  },
+
+  // ✅ Update progress
+  updateProjectProgress: (projectId, progress) => 
+    api.put(`/admin/projects/${projectId}/progress`, { progress }),
+
+  // ✅ Deliver project WITH FILES
+  deliverProject: (projectId, formData) => {
+    if (formData instanceof FormData) {
+      return api.post(`/admin/projects/${projectId}/deliver`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+    }
+    return api.post(`/admin/projects/${projectId}/deliver`, formData);
+  },
+
+  // ✅ Respond to feedback
+  respondToFeedback: (projectId, feedbackId, response) => 
+    api.put(`/admin/projects/${projectId}/feedback/${feedbackId}`, response),
+
+  // ✅ Get all feedback
+  getAllFeedback: () => api.get('/admin/projects/feedback/all'),
+
+  // Existing functions...
+  getClients: () => api.get('/admin/clients'),
+  getEmployees: () => api.get('/admin/employees')
 };
