@@ -10,7 +10,7 @@ import { toast } from "react-toastify";
 import "./AdminDashboard.css";
 
 function AdminDashboard() {
-  
+
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -237,13 +237,13 @@ function AdminDashboard() {
   // ✅✅✅ NEW: Format location name
   const formatLocation = (record) => {
     // Try to get location from different possible fields
-    const locationName = record.checkInLocation || 
-                        record.checkInLocationDetails?.shortName ||
-                        record.location ||
-                        'Unknown Location';
-    
+    const locationName = record.checkInLocation ||
+      record.checkInLocationDetails?.shortName ||
+      record.location ||
+      'Unknown Location';
+
     console.log('📍 Formatting location for', record.employeeName, ':', locationName);
-    
+
     return locationName;
   };
 
@@ -382,7 +382,7 @@ function AdminDashboard() {
                 ))}
               </div>
             ) : (
-              <div className="empty-state">
+              <div className="AdminClient-empty-state">
                 <FiBriefcase style={{ fontSize: '48px', color: '#d1d5db' }} />
                 <p>No projects yet</p>
                 <button
