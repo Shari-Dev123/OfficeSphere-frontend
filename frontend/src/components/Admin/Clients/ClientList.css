@@ -352,7 +352,9 @@
 }
 
 /* Buttons */
-.btn {
+.AdminClient-btn {
+  white-space: nowrap;
+  user-select: none;
   padding: 10px 20px;
   border: none;
   border-radius: 8px;
@@ -361,16 +363,18 @@
   cursor: pointer;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   transition: all 0.3s;
+  border: 1px solid transparent;
 }
 
-.btn-primary {
+.AdminClient-btn-primary {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
 }
 
-.btn-primary:hover {
+.AdminClient-btn-primary:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }

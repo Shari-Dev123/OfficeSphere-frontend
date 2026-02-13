@@ -150,7 +150,7 @@ function ClientList() {
           <p>Manage your client accounts</p>
         </div>
         <button
-          className="btn btn-primary"
+          className="AdminClient-btn AdminClient-btn-primary"
           onClick={() => navigate("/admin/clients/add")}
         >
           <FiPlus /> Add Client
@@ -270,7 +270,7 @@ function ClientList() {
           </p>
           {!searchTerm && (
             <button
-              className="btn btn-primary"
+              className="AdminClient-btn AdminClient-btn-primary"
               onClick={() => navigate("/admin/clients/add")}
             >
               <FiPlus /> Add First Client
