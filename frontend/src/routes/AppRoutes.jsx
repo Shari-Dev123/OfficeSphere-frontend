@@ -3,12 +3,10 @@ import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import PrivateRoute from "./PrivateRoute";
 import { useAuth } from "../hooks/useAuth";
 
-// Auth Components
-import Login from "../Components/Auth/Login";
+import Login from "../Components/Auth/Login"; // OK if folder is 'Components/Auth'
 import Register from "../Components/Auth/Register";
-
-// Admin Components
 import AdminLayout from "../Components/Shared/Layout/AdminLayout";
+
 import AdminDashboard from "../Components/Admin/Dashboard/AdminDashboard";
 import EmployeeList from "../Components/Admin/Employees/EmployeeList";
 import AddEmployee from "../Components/Admin/Employees/AddEmployee";
@@ -44,7 +42,8 @@ import ClientMeetings from "../Components/Client/Meetings/ClientMeetings";
 import ClientReports from "../Components/Client/Reports/ClientReports";
 import FeedbackForm from "../Components/Client/Feedback/FeedbackForm";
 import ClientProfile from "../Components/Client/Profile/ClientProfile"; // ← ADDED
-import ClientNotifications from "../Components/Client/Clientnotifications/Clientnotifications.jsx"
+import ClientNotifications from "../Components/Client/Clientnotifications/ClientNotifications.jsx";
+
 // Loader
 import Loader from "../Components/Shared/Loader/Loader";
 
