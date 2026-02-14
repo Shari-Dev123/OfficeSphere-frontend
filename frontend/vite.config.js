@@ -1,25 +1,29 @@
-import { defineConfig } from 'vite'
+
 import react from '@vitejs/plugin-react'
-import path from 'path'
+
 
 // https://vitejs.dev/config/
-export default defineConfig({
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+export default {
   plugins: [react()],
-  
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
-      '@components': path.resolve(__dirname, './src/Components'),
-      '@shared': path.resolve(__dirname, './src/Components/Shared'),
-      '@utils': path.resolve(__dirname, './src/utils'),
-      '@context': path.resolve(__dirname, './src/context'),
-      '@hooks': path.resolve(__dirname, './src/hooks'),
-      '@assets': path.resolve(__dirname, './src/assets'),
-      'react': path.resolve(__dirname, './node_modules/react'),
-      'react-dom': path.resolve(__dirname, './node_modules/react-dom'),
+      '@': resolve(__dirname, './src'),
+      '@components': resolve(__dirname, './src/Components'),
+      '@shared': resolve(__dirname, './src/Components/Shared'),
+      '@utils': resolve(__dirname, './src/utils'),
+      '@context': resolve(__dirname, './src/context'),
+      '@hooks': resolve(__dirname, './src/hooks'),
+      '@assets': resolve(__dirname, './src/assets'),
+      'react': resolve(__dirname, './node_modules/react'),
+      'react-dom': resolve(__dirname, './node_modules/react-dom'),
     },
   },
-  
   server: {
     port: 3000,
     open: true,
@@ -47,4 +51,4 @@ export default defineConfig({
   preview: {
     port: 4173,
   },
-})
+}

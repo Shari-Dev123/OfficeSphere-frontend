@@ -294,7 +294,7 @@ export const uploadAPI = {
     return api.post("/upload/avatar", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
-  },
+  }
 
 };
 
