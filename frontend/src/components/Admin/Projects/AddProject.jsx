@@ -10,7 +10,7 @@ function AddProject() {
   const [loading, setLoading] = useState(false);
   const [clients, setClients] = useState([]);
   const [employees, setEmployees] = useState([]);
-  
+
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -60,7 +60,7 @@ function AddProject() {
       ...prev,
       [name]: value
     }));
-    
+
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -112,7 +112,7 @@ function AddProject() {
 
     try {
       setLoading(true);
-      
+
       // ✅ Prepare data to match Project model schema
       const projectData = {
         name: formData.name.trim(),
@@ -148,7 +148,7 @@ function AddProject() {
 
   return (
     <div className="add-project">
-      <div className="page-header">
+      <div className="AdminAddProject-page-header">
         <div>
           <h1>Create New Project</h1>
           <p>Set up a new project for your client</p>
@@ -159,11 +159,11 @@ function AddProject() {
         <form onSubmit={handleSubmit}>
           {/* Project Details */}
           <div className="form-section">
-            <h3 className="section-title">
+            <h3 className="AdminAddProject-section-title">
               <FiBriefcase /> Project Details
             </h3>
             <div className="form-grid">
-              <div className="form-group full-width">
+              <div className="AdminAddProject-form-group full-width">
                 <label>Project Name *</label>
                 <input
                   type="text"
@@ -176,7 +176,7 @@ function AddProject() {
                 {errors.name && <span className="error-message">{errors.name}</span>}
               </div>
 
-              <div className="form-group full-width">
+              <div className="AdminAddProject-form-group full-width">
                 <label>
                   <FiAlignLeft /> Description *
                 </label>
@@ -192,7 +192,7 @@ function AddProject() {
               </div>
 
               {/* ✅ FIXED: Client Dropdown */}
-              <div className="form-group">
+              <div className="AdminAddProject-form-group">
                 <label>
                   <FiUsers /> Client *
                 </label>
@@ -213,7 +213,7 @@ function AddProject() {
               </div>
 
               {/* ✅ NEW: Project Manager (Optional) */}
-              <div className="form-group">
+              <div className="AdminAddProject-form-group">
                 <label>
                   <FiUsers /> Project Manager (Optional)
                 </label>
@@ -235,11 +235,11 @@ function AddProject() {
 
           {/* Timeline & Budget */}
           <div className="form-section">
-            <h3 className="section-title">
+            <h3 className="AdminAddProject-section-title">
               <FiCalendar /> Timeline & Budget
             </h3>
             <div className="form-grid">
-              <div className="form-group">
+              <div className="AdminAddProject-form-group">
                 <label>Start Date *</label>
                 <input
                   type="date"
@@ -250,7 +250,7 @@ function AddProject() {
               </div>
 
               {/* ✅ FIXED: Changed to endDate */}
-              <div className="form-group">
+              <div className="AdminAddProject-form-group">
                 <label>End Date *</label>
                 <input
                   type="date"
@@ -263,7 +263,7 @@ function AddProject() {
               </div>
 
               {/* ✅ FIXED: Budget now required */}
-              <div className="form-group full-width">
+              <div className="AdminAddProject-form-group full-width">
                 <label>
                   <FiDollarSign /> Budget *
                 </label>
@@ -284,12 +284,12 @@ function AddProject() {
 
           {/* Status & Priority */}
           <div className="form-section">
-            <h3 className="section-title">
+            <h3 className="AdminAddProject-section-title">
               <FiFlag /> Status & Priority
             </h3>
             <div className="form-grid">
               {/* ✅ FIXED: Status values match model enum */}
-              <div className="form-group">
+              <div className="AdminAddProject-form-group">
                 <label>Status</label>
                 <select
                   name="status"
@@ -305,7 +305,7 @@ function AddProject() {
               </div>
 
               {/* ✅ FIXED: Priority values match model enum (capitalized) */}
-              <div className="form-group">
+              <div className="AdminAddProject-form-group">
                 <label>Priority</label>
                 <select
                   name="priority"
@@ -323,10 +323,10 @@ function AddProject() {
           </div>
 
           {/* Form Actions */}
-          <div className="form-actions">
+          <div className="AdminAddProject-form-actions">
             <button
               type="button"
-              className="btn btn-secondary"
+              className="AdminAddProject-btn AdminAddProject-btn-secondary"
               onClick={handleCancel}
               disabled={loading}
             >
@@ -334,7 +334,7 @@ function AddProject() {
             </button>
             <button
               type="submit"
-              className="btn btn-primary"
+              className="AdminAddProject-btn AdminAddProject-btn-primary"
               disabled={loading}
             >
               {loading ? (

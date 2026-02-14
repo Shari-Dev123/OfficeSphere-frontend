@@ -7,28 +7,31 @@
 }
 
 /* ==================== Header ==================== */
-.page-header {
+.AdminProject-page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 32px;
+  
 }
 
-.page-header h1 {
+.AdminProject-page-header h1 {
   font-size: 28px;
   font-weight: 600;
   color: #1a1a1a;
   margin: 0 0 4px 0;
 }
 
-.page-header p {
+.AdminProject-page-header p {
   font-size: 14px;
   color: #666;
   margin: 0;
 }
 
 /* ==================== Filters ==================== */
-.filters-section {
+.AdminProject-filters-section {
+  border: 2px solid #e5e7eb;
+  animation: slideDown 0.3s ease-out;
   display: flex;
   gap: 16px;
   margin-bottom: 24px;
@@ -101,7 +104,11 @@
   margin-bottom: 24px;
 }
 
-.stat-item {
+.AdminProject-stat-item {
+  border-radius: 12px;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
   background: white;
   padding: 16px;
   border-radius: 8px;
@@ -111,22 +118,22 @@
   gap: 4px;
 }
 
-.stat-label {
-  font-size: 12px;
+.AdminProject-stat-label {
+  font-size: 14px;
   color: #666;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-.stat-value {
-  font-size: 24px;
-  font-weight: 600;
+.AdminProject-stat-value {
+  font-size: 32px;
+  font-weight: bold;
   color: #1a1a1a;
 }
 
-.stat-value.stat-info { color: #3b82f6; }
-.stat-value.stat-success { color: #10b981; }
-.stat-value.stat-warning { color: #f59e0b; }
+.AdminProject-stat-value.stat-info { color: #3b82f6; }
+.AdminProject-stat-value.stat-success { color: #10b981; }
+.AdminProject-stat-value.stat-warning { color: #f59e0b; }
 
 /* ==================== Project Grid ==================== */
 .project-grid {
@@ -415,31 +422,32 @@
 }
 
 /* ==================== Empty State ==================== */
-.empty-state {
-  background: white;
-  border: 2px dashed #e0e0e0;
-  border-radius: 12px;
-  padding: 60px 20px;
+.AdminProject-empty-state {
+  padding: 80px 20px;
   text-align: center;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 2px dashed #e0e0e0;
 }
 
-.empty-icon {
-  font-size: 48px;
+.AdminProject-empty-icon {
+  font-size: 64px;
   color: #d1d5db;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 
-.empty-state h3 {
+.AdminProject-empty-state h3 {
   font-size: 20px;
   font-weight: 600;
   color: #1a1a1a;
   margin: 0 0 8px 0;
 }
 
-.empty-state p {
+.AdminProject-empty-state p {
   font-size: 14px;
-  color: #666;
-  margin: 0 0 20px 0;
+  color: #9ca3af;
+  margin: 10px;
 }
 
 /* ==================== Loading State ==================== */
@@ -467,11 +475,15 @@
 }
 
 /* ==================== Buttons ==================== */
-.btn {
+.AdminProject-btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
   padding: 10px 20px;
+  line-height: 1.5;
+  white-space: nowrap;
+  user-select: none;
+  gap: 8px;
   border: none;
   border-radius: 8px;
   font-size: 14px;
@@ -480,12 +492,12 @@
   transition: all 0.2s;
 }
 
-.btn-primary {
+.AdminProject-btn-primary {
   background: #3b82f6;
   color: white;
 }
 
-.btn-primary:hover {
+.AdminProject-btn-primary:hover {
   background: #2563eb;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
@@ -503,7 +515,7 @@
     gap: 16px;
   }
 
-  .filters-section {
+  .AdminProject-filters-section {
     flex-direction: column;
   }
 

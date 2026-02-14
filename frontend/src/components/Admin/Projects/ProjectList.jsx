@@ -232,18 +232,18 @@ function ProjectList() {
   return (
     <div className="project-list">
       {/* Header */}
-      <div className="page-header">
+      <div className="AdminProject-page-header">
         <div>
           <h1>Projects</h1>
           <p>Manage and track your projects ({projects.length} total)</p>
         </div>
-        <button className="btn btn-primary" onClick={() => navigate('/admin/projects/add')}>
+        <button className="AdminProject-btn AdminProject-btn-primary" onClick={() => navigate('/admin/projects/add')}>
           <FiPlus /> New Project
         </button>
       </div>
 
       {/* Filters */}
-      <div className="filters-section">
+      <div className="AdminProject-filters-section">
         <div className="search-bar">
           <FiSearch className="search-icon" />
           <input
@@ -290,31 +290,31 @@ function ProjectList() {
 
       {/* Project Stats */}
       <div className="project-stats">
-        <div className="stat-item">
-          <span className="stat-label">Total Projects</span>
-          <span className="stat-value">{projects.length}</span>
+        <div className="AdminProject-stat-item">
+          <span className="AdminProject-stat-label">Total Projects</span>
+          <span className="AdminProject-stat-value">{projects.length}</span>
         </div>
-        <div className="stat-item">
-          <span className="stat-label">Planning</span>
-          <span className="stat-value stat-info">
+        <div className="AdminProject-stat-item">
+          <span className="AdminProject-stat-label">Planning</span>
+          <span className="AdminProject-stat-value stat-info">
             {projects.filter(p => p.status === 'Planning').length}
           </span>
         </div>
-        <div className="stat-item">
-          <span className="stat-label">In Progress</span>
-          <span className="stat-value stat-success">
+        <div className="AdminProject-stat-item">
+          <span className="AdminProject-stat-label">In Progress</span>
+          <span className="AdminProject-stat-value stat-success">
             {projects.filter(p => p.status === 'In Progress').length}
           </span>
         </div>
-        <div className="stat-item">
-          <span className="stat-label">Completed</span>
-          <span className="stat-value stat-info">
+        <div className="AdminProject-stat-item">
+          <span className="AdminProject-stat-label">Completed</span>
+          <span className="AdminProject-stat-value stat-info">
             {projects.filter(p => p.status === 'Completed').length}
           </span>
         </div>
-        <div className="stat-item">
-          <span className="stat-label">On Hold</span>
-          <span className="stat-value stat-warning">
+        <div className="AdminProject-stat-item">
+          <span className="AdminProject-stat-label">On Hold</span>
+          <span className="AdminProject-stat-value stat-warning">
             {projects.filter(p => p.status === 'On Hold').length}
           </span>
         </div>
@@ -456,8 +456,8 @@ function ProjectList() {
           ))}
         </div>
       ) : (
-        <div className="empty-state">
-          <div className="empty-icon">
+        <div className="AdminProject-empty-state">
+          <div className="AdminProject-empty-icon">
             <FiPlus />
           </div>
           <h3>No Projects Found</h3>
@@ -467,7 +467,7 @@ function ProjectList() {
               : 'Start by creating your first project'}
           </p>
           {!searchTerm && filterStatus === 'all' && (
-            <button className="btn btn-primary" onClick={() => navigate('/admin/projects/add')}>
+            <button className="AdminProject-btn AdminProject-btn-primary" onClick={() => navigate('/admin/projects/add')}>
               <FiPlus /> Create First Project
             </button>
           )}

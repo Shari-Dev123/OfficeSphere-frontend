@@ -382,7 +382,7 @@ function AdminDashboard() {
                 ))}
               </div>
             ) : (
-              <div className="AdminClient-empty-state">
+              <div className="AdminDashboard-empty-state">
                 <FiBriefcase style={{ fontSize: '48px', color: '#d1d5db' }} />
                 <p>No projects yet</p>
                 <button
@@ -455,7 +455,7 @@ function AdminDashboard() {
                 ))}
               </div>
             ) : (
-              <div className="empty-state">
+              <div className="AdminDashboard-empty-state">
                 <FiUserCheck style={{ fontSize: '32px', color: '#d1d5db' }} />
                 <p>No attendance records yet</p>
                 <p style={{ fontSize: '12px', color: '#999', marginTop: '8px' }}>
@@ -487,7 +487,7 @@ function AdminDashboard() {
                 ))}
               </div>
             ) : (
-              <div className="empty-state">
+              <div className="AdminDashboard-empty-state">
                 <p>No recent activity</p>
               </div>
             )}
