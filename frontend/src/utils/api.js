@@ -155,12 +155,8 @@ export const adminAPI = {
   scheduleMeeting: (data) => api.post("/meetings/admin", data),
   updateMeeting: (id, data) => api.put(`/meetings/admin/${id}`, data),
   deleteMeeting: (id) => api.delete(`/meetings/admin/${id}`),
-<<<<<<< HEAD
   addMeetingMinutes: (id, data) =>
     api.post(`/meetings/admin/${id}/minutes`, data),
-=======
-  addMeetingMinutes: (id, data) => api.post(`/meetings/admin/${id}/minutes`, data),
->>>>>>> a10bdaf (deploy)
 
   // Reports
   generateReport: (data) => api.post("/reports/admin/generate", data),
@@ -168,11 +164,7 @@ export const adminAPI = {
   getProductivityReport: (params) => api.get("/reports/admin/productivity", { params }),
   getAttendanceReportData: (params) => api.get("/reports/admin/attendance", { params }),
   getEmployeeReport: (params) => api.get("/reports/admin/employee", { params }),
-<<<<<<< HEAD
   getDailyReports: (params) => api.get("/reports/admin/daily", { params }),
-=======
-  getDailyReports: (params) => api.get('/reports/admin/daily', { params }),
->>>>>>> a10bdaf (deploy)
   exportReport: (reportType, params) =>
     api.get(`/reports/admin/${reportType}/export`, { params, responseType: "blob" }),
 
@@ -191,13 +183,8 @@ export const employeeAPI = {
   markAllNotificationsAsRead: () => api.patch('/employee/notifications/mark-all-read'),
   deleteNotification: (id) => api.delete(`/employee/notifications/${id}`),
   deleteNotifications: (ids) => api.post('/employee/notifications/delete-many', { ids }),
-<<<<<<< HEAD
-  
-  // ============ Attendance ============
-=======
 
   // Attendance
->>>>>>> a10bdaf (deploy)
   checkIn: (data) => api.post("/attendance/employee/attendance/checkin", data),
   checkOut: (data) => api.post("/attendance/employee/attendance/checkout", data),
   getMyAttendance: (params) => api.get("/attendance/employee", { params }),
@@ -308,8 +295,6 @@ export const uploadAPI = {
       headers: { "Content-Type": "multipart/form-data" },
     });
   },
-<<<<<<< HEAD
+
 };
-=======
-};
->>>>>>> a10bdaf (deploy)
+
