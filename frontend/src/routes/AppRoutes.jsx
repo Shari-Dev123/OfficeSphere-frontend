@@ -22,7 +22,7 @@ import MeetingList from "../Components/Admin/Meetings/MeetingList";
 import ReportGenerator from "../Components/Admin/Reports/ReportGenerator";
 import AdminSettings from "../Components/Admin/Settings/AdminSettings"; // ← ADDED
 import AdminNotifications from '../Components/Admin/AdminNotifications/AdminNotifications.jsx'
-import EmployeeNotifications from '../Components/Employee/EmployeeNotifications/EmployeeNotifications.jsx';
+import EmployeeNotifications from '../Components/Employee/Employeenotifications/EmployeeNotifications.jsx';
 
 // Employee Components
 import EmployeeLayout from "../Components/Shared/Layout/EmployeeLayout";
@@ -42,7 +42,7 @@ import ClientMeetings from "../Components/Client/Meetings/ClientMeetings";
 import ClientReports from "../Components/Client/Reports/ClientReports";
 import FeedbackForm from "../Components/Client/Feedback/FeedbackForm";
 import ClientProfile from "../Components/Client/Profile/ClientProfile"; // ← ADDED
-import ClientNotifications from '../Components/Client/ClientNotifications/ClientNotifications.jsx';
+import ClientNotifications from '../Components/Client/Clientnotifications/ClientNotifications.jsx';
 
 // Loader
 import Loader from "../Components/Shared/Loader/Loader";
