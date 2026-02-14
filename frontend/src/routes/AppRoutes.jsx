@@ -24,7 +24,7 @@ import ReportGenerator from "../components/Admin/Reports/ReportGenerator";
 // import AdminNotifications from '../components/Admin/AdminNotifications/AdminNotifications'
 import EmployeeNotifications from '../components/Employee/Employeenotifications/EmployeeNotifications';
 
-// Employee components
+// Employee Components
 import EmployeeLayout from "../components/Shared/Layout/EmployeeLayout";
 import EmployeeDashboard from "../components/Employee/Dashboard/EmployeeDashboard";
 import MyTasks from "../components/Employee/Tasks/MyTasks";
@@ -34,7 +34,7 @@ import DailyReportForm from "../components/Employee/DailyReport/DailyReportForm"
 import EmployeeMeetings from "../components/Employee/Meetings/EmployeeMeetings";
 import EmployeeProfile from "../components/Employee/Profile/EmployeeProfile";
 
-// Client components
+// Client Components
 import ClientLayout from "../components/Shared/Layout/ClientLayout";
 import ClientDashboard from "../components/Client/Dashboard/ClientDashboard";
 import ClientProjects from "../components/Client/Projects/ClientProjects";
@@ -47,7 +47,7 @@ import ClientNotifications from '../components/Client/Clientnotifications/Client
 // Loader
 import Loader from "../components/Shared/Loader/Loader";
 
-// Error Pages components
+// Error Pages Components
 const UnauthorizedPage = () => {
   const navigate = useNavigate();
 
