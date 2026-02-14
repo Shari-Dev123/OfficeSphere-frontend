@@ -22,7 +22,7 @@ import MeetingList from "../components/Admin/Meetings/MeetingList";
 import ReportGenerator from "../components/Admin/Reports/ReportGenerator";
 // import AdminSettings from "../components/Admin/Settings/AdminSettings";
 // import AdminNotifications from '../components/Admin/AdminNotifications/AdminNotifications'
-import EmployeeNotifications from '../components/Employee/Employeenotifications/EmployeeNotifications';
+import EmployeeNotifications from '../components/Employee/EmployeeNotifications/EmployeeNotifications';
 
 // Employee Components
 import EmployeeLayout from "../components/Shared/Layout/EmployeeLayout";
