@@ -14,8 +14,8 @@ export default {
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
-      '@components': resolve(__dirname, './src/Components'),
-      '@shared': resolve(__dirname, './src/Components/Shared'),
+      '@components': resolve(__dirname, './src/components'),
+      '@shared': resolve(__dirname, './src/components/Shared'),
       '@utils': resolve(__dirname, './src/utils'),
       '@context': resolve(__dirname, './src/context'),
       '@hooks': resolve(__dirname, './src/hooks'),

@@ -35,7 +35,7 @@ export const getAddressFromCoordinates = async (latitude, longitude) => {
           const result = googleData.results[0];
           
           // Extract detailed address components
-          const addressComponents = result.address_components;
+          const addresscomponents = result.address_components;
           
           let street = '';
           let area = '';
@@ -44,7 +44,7 @@ export const getAddressFromCoordinates = async (latitude, longitude) => {
           let country = '';
           let postalCode = '';
 
-          addressComponents.forEach(component => {
+          addresscomponents.forEach(component => {
             const types = component.types;
             
             if (types.includes('street_number') || types.includes('route')) {

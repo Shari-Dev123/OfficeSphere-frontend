@@ -1,4 +1,4 @@
-// Components/Employee/EmployeeNotifications/EmployeeNotifications.jsx
+// components/Employee/EmployeeNotifications/EmployeeNotifications.jsx
 import React, { useState, useEffect } from 'react';
 import { employeeAPI } from '../../../utils/api';
 import { useSocket } from '../../../context/SocketContext';

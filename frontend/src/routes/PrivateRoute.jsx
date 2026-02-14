@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
-import Loader from '../Components/Shared/Loader/Loader';
+import Loader from '../components/Shared/Loader/Loader';
 
 function PrivateRoute({ children, allowedRoles }) {
   const { isAuthenticated, loading, user } = useAuth();

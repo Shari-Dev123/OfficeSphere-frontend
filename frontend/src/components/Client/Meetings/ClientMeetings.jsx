@@ -1,4 +1,4 @@
-// Components/Client/Meetings/ClientMeetings.jsx
+// components/Client/Meetings/ClientMeetings.jsx
 // ✅ FIXED VERSION - Shows meetings where client is organizer OR participant
 
 import React, { useState, useEffect } from 'react';

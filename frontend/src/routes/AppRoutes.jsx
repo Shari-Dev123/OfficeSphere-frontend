@@ -20,9 +20,9 @@ import CreateTask from "../components/Admin/Tasks/CreateTask";
 import EditTask from "../components/Admin/Tasks/EditTask";
 import MeetingList from "../components/Admin/Meetings/MeetingList";
 import ReportGenerator from "../components/Admin/Reports/ReportGenerator";
-// import AdminSettings from "../components/Admin/Settings/AdminSettings"; // TODO: Create this component
-// import AdminNotifications from '../components/Admin/AdminNotifications/AdminNotifications.jsx' // TODO: Create this component
-import EmployeeNotifications from '../components/Employee/Employeenotifications/EmployeeNotifications.jsx';
+// import AdminSettings from "../components/Admin/Settings/AdminSettings";
+// import AdminNotifications from '../components/Admin/AdminNotifications/AdminNotifications'
+import EmployeeNotifications from '../components/Employee/Employeenotifications/EmployeeNotifications';
 
 // Employee components
 import EmployeeLayout from "../components/Shared/Layout/EmployeeLayout";
@@ -42,10 +42,10 @@ import ClientMeetings from "../components/Client/Meetings/ClientMeetings";
 import ClientReports from "../components/Client/Reports/ClientReports";
 import FeedbackForm from "../components/Client/Feedback/FeedbackForm";
 import ClientProfile from "../components/Client/Profile/ClientProfile";
-import ClientNotifications from 'frontend/src/components/Client/Clientnotifications/Clientnotifications.jsx'; // TODO: Create this component
+import ClientNotifications from '../components/Client/Clientnotifications/Clientnotifications';
 
 // Loader
-import Loader from "frontend/src/components/Shared/Loader/Loader.jsx";
+import Loader from "../components/Shared/Loader/Loader";
 
 // Error Pages components
 const UnauthorizedPage = () => {
