@@ -3,7 +3,7 @@ import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import PrivateRoute from "./PrivateRoute";
 import { useAuth } from "../hooks/useAuth";
 
-import Login from "../Components/Auth/Login"; // OK if folder is 'Components/Auth'
+import Login from "../Components/Auth/Login";
 import Register from "../Components/Auth/Register";
 import AdminLayout from "../Components/Shared/Layout/AdminLayout";
 
@@ -16,12 +16,12 @@ import ProjectList from "../Components/Admin/Projects/ProjectList";
 import AddProject from "../Components/Admin/Projects/AddProject";
 import AttendanceMonitor from "../Components/Admin/Attendance/AttendanceMonitor";
 import TaskList from "../Components/Admin/Tasks/TaskList";
-import CreateTask from "../Components/Admin/Tasks/CreateTask"; // ✅ NEW
+import CreateTask from "../Components/Admin/Tasks/CreateTask";
 import EditTask from "../Components/Admin/Tasks/EditTask";
 import MeetingList from "../Components/Admin/Meetings/MeetingList";
 import ReportGenerator from "../Components/Admin/Reports/ReportGenerator";
-import AdminSettings from "../Components/Admin/Settings/AdminSettings"; // ← ADDED
-import AdminNotifications from '../Components/Admin/AdminNotifications/AdminNotifications.jsx'
+// import AdminSettings from "../Components/Admin/Settings/AdminSettings"; // TODO: Create this component
+// import AdminNotifications from '../Components/Admin/AdminNotifications/AdminNotifications.jsx' // TODO: Create this component
 import EmployeeNotifications from '../Components/Employee/Employeenotifications/EmployeeNotifications.jsx';
 
 // Employee Components
@@ -41,7 +41,7 @@ import ClientProjects from "../Components/Client/Projects/ClientProjects";
 import ClientMeetings from "../Components/Client/Meetings/ClientMeetings";
 import ClientReports from "../Components/Client/Reports/ClientReports";
 import FeedbackForm from "../Components/Client/Feedback/FeedbackForm";
-import ClientProfile from "../Components/Client/Profile/ClientProfile"; // ← ADDED
+import ClientProfile from "../Components/Client/Profile/ClientProfile";
 import ClientNotifications from '../Components/Client/Clientnotifications/ClientNotifications.jsx';
 
 // Loader
@@ -202,7 +202,7 @@ function AppRoutes() {
         }
         
       >
-        <Route path="notifications" element={<AdminNotifications />} />
+        {/* <Route path="notifications" element={<AdminNotifications />} /> */}
         <Route index element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="employees" element={<EmployeeList />} />
@@ -217,7 +217,7 @@ function AppRoutes() {
         <Route path="tasks/edit/:id" element={<EditTask />} />
         <Route path="meetings" element={<MeetingList />} />
         <Route path="reports" element={<ReportGenerator />} />
-        <Route path="settings" element={<AdminSettings />} /> {/* ← ADDED */}
+        {/* <Route path="settings" element={<AdminSettings />} /> */}
       </Route>
 
       {/* Employee Routes */}
@@ -256,7 +256,7 @@ function AppRoutes() {
         <Route path="meetings" element={<ClientMeetings />} />
         <Route path="reports" element={<ClientReports />} />
         <Route path="feedback" element={<FeedbackForm />} />
-        <Route path="profile" element={<ClientProfile />} /> {/* ← ADDED */}
+        <Route path="profile" element={<ClientProfile />} />
       </Route>
 
       {/* Default Redirect */}
