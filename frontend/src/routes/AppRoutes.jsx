@@ -3,51 +3,51 @@ import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import PrivateRoute from "./PrivateRoute";
 import { useAuth } from "../hooks/useAuth";
 
-import Login from "../Components/Auth/Login";
-import Register from "../Components/Auth/Register";
-import AdminLayout from "../Components/Shared/Layout/AdminLayout";
+import Login from "../components/Auth/Login";
+import Register from "../components/Auth/Register";
+import AdminLayout from "../components/Shared/Layout/AdminLayout";
 
-import AdminDashboard from "../Components/Admin/Dashboard/AdminDashboard";
-import EmployeeList from "../Components/Admin/Employees/EmployeeList";
-import AddEmployee from "../Components/Admin/Employees/AddEmployee";
-import ClientList from "../Components/Admin/Clients/ClientList";
-import AddClient from "../Components/Admin/Clients/AddClient";
-import ProjectList from "../Components/Admin/Projects/ProjectList";
-import AddProject from "../Components/Admin/Projects/AddProject";
-import AttendanceMonitor from "../Components/Admin/Attendance/AttendanceMonitor";
-import TaskList from "../Components/Admin/Tasks/TaskList";
-import CreateTask from "../Components/Admin/Tasks/CreateTask";
-import EditTask from "../Components/Admin/Tasks/EditTask";
-import MeetingList from "../Components/Admin/Meetings/MeetingList";
-import ReportGenerator from "../Components/Admin/Reports/ReportGenerator";
-// import AdminSettings from "../Components/Admin/Settings/AdminSettings"; // TODO: Create this component
-// import AdminNotifications from '../Components/Admin/AdminNotifications/AdminNotifications.jsx' // TODO: Create this component
-import EmployeeNotifications from '../Components/Employee/Employeenotifications/EmployeeNotifications.jsx';
+import AdminDashboard from "../components/Admin/Dashboard/AdminDashboard";
+import EmployeeList from "../components/Admin/Employees/EmployeeList";
+import AddEmployee from "../components/Admin/Employees/AddEmployee";
+import ClientList from "../components/Admin/Clients/ClientList";
+import AddClient from "../components/Admin/Clients/AddClient";
+import ProjectList from "../components/Admin/Projects/ProjectList";
+import AddProject from "../components/Admin/Projects/AddProject";
+import AttendanceMonitor from "../components/Admin/Attendance/AttendanceMonitor";
+import TaskList from "../components/Admin/Tasks/TaskList";
+import CreateTask from "../components/Admin/Tasks/CreateTask";
+import EditTask from "../components/Admin/Tasks/EditTask";
+import MeetingList from "../components/Admin/Meetings/MeetingList";
+import ReportGenerator from "../components/Admin/Reports/ReportGenerator";
+// import AdminSettings from "../components/Admin/Settings/AdminSettings"; // TODO: Create this component
+// import AdminNotifications from '../components/Admin/AdminNotifications/AdminNotifications.jsx' // TODO: Create this component
+import EmployeeNotifications from '../components/Employee/Employeenotifications/EmployeeNotifications.jsx';
 
-// Employee Components
-import EmployeeLayout from "../Components/Shared/Layout/EmployeeLayout";
-import EmployeeDashboard from "../Components/Employee/Dashboard/EmployeeDashboard";
-import MyTasks from "../Components/Employee/Tasks/MyTasks";
-import AutoAttendance from "../Components/Employee/Attendance/AutoAttendance";
-import MyProjects from "../Components/Employee/Projects/MyProjects";
-import DailyReportForm from "../Components/Employee/DailyReport/DailyReportForm";
-import EmployeeMeetings from "../Components/Employee/Meetings/EmployeeMeetings";
-import EmployeeProfile from "../Components/Employee/Profile/EmployeeProfile";
+// Employee components
+import EmployeeLayout from "../components/Shared/Layout/EmployeeLayout";
+import EmployeeDashboard from "../components/Employee/Dashboard/EmployeeDashboard";
+import MyTasks from "../components/Employee/Tasks/MyTasks";
+import AutoAttendance from "../components/Employee/Attendance/AutoAttendance";
+import MyProjects from "../components/Employee/Projects/MyProjects";
+import DailyReportForm from "../components/Employee/DailyReport/DailyReportForm";
+import EmployeeMeetings from "../components/Employee/Meetings/EmployeeMeetings";
+import EmployeeProfile from "../components/Employee/Profile/EmployeeProfile";
 
-// Client Components
-import ClientLayout from "../Components/Shared/Layout/ClientLayout";
-import ClientDashboard from "../Components/Client/Dashboard/ClientDashboard";
-import ClientProjects from "../Components/Client/Projects/ClientProjects";
-import ClientMeetings from "../Components/Client/Meetings/ClientMeetings";
-import ClientReports from "../Components/Client/Reports/ClientReports";
-import FeedbackForm from "../Components/Client/Feedback/FeedbackForm";
-import ClientProfile from "../Components/Client/Profile/ClientProfile";
+// Client components
+import ClientLayout from "../components/Shared/Layout/ClientLayout";
+import ClientDashboard from "../components/Client/Dashboard/ClientDashboard";
+import ClientProjects from "../components/Client/Projects/ClientProjects";
+import ClientMeetings from "../components/Client/Meetings/ClientMeetings";
+import ClientReports from "../components/Client/Reports/ClientReports";
+import FeedbackForm from "../components/Client/Feedback/FeedbackForm";
+import ClientProfile from "../components/Client/Profile/ClientProfile";
 import ClientNotifications from 'frontend/src/components/Client/Clientnotifications/Clientnotifications.jsx'; // TODO: Create this component
 
 // Loader
-import Loader from "../Components/Shared/Loader/Loader";
+import Loader from "frontend/src/components/Shared/Loader/Loader.jsx";
 
-// Error Pages Components
+// Error Pages components
 const UnauthorizedPage = () => {
   const navigate = useNavigate();
 
