@@ -42,7 +42,7 @@ import ClientMeetings from "../Components/Client/Meetings/ClientMeetings";
 import ClientReports from "../Components/Client/Reports/ClientReports";
 import FeedbackForm from "../Components/Client/Feedback/FeedbackForm";
 import ClientProfile from "../Components/Client/Profile/ClientProfile";
-import ClientNotifications from '../Components/Client/Clientnotifications/ClientNotifications.jsx';
+import ClientNotifications from 'frontend/src/components/Client/Clientnotifications/Clientnotifications.jsx'; // TODO: Create this component
 
 // Loader
 import Loader from "../Components/Shared/Loader/Loader";
