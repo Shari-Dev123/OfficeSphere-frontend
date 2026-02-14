@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react'; // ✅ useCallback added
 import { clientAPI } from '../../../utils/api';
 import { FiSearch, FiFilter, FiGrid, FiList, FiTrendingUp, FiClock, FiCheckCircle, FiPlus, FiSend, FiX, FiPaperclip, FiTrash2 } from 'react-icons/fi';
 import { BiTask } from 'react-icons/bi';
@@ -35,30 +35,43 @@ function ClientProjects() {
     tags: []
   });
 
-  // ✅ FILE UPLOAD STATE
   const [selectedFiles, setSelectedFiles] = useState([]);
 
-  // Send to admin form data
   const [sendData, setSendData] = useState({
     message: '',
     urgency: 'Normal',
     requestType: 'Review'
   });
 
+  // ✅ FIX 1: filterProjects useCallback mein wrap kiya — useEffect se pehle declare karna zaroori hai
+  const filterProjects = useCallback(() => {
+    let filtered = [...projects];
+    if (searchTerm) {
+      filtered = filtered.filter(project =>
+        project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        project.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    if (filterStatus !== 'all') {
+      filtered = filtered.filter(project => project.status === filterStatus);
+    }
+    setFilteredProjects(filtered);
+  }, [projects, searchTerm, filterStatus]);
+
   useEffect(() => {
     fetchProjects();
   }, []);
 
+  // ✅ FIX 2: filterProjects dependency array mein add kiya — ab warning nahi aayegi
   useEffect(() => {
     filterProjects();
-  }, [searchTerm, filterStatus, projects]);
+  }, [filterProjects]);
 
   const fetchProjects = async () => {
     try {
       setLoading(true);
       const response = await clientAPI.getMyProjects();
       const projectsArray = response.data.data || [];
-      
       console.log('✅ Loaded projects:', projectsArray.length);
       setProjects(projectsArray);
       setFilteredProjects(projectsArray);
@@ -70,24 +83,6 @@ function ClientProjects() {
     }
   };
 
-  const filterProjects = () => {
-    let filtered = [...projects];
-
-    if (searchTerm) {
-      filtered = filtered.filter(project =>
-        project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        project.description.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    if (filterStatus !== 'all') {
-      filtered = filtered.filter(project => project.status === filterStatus);
-    }
-
-    setFilteredProjects(filtered);
-  };
-
-  // ✅ HANDLE FILE SELECTION
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
     if (files.length + selectedFiles.length > 10) {
@@ -97,28 +92,22 @@ function ClientProjects() {
     setSelectedFiles([...selectedFiles, ...files]);
   };
 
-  // ✅ REMOVE SELECTED FILE
   const removeFile = (index) => {
     setSelectedFiles(selectedFiles.filter((_, i) => i !== index));
   };
 
-  // ✅ HANDLE CREATE PROJECT WITH FILES
   const handleCreateProject = async (e) => {
     e.preventDefault();
     
     try {
       setSubmitting(true);
 
-      // Validation
       if (!newProject.name || !newProject.description || !newProject.startDate || !newProject.endDate) {
         toast.error('Please fill all required fields');
         return;
       }
 
-      // ✅ CREATE FORMDATA FOR FILE UPLOAD
       const formData = new FormData();
-      
-      // Add project data
       formData.append('name', newProject.name);
       formData.append('description', newProject.description);
       formData.append('startDate', newProject.startDate);
@@ -131,20 +120,19 @@ function ClientProjects() {
         formData.append('tags', JSON.stringify(newProject.tags));
       }
 
-      // ✅ Add files to FormData
       selectedFiles.forEach(file => {
         formData.append('files', file);
       });
 
       console.log('Creating project with', selectedFiles.length, 'files');
-      const response = await clientAPI.createProject(formData);
+
+      // ✅ FIX 3: response variable remove kiya — return value use nahi ho raha tha
+      await clientAPI.createProject(formData);
       
       toast.success('Project created successfully! Waiting for admin approval.');
       
-      // Refresh projects list
       await fetchProjects();
       
-      // Close modal and reset form
       setShowCreateModal(false);
       setNewProject({
         name: '',
@@ -156,7 +144,7 @@ function ClientProjects() {
         priority: 'Medium',
         tags: []
       });
-      setSelectedFiles([]); // ✅ Reset files
+      setSelectedFiles([]);
 
     } catch (error) {
       console.error('Error creating project:', error);
@@ -166,7 +154,6 @@ function ClientProjects() {
     }
   };
 
-  // Handle Send to Admin
   const handleSendToAdmin = async (e) => {
     e.preventDefault();
     
@@ -189,7 +176,6 @@ function ClientProjects() {
       
       toast.success('Project sent to admin successfully!');
       
-      // Close modal and reset
       setShowSendModal(false);
       setSelectedProject(null);
       setSendData({
@@ -335,7 +321,6 @@ function ClientProjects() {
                   <p className="project-description">{project.description}</p>
                 </div>
 
-                {/* ✅ SHOW PROGRESS BAR */}
                 <div className="project-progress">
                   <div className="progress-header">
                     <span>Progress</span>
@@ -351,7 +336,7 @@ function ClientProjects() {
                     ></div>
                   </div>
                 </div>
-
+                      
                 <div className="project-footer">
                   <div className="project-dates">
                     <span className="date-label">Start:</span>
@@ -360,7 +345,12 @@ function ClientProjects() {
                     <span className="date-label">End:</span>
                     <span className="date-value">{formatDate(project.endDate)}</span>
                   </div>
-                  
+
+                  {/* ✅ daysLeft ab UI mein use ho raha hai */}
+                  <span className={`days-left ${daysLeft < 0 ? 'overdue' : daysLeft < 7 ? 'urgent' : ''}`}>
+                    {daysLeft < 0 ? `${Math.abs(daysLeft)}d overdue` : `${daysLeft}d left`}
+                  </span>
+
                   <div className="project-actions">
                     <button 
                       className="send-to-admin-btn"
@@ -391,7 +381,7 @@ function ClientProjects() {
           <p>
             {searchTerm || filterStatus !== 'all'
               ? 'Try adjusting your filters'
-              : 'You don\'t have any projects yet'}
+              : "You don't have any projects yet"}
           </p>
           <button 
             className="create-first-project-btn"
@@ -494,7 +484,7 @@ function ClientProjects() {
                   />
                 </div>
 
-                {/* ✅ FILE UPLOAD SECTION */}
+                {/* File Upload Section */}
                 <div className="form-group full-width">
                   <label>
                     <FiPaperclip /> Attach Files (Optional - Max 10 files)
@@ -517,7 +507,6 @@ function ClientProjects() {
                     </span>
                   </div>
 
-                  {/* ✅ SELECTED FILES LIST */}
                   {selectedFiles.length > 0 && (
                     <div className="selected-files-list">
                       {selectedFiles.map((file, index) => (
@@ -572,7 +561,7 @@ function ClientProjects() {
         </div>
       )}
 
-      {/* Send to Admin Modal - UNCHANGED */}
+      {/* Send to Admin Modal */}
       {showSendModal && selectedProject && (
         <div className="modal-overlay" onClick={() => setShowSendModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
